@@ -1,0 +1,40 @@
+{
+  "name": "firstdraft",
+  "version": "0.1.0",
+  "description": "Screenplay-aware writing assistance for Obsidian, with portable Fountain source.",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs production",
+    "dev": "node esbuild.config.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test-vault": "npm run build && node scripts/install-test-vault.mjs"
+  },
+  "keywords": [
+    "obsidian",
+    "fountain",
+    "screenplay",
+    "screenwriting"
+  ],
+  "author": "Christian Grobmeier",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12 <23 || >=24"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "esbuild": "0.25.5",
+    "eslint": "^9.39.4",
+    "globals": "^17.6.0",
+    "obsidian": "latest",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.59.1",
+    "vite": "8.3.0",
+    "vitest": "5.0.1"
+  }
+}
