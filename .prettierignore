@@ -1,0 +1,4 @@
+main.js
+node_modules/
+.test-vault/
+package-lock.json
