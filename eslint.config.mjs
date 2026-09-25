@@ -3,7 +3,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["main.js", "node_modules", ".test-vault"] },
+  { ignores: ["main.js", "node_modules", "First Draft Test Vault"] },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {

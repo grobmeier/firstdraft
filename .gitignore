@@ -1,6 +1,6 @@
 node_modules/
 main.js
 *.map
-.test-vault/
+First Draft Test Vault/
 coverage/
 .DS_Store

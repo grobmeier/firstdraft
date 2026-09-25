@@ -10,7 +10,7 @@ human-readable, and useful when the plugin is not installed.
 > First Draft is in early private development. It is not yet available in the
 > Obsidian community-plugin directory.
 
-## Milestone 1
+## Milestone 2
 
 The current build provides:
 
@@ -18,10 +18,14 @@ The current build provides:
 - screenplay mode for Markdown notes with `screenplay: true` frontmatter;
 - Fountain-aware scene and character parsing;
 - a debounced status item with word and scene counts;
-- settings to disable either activation method.
+- context-aware character, character-extension, scene-location, and time
+  autocomplete;
+- keyboard-first Character, Character Extension, and New Scene commands;
+- settings for activation, autocomplete ranking, result limits, scene types,
+  and times of day.
 
-Autocomplete, screenplay commands, page/runtime estimates, and exports are
-planned for later milestones.
+Page/runtime estimates, the statistics dialog, parenthetical and transition
+helpers, and exports are planned for later milestones.
 
 ## Development
 
@@ -40,18 +44,25 @@ Run `npm run dev` for a watch build.
 ## Test safely in Obsidian
 
 Never develop against your everyday vault. Build and install into the ignored,
-repository-local test vault:
+repository-local `First Draft Test Vault` directory:
 
 ```bash
 npm run test-vault
 ```
 
-Then open `.test-vault` as a separate Obsidian vault, enable **First Draft** in
-Settings → Community plugins, and open `Milestone 1.md`.
+Then open the visible `First Draft Test Vault` directory as a separate Obsidian
+vault, enable or reload **First Draft** in Settings → Community plugins, and
+open `Milestone 2.md`.
 
 Expected result:
 
-- the status bar shows `Screenplay · 7 words · 1 scenes`;
+- type `JA` on the final blank line: choose `JANE` with Tab or Enter and start
+  typing dialogue on the next line;
+- type `INT. MIL`, accept a known location, then accept a time;
+- run `Screenplay: New Scene` from the command palette and complete all three
+  steps without the mouse;
+- put the caret on a character cue and run
+  `Screenplay: Character Extension`;
 - changing dialogue updates the word count after a short delay;
 - removing `screenplay: true` and reopening the note hides the item;
 - creating a `.fountain` file activates it without frontmatter;

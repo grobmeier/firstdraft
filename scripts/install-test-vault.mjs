@@ -8,7 +8,7 @@ const projectRoot = path.resolve(
   "..",
 );
 const vaultRoot = path.resolve(
-  process.argv[2] ?? path.join(projectRoot, ".test-vault"),
+  process.argv[2] ?? path.join(projectRoot, "First Draft Test Vault"),
 );
 const pluginRoot = path.join(vaultRoot, ".obsidian", "plugins", "firstdraft");
 
@@ -21,9 +21,20 @@ await copyFile(
   path.join(projectRoot, "manifest.json"),
   path.join(pluginRoot, "manifest.json"),
 );
+await copyFile(
+  path.join(projectRoot, "styles.css"),
+  path.join(pluginRoot, "styles.css"),
+);
 await writeFile(
   path.join(vaultRoot, "Milestone 1.md"),
-  `---\nscreenplay: true\n---\n\nINT. TEST ROOM - DAY\n\nJANE\n+It works.\n`,
+  `---\nscreenplay: true\n---\n\nINT. TEST ROOM - DAY\n\nJANE\nIt works.\n`,
+  { flag: "wx" },
+).catch((error) => {
+  if (error?.code !== "EEXIST") throw error;
+});
+await writeFile(
+  path.join(vaultRoot, "Milestone 2.md"),
+  `---\nscreenplay: true\n---\n\nINT. MILITARY BASE - THERAPY ROOM - DAY\n\nDR. JANE MORROW, 42, enters.\n\nJANE\nHow long have you been having these dreams?\n\nMILLER\nSince I died.\n\nINT. MILITARY BASE - WARD - NIGHT\n\nREEVES\nMiller is awake.\n\nJANE\nI'll be there.\n\n`,
   { flag: "wx" },
 ).catch((error) => {
   if (error?.code !== "EEXIST") throw error;
