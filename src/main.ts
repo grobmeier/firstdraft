@@ -1,5 +1,12 @@
 import { MarkdownView, Plugin } from "obsidian";
 import type { TFile } from "obsidian";
+import { openCharacterPicker } from "./commands/character";
+import {
+  isLikelyCharacterCue,
+  openCharacterExtension,
+} from "./commands/characterExtension";
+import { openNewScene } from "./commands/newScene";
+import { createScreenplayCompletionExtension } from "./editor/completion";
 import { isScreenplayMode } from "./screenplay/mode";
 import { parseFountain } from "./screenplay/parser";
 import { calculateStatistics } from "./screenplay/statistics";
@@ -19,7 +26,42 @@ export default class FirstDraftPlugin extends Plugin {
     this.registerExtensions(["fountain"], "markdown");
     this.statusBarItem = this.addStatusBarItem();
     this.statusBarItem.addClass("firstdraft-status");
+    this.statusBarItem.hide();
     this.addSettingTab(new FirstDraftSettingTab(this.app, this));
+    this.registerEditorExtension(createScreenplayCompletionExtension(this));
+
+    this.addCommand({
+      id: "screenplay-new-scene",
+      name: "Screenplay: New Scene",
+      editorCheckCallback: (checking, editor, context) => {
+        if (!this.isScreenplayFile(context.file)) return false;
+        if (!checking) openNewScene(this, editor);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-character",
+      name: "Screenplay: Character",
+      editorCheckCallback: (checking, editor, context) => {
+        if (!this.isScreenplayFile(context.file)) return false;
+        if (!checking) openCharacterPicker(this, editor);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-character-extension",
+      name: "Screenplay: Character Extension",
+      editorCheckCallback: (checking, editor, context) => {
+        if (
+          !this.isScreenplayFile(context.file) ||
+          !isLikelyCharacterCue(editor.getLine(editor.getCursor().line))
+        ) {
+          return false;
+        }
+        if (!checking) openCharacterExtension(this, editor);
+        return true;
+      },
+    });
 
     this.registerEvent(
       this.app.workspace.on("active-leaf-change", () => this.scheduleRefresh()),
@@ -50,6 +92,13 @@ export default class FirstDraftPlugin extends Plugin {
     await this.saveData(this.settings);
   }
 
+  isScreenplayFile(file: TFile | null): boolean {
+    const frontmatter = file
+      ? this.app.metadataCache.getFileCache(file)?.frontmatter
+      : undefined;
+    return isScreenplayMode(file, frontmatter, this.settings);
+  }
+
   refreshStatus(): void {
     if (this.refreshTimer !== null) {
       clearTimeout(this.refreshTimer);
@@ -58,11 +107,7 @@ export default class FirstDraftPlugin extends Plugin {
 
     const view = this.app.workspace.getActiveViewOfType(MarkdownView);
     const file = view?.file ?? null;
-    const frontmatter = file
-      ? this.app.metadataCache.getFileCache(file)?.frontmatter
-      : undefined;
-
-    if (view === null || !isScreenplayMode(file, frontmatter, this.settings)) {
+    if (view === null || !this.isScreenplayFile(file)) {
       this.statusBarItem?.hide();
       return;
     }
