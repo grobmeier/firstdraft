@@ -70,6 +70,7 @@ function pushElement(
 export function parseFountain(source: string): ScreenplayDocument {
   const lines = withoutFrontmatter(source).split("\n");
   const elements: ScreenplayElement[] = [];
+  let blankLines = 0;
   let inDialogue = false;
 
   for (let index = 0; index < lines.length; index += 1) {
@@ -80,6 +81,7 @@ export function parseFountain(source: string): ScreenplayDocument {
       index === lines.length - 1 || (lines[index + 1]?.trim() ?? "") === "";
 
     if (text === "") {
+      blankLines += 1;
       inDialogue = false;
       continue;
     }
@@ -116,5 +118,5 @@ export function parseFountain(source: string): ScreenplayDocument {
     pushElement(elements, "action", raw, index + 1);
   }
 
-  return { elements };
+  return { elements, blankLines };
 }

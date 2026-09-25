@@ -14,6 +14,25 @@ export interface ScreenplayElement {
 
 export interface ScreenplayDocument {
   elements: ScreenplayElement[];
+  blankLines: number;
+}
+
+export type PageSize = "us-letter" | "a4";
+
+export interface PageEstimate {
+  pages: number;
+  formattedLines: number;
+}
+
+export interface PageEstimationOptions {
+  pageSize: PageSize;
+}
+
+export interface PageEstimator {
+  estimate(
+    document: ScreenplayDocument,
+    options: PageEstimationOptions,
+  ): PageEstimate;
 }
 
 export interface CharacterUsage {
