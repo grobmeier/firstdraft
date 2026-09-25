@@ -10,11 +10,13 @@ import { createScreenplayCompletionExtension } from "./editor/completion";
 import { isScreenplayMode } from "./screenplay/mode";
 import { parseFountain } from "./screenplay/parser";
 import { calculateStatistics } from "./screenplay/statistics";
+import { formatScreenplayStatus } from "./screenplay/status";
 import {
   DEFAULT_SETTINGS,
   FirstDraftSettingTab,
   type FirstDraftSettings,
 } from "./settings/settings";
+import { StatisticsModal } from "./ui/statisticsModal";
 
 export default class FirstDraftPlugin extends Plugin {
   settings: FirstDraftSettings = { ...DEFAULT_SETTINGS };
@@ -62,6 +64,18 @@ export default class FirstDraftPlugin extends Plugin {
         return true;
       },
     });
+    this.addCommand({
+      id: "screenplay-show-statistics",
+      name: "Screenplay: Show Statistics",
+      checkCallback: (checking) => {
+        const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (view === null || !this.isScreenplayFile(view.file)) return false;
+        if (!checking) {
+          new StatisticsModal(this.app, this.statisticsFor(view)).open();
+        }
+        return true;
+      },
+    });
 
     this.registerEvent(
       this.app.workspace.on("active-leaf-change", () => this.scheduleRefresh()),
@@ -105,6 +119,11 @@ export default class FirstDraftPlugin extends Plugin {
       this.refreshTimer = null;
     }
 
+    if (!this.settings.statusBarEnabled) {
+      this.statusBarItem?.hide();
+      return;
+    }
+
     const view = this.app.workspace.getActiveViewOfType(MarkdownView);
     const file = view?.file ?? null;
     if (view === null || !this.isScreenplayFile(file)) {
@@ -112,15 +131,17 @@ export default class FirstDraftPlugin extends Plugin {
       return;
     }
 
-    const statistics = calculateStatistics(
-      parseFountain(view.editor.getValue()),
-    );
-    this.statusBarItem?.setText(
-      `Screenplay · ${statistics.words.toLocaleString()} words · ${statistics.scenes} scenes`,
-    );
+    const statistics = this.statisticsFor(view);
+    const status = formatScreenplayStatus(statistics, {
+      estimatedPages: this.settings.showEstimatedPages,
+      estimatedRuntime: this.settings.showEstimatedRuntime,
+      words: this.settings.showWordCount,
+      scenes: this.settings.showSceneCount,
+    });
+    this.statusBarItem?.setText(status);
     this.statusBarItem?.setAttribute(
       "aria-label",
-      `First Draft screenplay statistics: ${statistics.words} words, ${statistics.scenes} scenes`,
+      `First Draft screenplay statistics: ${status}`,
     );
     this.statusBarItem?.show();
   }
@@ -131,6 +152,13 @@ export default class FirstDraftPlugin extends Plugin {
       () => this.refreshStatus(),
       this.settings.updateDelayMs,
     );
+  }
+
+  private statisticsFor(view: MarkdownView) {
+    return calculateStatistics(parseFountain(view.editor.getValue()), {
+      pageSize: this.settings.pageSize,
+      minutesPerPage: this.settings.minutesPerPage,
+    });
   }
 
   private activeFile(): TFile | null {

@@ -56,4 +56,9 @@ export interface ScreenplayStatistics {
   scenes: number;
   words: number;
   characters: CharacterUsage[];
+  locations: string[];
+  dialogueBlocks: number;
+  actionBlocks: number;
+  estimatedPages: number;
+  estimatedRuntimeMinutes: number;
 }

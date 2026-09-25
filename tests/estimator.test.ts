@@ -16,6 +16,7 @@ JANE
 The room is silent except for rain tapping steadily against the windows.
 `);
 
+    expect(estimateScreenplayPages(base).pages).toBe(0.1);
     expect(estimateScreenplayPages(withAction).formattedLines).toBeGreaterThan(
       estimateScreenplayPages(base).formattedLines,
     );

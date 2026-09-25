@@ -38,7 +38,8 @@ const PAGE_METRICS: Record<PageSize, PageMetrics> = {
 };
 
 function roundedPageCount(value: number): number {
-  return Math.round(value * 10) / 10;
+  if (value === 0) return 0;
+  return Math.max(0.1, Math.round(value * 10) / 10);
 }
 
 export function wrappedLineCount(text: string, width: number): number {
