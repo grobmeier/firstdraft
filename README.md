@@ -10,7 +10,7 @@ human-readable, and useful when the plugin is not installed.
 > First Draft is in early private development. It is not yet available in the
 > Obsidian community-plugin directory.
 
-## Milestone 2
+## Milestone 3
 
 The current build provides:
 
@@ -18,14 +18,17 @@ The current build provides:
 - screenplay mode for Markdown notes with `screenplay: true` frontmatter;
 - Fountain-aware scene and character parsing;
 - a debounced status item with word and scene counts;
+- screenplay-aware estimated pages for US Letter or A4;
+- configurable runtime estimation based on minutes per page;
+- a current-document statistics dialog with character dialogue rankings;
 - context-aware character, character-extension, scene-location, and time
   autocomplete;
 - keyboard-first Character, Character Extension, and New Scene commands;
 - settings for activation, autocomplete ranking, result limits, scene types,
   and times of day.
 
-Page/runtime estimates, the statistics dialog, parenthetical and transition
-helpers, and exports are planned for later milestones.
+Parenthetical and transition helpers, Fountain export, and Final Draft export
+are planned for later milestones.
 
 ## Development
 
@@ -52,10 +55,15 @@ npm run test-vault
 
 Then open the visible `First Draft Test Vault` directory as a separate Obsidian
 vault, enable or reload **First Draft** in Settings → Community plugins, and
-open `Milestone 2.md`.
+open `Milestone 3.md`.
 
 Expected result:
 
+- the status bar shows estimated pages, estimated runtime, words, and scenes;
+- run `Screenplay: Show Statistics` to see document totals and dialogue counts
+  by character;
+- switch page size, minutes per page, or individual status fields under
+  Settings → First Draft and confirm the display updates;
 - type `JA` on the final blank line: choose `JANE` with Tab or Enter and start
   typing dialogue on the next line;
 - type `INT. MIL`, accept a known location, then accept a time;

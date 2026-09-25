@@ -39,5 +39,12 @@ await writeFile(
 ).catch((error) => {
   if (error?.code !== "EEXIST") throw error;
 });
+await writeFile(
+  path.join(vaultRoot, "Milestone 3.md"),
+  `---\nscreenplay: true\n---\n\nINT. MILITARY BASE - THERAPY ROOM - DAY\n\nRain traces the reinforced windows. DR. JANE MORROW, 42, studies a silent monitor.\n\nJANE\nHow long have you been having these dreams?\n\nMILLER\nSince I died.\n\nJANE\nThat is not the answer I expected.\n\nINT. MILITARY BASE - WARD - NIGHT\n\nOrderlies hurry between curtained beds as an alarm begins to pulse.\n\nREEVES\nMiller is awake.\n\nJANE\nI'll be there.\n\nEXT. MILITARY BASE - PARADE GROUND - DAWN\n\nThe rain has stopped. Miller stands alone beneath the first pale light.\n\n`,
+  { flag: "wx" },
+).catch((error) => {
+  if (error?.code !== "EEXIST") throw error;
+});
 
 console.log(`Installed First Draft in test vault: ${vaultRoot}`);
