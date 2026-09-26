@@ -10,7 +10,7 @@ human-readable, and useful when the plugin is not installed.
 > First Draft is in early private development. It is not yet available in the
 > Obsidian community-plugin directory.
 
-## Milestone 5
+## Version 0.6
 
 The current build provides:
 
@@ -26,6 +26,8 @@ The current build provides:
 - non-destructive export to a clean `.fountain` file;
 - non-destructive Final Draft `.fdx` export for the six core screenplay element
   types;
+- a dockable First Draft Palette with contextual actions and recent screenplay
+  elements;
 - context-aware character, character-extension, scene-location, and time
   autocomplete;
 - keyboard-first Character, Character Extension, and New Scene commands;
@@ -60,10 +62,17 @@ npm run test-vault
 
 Then open the visible `First Draft Test Vault` directory as a separate Obsidian
 vault, enable or reload **First Draft** in Settings → Community plugins, and
-open `Milestone 5.md`.
+open `Milestone 4.md`.
 
 Expected result:
 
+- click the clapperboard ribbon icon or run
+  `Screenplay: Open First Draft Palette`; the panel opens in the right sidebar;
+- move the caret between a character cue, dialogue, and a blank line and confirm
+  the highlighted first action changes appropriately;
+- click a recent character, parenthetical, or transition to insert it, or click
+  a recent location to start a New Scene using that location;
+- filter recent items from the panel without losing keyboard focus;
 - the status bar shows estimated pages, estimated runtime, words, and scenes;
 - run `Screenplay: Show Statistics` to see document totals and dialogue counts
   by character;
