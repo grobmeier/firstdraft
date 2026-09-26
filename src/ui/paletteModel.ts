@@ -3,6 +3,7 @@ import { isLikelyCharacterCue } from "../screenplay/characterExtension";
 export type PaletteAction =
   | "character"
   | "character-extension"
+  | "character-page"
   | "parenthetical"
   | "new-scene"
   | "transition";
@@ -40,6 +41,7 @@ export function orderPaletteActions(
   if (isLikelyCharacterCue(line)) {
     return [
       "character-extension",
+      "character-page",
       "parenthetical",
       "character",
       "new-scene",
@@ -47,10 +49,28 @@ export function orderPaletteActions(
     ];
   }
   if (isDialogueContext(lines, lineNumber)) {
-    return ["parenthetical", "character", "new-scene", "transition"];
+    return [
+      "parenthetical",
+      "character",
+      "character-page",
+      "new-scene",
+      "transition",
+    ];
   }
   if (line === "") {
-    return ["new-scene", "character", "transition", "parenthetical"];
+    return [
+      "new-scene",
+      "character",
+      "character-page",
+      "transition",
+      "parenthetical",
+    ];
   }
-  return ["character", "new-scene", "transition", "parenthetical"];
+  return [
+    "character",
+    "character-page",
+    "new-scene",
+    "transition",
+    "parenthetical",
+  ];
 }

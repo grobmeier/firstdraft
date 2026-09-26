@@ -7,6 +7,7 @@ import {
   isLikelyCharacterCue,
   openCharacterExtension,
 } from "./commands/characterExtension";
+import { openCharacterDossier } from "./commands/characterPage";
 import { openNewScene } from "./commands/newScene";
 import { openParenthetical } from "./commands/parenthetical";
 import { openTransition } from "./commands/transition";
@@ -68,6 +69,17 @@ export default class FirstDraftPlugin extends Plugin {
       editorCheckCallback: (checking, editor, context) => {
         if (!this.isScreenplayFile(context.file)) return false;
         if (!checking) openCharacterPicker(this, editor);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-character-page",
+      name: "Screenplay: Open or Create Character Page",
+      editorCheckCallback: (checking, editor, context) => {
+        if (!this.isScreenplayFile(context.file) || context.file === null) {
+          return false;
+        }
+        if (!checking) openCharacterDossier(this, editor, context.file);
         return true;
       },
     });

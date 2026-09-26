@@ -4,6 +4,17 @@ const HAS_LETTER = /\p{L}/u;
 const LOWERCASE_LETTER = /\p{Ll}/u;
 const STANDARD_TRANSITION = /(?:TO:|FADE IN:|FADE OUT\.)$/u;
 
+export function characterNameFromCue(line: string): string | null {
+  if (!isLikelyCharacterCue(line)) return null;
+  return line
+    .trim()
+    .replace(/^@/u, "")
+    .replace(/\s*\^\s*$/u, "")
+    .replace(/\s+\([^)]*\)\s*$/u, "")
+    .trim()
+    .toLocaleUpperCase();
+}
+
 export function isLikelyCharacterCue(line: string): boolean {
   const text = line.trim();
   const forced = text.startsWith("@");

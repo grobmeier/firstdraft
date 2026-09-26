@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  characterNameFromCue,
   isLikelyCharacterCue,
   withCharacterExtension,
 } from "../src/screenplay/characterExtension";
@@ -12,6 +13,13 @@ describe("character extensions", () => {
 
   it("preserves dual-dialogue markers", () => {
     expect(withCharacterExtension("JANE ^", "(O.S.)")).toBe("JANE (O.S.) ^");
+  });
+
+  it("extracts canonical names from valid cues", () => {
+    expect(characterNameFromCue("@Dr. Jane Morrow (O.S.) ^")).toBe(
+      "DR. JANE MORROW",
+    );
+    expect(characterNameFromCue("CUT TO:")).toBeNull();
   });
 
   it("rejects scene headings and ordinary mixed-case text", () => {

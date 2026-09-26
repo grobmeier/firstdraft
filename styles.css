@@ -58,6 +58,23 @@
   gap: var(--size-2-3);
 }
 
+.firstdraft-palette-item-row {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.firstdraft-palette-item-row .firstdraft-palette-item {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.firstdraft-palette-item-secondary {
+  color: var(--text-muted);
+  border-inline-start: 1px solid var(--background-modifier-border);
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+
 .firstdraft-palette-item {
   max-width: 100%;
   overflow: hidden;

@@ -23,6 +23,7 @@ export interface FirstDraftSettings {
   pageSize: PageSize;
   minutesPerPage: number;
   updateDelayMs: number;
+  characterFolder: string;
 }
 
 export const DEFAULT_SETTINGS: FirstDraftSettings = {
@@ -41,6 +42,7 @@ export const DEFAULT_SETTINGS: FirstDraftSettings = {
   pageSize: "us-letter",
   minutesPerPage: 1,
   updateDelayMs: 300,
+  characterFolder: "Characters",
 };
 
 function valuesFromText(value: string): string[] {
@@ -212,6 +214,21 @@ export class FirstDraftSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.maximumSuggestions)
           .onChange(async (value) => {
             this.plugin.settings.maximumSuggestions = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(this.containerEl)
+      .setName("Character pages folder")
+      .setDesc("Vault-relative folder used for First Draft character dossiers.")
+      .addText((text) =>
+        text
+          .setPlaceholder("Characters")
+          .setValue(this.plugin.settings.characterFolder)
+          .onChange(async (value) => {
+            const folder = value.trim().replace(/^\/+|\/+$/gu, "");
+            if (!folder) return;
+            this.plugin.settings.characterFolder = folder;
             await this.plugin.saveSettings();
           }),
       );

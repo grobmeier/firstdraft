@@ -7,6 +7,9 @@ describe("First Draft palette action order", () => {
     expect(orderPaletteActions(source, source.indexOf("JANE") + 2)[0]).toBe(
       "character-extension",
     );
+    expect(orderPaletteActions(source, source.indexOf("JANE") + 2)[1]).toBe(
+      "character-page",
+    );
   });
 
   it("prioritises parentheticals inside a dialogue block", () => {

@@ -1,7 +1,9 @@
 import { ItemView } from "obsidian";
-import type { Editor, IconName, WorkspaceLeaf } from "obsidian";
+import type { Editor, IconName, TFile, WorkspaceLeaf } from "obsidian";
+import { characterPages } from "../characters/vault";
 import { insertCharacter, openCharacterPicker } from "../commands/character";
 import { openCharacterExtension } from "../commands/characterExtension";
+import { openCharacterDossier } from "../commands/characterPage";
 import { openNewScene, openNewSceneAtLocation } from "../commands/newScene";
 import {
   insertParenthetical,
@@ -18,6 +20,7 @@ export const FIRST_DRAFT_PALETTE_VIEW_TYPE = "firstdraft-palette";
 const ACTION_LABELS: Record<PaletteAction, string> = {
   character: "Character",
   "character-extension": "Character Extension",
+  "character-page": "Character Page",
   parenthetical: "Parenthetical",
   "new-scene": "New Scene",
   transition: "Transition",
@@ -27,6 +30,8 @@ interface RecentSection {
   title: string;
   values: string[];
   insert: (value: string) => void;
+  secondary?: (value: string) => void;
+  secondaryLabel?: (value: string) => string;
 }
 
 export class FirstDraftPaletteView extends ItemView {
@@ -69,7 +74,11 @@ export class FirstDraftPaletteView extends ItemView {
     container.createEl("h2", { text: "First Draft" });
 
     const view = this.plugin.activeMarkdownView();
-    if (view === null || !this.plugin.isScreenplayFile(view.file)) {
+    if (
+      view === null ||
+      view.file === null ||
+      !this.plugin.isScreenplayFile(view.file)
+    ) {
       container.createEl("p", {
         cls: "firstdraft-palette-empty",
         text: "Open a screenplay note to use writing actions and recent elements.",
@@ -80,13 +89,14 @@ export class FirstDraftPaletteView extends ItemView {
     const editor = view.editor;
     const source = editor.getValue();
     const cursorOffset = editor.posToOffset(editor.getCursor());
-    this.renderActions(container, editor, source, cursorOffset);
-    this.renderRecent(container, editor, source);
+    this.renderActions(container, editor, view.file, source, cursorOffset);
+    this.renderRecent(container, editor, view.file, source);
   }
 
   private renderActions(
     container: HTMLElement,
     editor: Editor,
+    screenplay: TFile,
     source: string,
     cursorOffset: number,
   ): void {
@@ -98,13 +108,16 @@ export class FirstDraftPaletteView extends ItemView {
         cls: "firstdraft-palette-action",
         text: ACTION_LABELS[action],
       });
-      button.addEventListener("click", () => this.runAction(action, editor));
+      button.addEventListener("click", () =>
+        this.runAction(action, editor, screenplay),
+      );
     }
   }
 
   private renderRecent(
     container: HTMLElement,
     editor: Editor,
+    screenplay: TFile,
     source: string,
   ): void {
     const index = buildScreenplayIndex(parseFountain(source));
@@ -116,11 +129,23 @@ export class FirstDraftPaletteView extends ItemView {
         this.plugin.settings.recentItemsWeighting,
         limit,
       ).map((usage) => usage.value);
+    const pages = characterPages(this.plugin.app);
     const sections: RecentSection[] = [
       {
         title: "Characters",
         values: ranked(index.characters),
         insert: (value) => insertCharacter(editor, value),
+        secondary: (value) =>
+          openCharacterDossier(this.plugin, editor, screenplay, value),
+        secondaryLabel: (value) => {
+          const normalized = value.toLocaleUpperCase();
+          const exists = pages.some(
+            (page) =>
+              page.character === normalized ||
+              page.aliases.includes(normalized),
+          );
+          return exists ? "Open page" : "Create page";
+        },
       },
       {
         title: "Locations",
@@ -161,12 +186,22 @@ export class FirstDraftPaletteView extends ItemView {
         group.createEl("h4", { text: section.title });
         const list = group.createDiv({ cls: "firstdraft-palette-items" });
         for (const value of values) {
-          const button = list.createEl("button", {
+          const item = list.createDiv({ cls: "firstdraft-palette-item-row" });
+          const button = item.createEl("button", {
             cls: "firstdraft-palette-item",
             text: value,
             attr: { title: `Insert ${value}` },
           });
           button.addEventListener("click", () => section.insert(value));
+          if (section.secondary && section.secondaryLabel) {
+            const secondary = item.createEl("button", {
+              cls: "firstdraft-palette-item-secondary",
+              text: section.secondaryLabel(value),
+            });
+            secondary.addEventListener("click", () =>
+              section.secondary?.(value),
+            );
+          }
         }
       }
       if (matches === 0) {
@@ -186,13 +221,20 @@ export class FirstDraftPaletteView extends ItemView {
     renderSections();
   }
 
-  private runAction(action: PaletteAction, editor: Editor): void {
+  private runAction(
+    action: PaletteAction,
+    editor: Editor,
+    screenplay: TFile,
+  ): void {
     switch (action) {
       case "character":
         openCharacterPicker(this.plugin, editor);
         break;
       case "character-extension":
         openCharacterExtension(this.plugin, editor);
+        break;
+      case "character-page":
+        openCharacterDossier(this.plugin, editor, screenplay);
         break;
       case "parenthetical":
         openParenthetical(this.plugin, editor);
