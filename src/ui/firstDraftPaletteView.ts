@@ -6,6 +6,7 @@ import {
   type CharacterPage,
 } from "../characters/catalogue";
 import { characterPages } from "../characters/vault";
+import { characterDocumentUsage } from "../characters/usage";
 import { openCharacterGraph } from "../commands/characterGraph";
 import { insertCharacter, openCharacterPicker } from "../commands/character";
 import { openCharacterExtension } from "../commands/characterExtension";
@@ -44,6 +45,7 @@ interface RecentSection {
 export class FirstDraftPaletteView extends ItemView {
   private readonly plugin: FirstDraftPlugin;
   private query = "";
+  private renderGeneration = 0;
 
   constructor(leaf: WorkspaceLeaf, plugin: FirstDraftPlugin) {
     super(leaf);
@@ -76,13 +78,14 @@ export class FirstDraftPaletteView extends ItemView {
   }
 
   private render(): void {
+    const generation = ++this.renderGeneration;
     const container = this.contentEl;
     container.empty();
     container.createEl("h2", { text: "First Draft" });
 
     const view = this.plugin.activeMarkdownView();
     if (view?.file && this.plugin.isCharacterFile(view.file)) {
-      this.renderCharacterPage(container, view.file);
+      this.renderCharacterPage(container, view.file, generation);
       return;
     }
     if (
@@ -104,7 +107,11 @@ export class FirstDraftPaletteView extends ItemView {
     this.renderRecent(container, editor, view.file, source);
   }
 
-  private renderCharacterPage(container: HTMLElement, file: TFile): void {
+  private renderCharacterPage(
+    container: HTMLElement,
+    file: TFile,
+    generation: number,
+  ): void {
     const frontmatter = this.plugin.app.metadataCache.getFileCache(file)
       ?.frontmatter as Record<string, unknown> | undefined;
     const page = characterPageFromFrontmatter(file.path, frontmatter);
@@ -125,8 +132,44 @@ export class FirstDraftPaletteView extends ItemView {
       "click",
       () => void openCharacterGraph(this.plugin, file),
     );
+    const usage = container.createEl("p", {
+      cls: "firstdraft-palette-muted",
+      text: "Calculating linked screenplay usage…",
+    });
+    void this.renderCharacterUsage(usage, page, generation);
     this.renderCharacterLinks(container, "Screenplays", page.screenplays, page);
     this.renderCharacterLinks(container, "Relationships", page.related, page);
+  }
+
+  private async renderCharacterUsage(
+    element: HTMLElement,
+    page: CharacterPage,
+    generation: number,
+  ): Promise<void> {
+    let cueAppearances = 0;
+    let dialogueBlocks = 0;
+    let scenes = 0;
+    let screenplays = 0;
+    for (const link of page.screenplays) {
+      const file = this.plugin.app.metadataCache.getFirstLinkpathDest(
+        wikiLinkTarget(link),
+        page.path,
+      );
+      if (!file) continue;
+      const source = await this.plugin.app.vault.cachedRead(file);
+      const usage = characterDocumentUsage(page, parseFountain(source));
+      cueAppearances += usage.cueAppearances;
+      dialogueBlocks += usage.dialogueBlocks;
+      scenes += usage.scenes;
+      screenplays += 1;
+    }
+    if (generation !== this.renderGeneration) return;
+    element.setText(
+      `${screenplays} linked screenplay${screenplays === 1 ? "" : "s"} · ` +
+        `${scenes} scene${scenes === 1 ? "" : "s"} · ` +
+        `${cueAppearances} cue${cueAppearances === 1 ? "" : "s"} · ` +
+        `${dialogueBlocks} dialogue block${dialogueBlocks === 1 ? "" : "s"}`,
+    );
   }
 
   private renderCharacterLinks(
