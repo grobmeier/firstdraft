@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<FinalDraft DocumentType="Script" Template="No" Version="3">
+  <Content>
+    <Paragraph Type="Scene Heading">
+      <Text>INT. EXAMPLE ROOM - DAY</Text>
+    </Paragraph>
+    <Paragraph Type="Action">
+      <Text>An example action.</Text>
+    </Paragraph>
+    <Paragraph Type="Character">
+      <Text>JANE</Text>
+    </Paragraph>
+    <Paragraph Type="Parenthetical">
+      <Text>(quietly)</Text>
+    </Paragraph>
+    <Paragraph Type="Dialogue">
+      <Text>Example dialogue.</Text>
+    </Paragraph>
+    <Paragraph Type="Transition">
+      <Text>CUT TO:</Text>
+    </Paragraph>
+  </Content>
+</FinalDraft>
