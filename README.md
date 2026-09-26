@@ -10,7 +10,7 @@ human-readable, and useful when the plugin is not installed.
 > First Draft is in early private development. It is not yet available in the
 > Obsidian community-plugin directory.
 
-## Milestone 4
+## Milestone 5
 
 The current build provides:
 
@@ -24,13 +24,16 @@ The current build provides:
 - parenthetical insertion with common, recently used, and custom choices;
 - transition insertion with common, previously used, and custom choices;
 - non-destructive export to a clean `.fountain` file;
+- non-destructive Final Draft `.fdx` export for the six core screenplay element
+  types;
 - context-aware character, character-extension, scene-location, and time
   autocomplete;
 - keyboard-first Character, Character Extension, and New Scene commands;
 - settings for activation, autocomplete ranking, result limits, scene types,
   and times of day.
 
-Final Draft export is planned for a later milestone.
+See [FDX compatibility](docs/FDX_COMPATIBILITY.md) for the intentionally narrow
+MVP compatibility boundary.
 
 ## Development
 
@@ -57,7 +60,7 @@ npm run test-vault
 
 Then open the visible `First Draft Test Vault` directory as a separate Obsidian
 vault, enable or reload **First Draft** in Settings → Community plugins, and
-open `Milestone 4.md`.
+open `Milestone 5.md`.
 
 Expected result:
 
@@ -71,6 +74,10 @@ Expected result:
 - run `Screenplay: Export to Fountain`; First Draft opens a new sibling
   `.fountain` file with the Obsidian frontmatter removed, leaving the original
   note untouched;
+- run `Screenplay: Export to Final Draft FDX`; First Draft creates a new sibling
+  `.fdx` file without changing the source. Open that file in Final Draft and
+  confirm the scene heading, action, character extension, parenthetical,
+  dialogue, and transition retain their element types;
 - switch page size, minutes per page, or individual status fields under
   Settings → First Draft and confirm the display updates;
 - use `Milestone 3 Settings Demo.md` when comparing Letter/A4 or runtime ratios;
@@ -92,6 +99,18 @@ To use another dedicated test vault:
 ```bash
 node scripts/install-test-vault.mjs /absolute/path/to/test-vault
 ```
+
+## Automated testing
+
+`npm test` covers parsing, estimation, helpers, both export formats, strict XML
+parsing, XML escaping, and structural FDX compatibility. `npm run test-vault`
+builds the production bundle and installs it into the isolated vault.
+
+Browser Playwright alone cannot exercise an Obsidian plugin because Obsidian is
+an Electron desktop application rather than a website. A separate Electron UI
+harness is possible, but it would be platform-specific and more brittle than
+the model-level tests. The remaining acceptance check is therefore a short run
+in the isolated Obsidian vault; see [FDX compatibility](docs/FDX_COMPATIBILITY.md).
 
 ## Privacy
 

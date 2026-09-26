@@ -73,5 +73,12 @@ await writeFile(
 ).catch((error) => {
   if (error?.code !== "EEXIST") throw error;
 });
+await writeFile(
+  path.join(vaultRoot, "Milestone 5.md"),
+  `---\nscreenplay: true\ntitle: Milestone 5 FDX Test\n---\n\n.INT. RESEARCH & DEVELOPMENT LAB - NIGHT\n\n!A monitor reads: 2 < 3, then "READY" > 'WAIT'.\n\nDR. JANE MORROW (O.S.)\n(under her breath)\nThis must remain safe & readable.\n\n>MEMORY CUT TO:\n`,
+  { flag: "wx" },
+).catch((error) => {
+  if (error?.code !== "EEXIST") throw error;
+});
 
 console.log(`Installed First Draft in test vault: ${vaultRoot}`);
