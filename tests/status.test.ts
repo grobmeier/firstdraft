@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { ScreenplayStatistics } from "../src/screenplay/model";
-import { formatScreenplayStatus } from "../src/screenplay/status";
+import {
+  formatEstimatedRuntime,
+  formatScreenplayStatus,
+} from "../src/screenplay/status";
 
 const statistics: ScreenplayStatistics = {
   scenes: 28,
@@ -14,6 +17,12 @@ const statistics: ScreenplayStatistics = {
 };
 
 describe("formatScreenplayStatus", () => {
+  it("keeps useful precision for short screenplay runtimes", () => {
+    expect(formatEstimatedRuntime(0.5)).toBe("0.5");
+    expect(formatEstimatedRuntime(0.75)).toBe("0.8");
+    expect(formatEstimatedRuntime(37.2)).toBe("37");
+  });
+
   it("formats all screenplay measurements", () => {
     const formattedWords = statistics.words.toLocaleString();
     expect(

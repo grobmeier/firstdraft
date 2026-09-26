@@ -12,7 +12,9 @@ export function formatEstimatedPages(pages: number): string {
 }
 
 export function formatEstimatedRuntime(minutes: number): string {
-  return Math.round(minutes).toString();
+  const rounded =
+    minutes < 10 ? Math.round(minutes * 10) / 10 : Math.round(minutes);
+  return rounded.toString();
 }
 
 export function formatScreenplayStatus(

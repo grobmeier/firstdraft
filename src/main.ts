@@ -68,7 +68,7 @@ export default class FirstDraftPlugin extends Plugin {
       id: "screenplay-show-statistics",
       name: "Screenplay: Show Statistics",
       checkCallback: (checking) => {
-        const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+        const view = this.activeMarkdownView();
         if (view === null || !this.isScreenplayFile(view.file)) return false;
         if (!checking) {
           new StatisticsModal(this.app, this.statisticsFor(view)).open();
@@ -81,6 +81,12 @@ export default class FirstDraftPlugin extends Plugin {
       this.app.workspace.on("active-leaf-change", () => this.scheduleRefresh()),
     );
     this.registerEvent(
+      this.app.workspace.on("file-open", () => this.scheduleRefresh()),
+    );
+    this.registerEvent(
+      this.app.workspace.on("layout-change", () => this.scheduleRefresh()),
+    );
+    this.registerEvent(
       this.app.workspace.on("editor-change", () => this.scheduleRefresh()),
     );
     this.registerEvent(
@@ -89,7 +95,7 @@ export default class FirstDraftPlugin extends Plugin {
       }),
     );
 
-    this.app.workspace.onLayoutReady(() => this.refreshStatus());
+    this.app.workspace.onLayoutReady(() => this.scheduleRefresh());
   }
 
   onunload(): void {
@@ -124,7 +130,7 @@ export default class FirstDraftPlugin extends Plugin {
       return;
     }
 
-    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+    const view = this.activeMarkdownView();
     const file = view?.file ?? null;
     if (view === null || !this.isScreenplayFile(file)) {
       this.statusBarItem?.hide();
@@ -159,6 +165,22 @@ export default class FirstDraftPlugin extends Plugin {
       pageSize: this.settings.pageSize,
       minutesPerPage: this.settings.minutesPerPage,
     });
+  }
+
+  private activeMarkdownView(): MarkdownView | null {
+    const direct = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (direct !== null) return direct;
+
+    const activeFile = this.activeFile();
+    if (activeFile === null) return null;
+
+    for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
+      if (leaf.view instanceof MarkdownView && leaf.view.file === activeFile) {
+        return leaf.view;
+      }
+    }
+
+    return null;
   }
 
   private activeFile(): TFile | null {
