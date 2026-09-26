@@ -10,7 +10,7 @@ human-readable, and useful when the plugin is not installed.
 > First Draft is in early private development. It is not yet available in the
 > Obsidian community-plugin directory.
 
-## Milestone 3
+## Milestone 4
 
 The current build provides:
 
@@ -21,14 +21,16 @@ The current build provides:
 - screenplay-aware estimated pages for US Letter or A4;
 - configurable runtime estimation based on minutes per page;
 - a current-document statistics dialog with character dialogue rankings;
+- parenthetical insertion with common, recently used, and custom choices;
+- transition insertion with common, previously used, and custom choices;
+- non-destructive export to a clean `.fountain` file;
 - context-aware character, character-extension, scene-location, and time
   autocomplete;
 - keyboard-first Character, Character Extension, and New Scene commands;
 - settings for activation, autocomplete ranking, result limits, scene types,
   and times of day.
 
-Parenthetical and transition helpers, Fountain export, and Final Draft export
-are planned for later milestones.
+Final Draft export is planned for a later milestone.
 
 ## Development
 
@@ -55,13 +57,20 @@ npm run test-vault
 
 Then open the visible `First Draft Test Vault` directory as a separate Obsidian
 vault, enable or reload **First Draft** in Settings → Community plugins, and
-open `Milestone 3.md`.
+open `Milestone 4.md`.
 
 Expected result:
 
 - the status bar shows estimated pages, estimated runtime, words, and scenes;
 - run `Screenplay: Show Statistics` to see document totals and dialogue counts
   by character;
+- put the caret in dialogue, run `Screenplay: Parenthetical`, and choose a
+  common or custom direction;
+- run `Screenplay: Transition` on a blank line and choose a common or custom
+  transition;
+- run `Screenplay: Export to Fountain`; First Draft opens a new sibling
+  `.fountain` file with the Obsidian frontmatter removed, leaving the original
+  note untouched;
 - switch page size, minutes per page, or individual status fields under
   Settings → First Draft and confirm the display updates;
 - use `Milestone 3 Settings Demo.md` when comparing Letter/A4 or runtime ratios;

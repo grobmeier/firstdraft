@@ -66,5 +66,12 @@ await writeFile(
 ).catch((error) => {
   if (error?.code !== "EEXIST") throw error;
 });
+await writeFile(
+  path.join(vaultRoot, "Milestone 4.md"),
+  `---\nscreenplay: true\ntitle: Milestone 4 Test\n---\n\nFADE IN:\n\nINT. MILITARY BASE - THERAPY ROOM - DAY\n\nRain traces the reinforced windows. DR. JANE MORROW, 42, studies a silent monitor.\n\nJANE\n(quietly)\nHow long have you been having these dreams?\n\nMILLER\n(to Jane)\nSince I died.\n\nJANE\nThat is not the answer I expected.\n\n>MEMORY CUT TO:\n\nINT. MILITARY BASE - WARD - NIGHT\n\nREEVES\nMiller is awake.\n\nJANE\nI'll be there.\n\nCUT TO:\n\n`,
+  { flag: "wx" },
+).catch((error) => {
+  if (error?.code !== "EEXIST") throw error;
+});
 
 console.log(`Installed First Draft in test vault: ${vaultRoot}`);
