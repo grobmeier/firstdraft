@@ -10,7 +10,7 @@ human-readable, and useful when the plugin is not installed.
 > First Draft is in early private development. It is not yet available in the
 > Obsidian community-plugin directory.
 
-## Version 0.6
+## Version 0.9
 
 The current build provides:
 
@@ -28,6 +28,14 @@ The current build provides:
   types;
 - a dockable First Draft Palette with contextual actions and recent screenplay
   elements;
+- portable Markdown character dossiers with aliases, screenplay links, and
+  relationship links;
+- derived per-character scene, cue, and dialogue usage without generated data
+  being written into dossiers;
+- deterministic character checks for missing pages, duplicate identities,
+  ambiguous aliases, broken relationships, unused pages, and likely spelling
+  variants;
+- native Obsidian Local Graph access for character relationships;
 - context-aware character, character-extension, scene-location, and time
   autocomplete;
 - keyboard-first Character, Character Extension, and New Scene commands;
@@ -72,6 +80,14 @@ Expected result:
   the highlighted first action changes appropriately;
 - click a recent character, parenthetical, or transition to insert it, or click
   a recent location to start a New Scene using that location;
+- use **Open page** beside JANE or MILLER, then confirm the dossier shows linked
+  screenplay usage, relationships, and an **Open Local Graph** action;
+- use **Create page** beside REEVES and confirm First Draft creates
+  `Characters/Reeves.md` without modifying the screenplay;
+- before creating REEVES, run `Screenplay: Check Characters` and confirm it is
+  reported as missing; run it again afterwards to clear that warning;
+- open `Characters/Jane.md`, choose **Open Local Graph**, and confirm Jane is
+  connected to Milestone 4 and Miller through ordinary wikilinks;
 - filter recent items from the panel without losing keyboard focus;
 - the status bar shows estimated pages, estimated runtime, words, and scenes;
 - run `Screenplay: Show Statistics` to see document totals and dialogue counts
@@ -111,9 +127,10 @@ node scripts/install-test-vault.mjs /absolute/path/to/test-vault
 
 ## Automated testing
 
-`npm test` covers parsing, estimation, helpers, both export formats, strict XML
-parsing, XML escaping, and structural FDX compatibility. `npm run test-vault`
-builds the production bundle and installs it into the isolated vault.
+`npm test` covers parsing, estimation, helpers, character cataloguing and
+verification, derived dossier usage, both export formats, strict XML parsing,
+XML escaping, and structural FDX compatibility. `npm run test-vault` builds the
+production bundle and installs it into the isolated vault.
 
 Browser Playwright alone cannot exercise an Obsidian plugin because Obsidian is
 an Electron desktop application rather than a website. A separate Electron UI

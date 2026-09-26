@@ -11,6 +11,7 @@ const vaultRoot = path.resolve(
   process.argv[2] ?? path.join(projectRoot, "First Draft Test Vault"),
 );
 const pluginRoot = path.join(vaultRoot, ".obsidian", "plugins", "firstdraft");
+const characterRoot = path.join(vaultRoot, "Characters");
 const settingsDemo = Array.from(
   { length: 18 },
   (_, index) => `INT. TEST STAGE ${index + 1} - DAY #${index + 1}#
@@ -26,6 +27,7 @@ The numbers move.
 ).join("\n");
 
 await mkdir(pluginRoot, { recursive: true });
+await mkdir(characterRoot, { recursive: true });
 await copyFile(
   path.join(projectRoot, "main.js"),
   path.join(pluginRoot, "main.js"),
@@ -76,6 +78,69 @@ await writeFile(
 await writeFile(
   path.join(vaultRoot, "Milestone 5.md"),
   `---\nscreenplay: true\ntitle: Milestone 5 FDX Test\n---\n\n.INT. RESEARCH & DEVELOPMENT LAB - NIGHT\n\n!A monitor reads: 2 < 3, then "READY" > 'WAIT'.\n\nDR. JANE MORROW (O.S.)\n(under her breath)\nThis must remain safe & readable.\n\n>MEMORY CUT TO:\n`,
+  { flag: "wx" },
+).catch((error) => {
+  if (error?.code !== "EEXIST") throw error;
+});
+await writeFile(
+  path.join(characterRoot, "Jane.md"),
+  `---
+firstdraft: character
+character: JANE
+aliases:
+  - DR. JANE MORROW
+screenplays:
+  - "[[Milestone 4]]"
+related:
+  - "[[Characters/Miller]]"
+---
+
+# Jane
+
+## Background
+
+Jane works at the military base.
+
+## Wants and fears
+
+## Voice
+
+## Relationships
+
+- [[Characters/Miller]] — her patient.
+
+## Continuity notes
+`,
+  { flag: "wx" },
+).catch((error) => {
+  if (error?.code !== "EEXIST") throw error;
+});
+await writeFile(
+  path.join(characterRoot, "Miller.md"),
+  `---
+firstdraft: character
+character: MILLER
+aliases: []
+screenplays:
+  - "[[Milestone 4]]"
+related:
+  - "[[Characters/Jane]]"
+---
+
+# Miller
+
+## Background
+
+## Wants and fears
+
+## Voice
+
+## Relationships
+
+- [[Characters/Jane]] — his doctor.
+
+## Continuity notes
+`,
   { flag: "wx" },
 ).catch((error) => {
   if (error?.code !== "EEXIST") throw error;
