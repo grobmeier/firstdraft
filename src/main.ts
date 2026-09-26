@@ -1,6 +1,7 @@
 import { MarkdownView, Plugin } from "obsidian";
 import type { TFile } from "obsidian";
 import { openCharacterPicker } from "./commands/character";
+import { exportFountain } from "./commands/exportFountain";
 import {
   isLikelyCharacterCue,
   openCharacterExtension,
@@ -93,6 +94,16 @@ export default class FirstDraftPlugin extends Plugin {
         if (!checking) {
           new StatisticsModal(this.app, this.statisticsFor(view)).open();
         }
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-export-fountain",
+      name: "Screenplay: Export to Fountain",
+      checkCallback: (checking) => {
+        const view = this.activeMarkdownView();
+        if (view === null || !this.isScreenplayFile(view.file)) return false;
+        if (!checking) void exportFountain(this, view);
         return true;
       },
     });
