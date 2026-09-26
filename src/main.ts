@@ -7,6 +7,7 @@ import {
 } from "./commands/characterExtension";
 import { openNewScene } from "./commands/newScene";
 import { openParenthetical } from "./commands/parenthetical";
+import { openTransition } from "./commands/transition";
 import { createScreenplayCompletionExtension } from "./editor/completion";
 import { isScreenplayMode } from "./screenplay/mode";
 import { parseFountain } from "./screenplay/parser";
@@ -71,6 +72,15 @@ export default class FirstDraftPlugin extends Plugin {
       editorCheckCallback: (checking, editor, context) => {
         if (!this.isScreenplayFile(context.file)) return false;
         if (!checking) openParenthetical(this, editor);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-transition",
+      name: "Screenplay: Transition",
+      editorCheckCallback: (checking, editor, context) => {
+        if (!this.isScreenplayFile(context.file)) return false;
+        if (!checking) openTransition(this, editor);
         return true;
       },
     });
