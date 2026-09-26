@@ -1,6 +1,7 @@
 import { MarkdownView, Plugin } from "obsidian";
 import type { TFile } from "obsidian";
 import { openCharacterPicker } from "./commands/character";
+import { exportFdx } from "./commands/exportFdx";
 import { exportFountain } from "./commands/exportFountain";
 import {
   isLikelyCharacterCue,
@@ -104,6 +105,16 @@ export default class FirstDraftPlugin extends Plugin {
         const view = this.activeMarkdownView();
         if (view === null || !this.isScreenplayFile(view.file)) return false;
         if (!checking) void exportFountain(this, view);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-export-final-draft-fdx",
+      name: "Screenplay: Export to Final Draft FDX",
+      checkCallback: (checking) => {
+        const view = this.activeMarkdownView();
+        if (view === null || !this.isScreenplayFile(view.file)) return false;
+        if (!checking) void exportFdx(this, view);
         return true;
       },
     });
