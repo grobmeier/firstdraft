@@ -11,6 +11,19 @@ const vaultRoot = path.resolve(
   process.argv[2] ?? path.join(projectRoot, "First Draft Test Vault"),
 );
 const pluginRoot = path.join(vaultRoot, ".obsidian", "plugins", "firstdraft");
+const settingsDemo = Array.from(
+  { length: 18 },
+  (_, index) => `INT. TEST STAGE ${index + 1} - DAY #${index + 1}#
+
+A monitor glows beside an empty chair.
+
+JANE
+Setting pass ${index + 1}.
+
+MILLER
+The numbers move.
+`,
+).join("\n");
 
 await mkdir(pluginRoot, { recursive: true });
 await copyFile(
@@ -42,6 +55,13 @@ await writeFile(
 await writeFile(
   path.join(vaultRoot, "Milestone 3.md"),
   `---\nscreenplay: true\n---\n\nINT. MILITARY BASE - THERAPY ROOM - DAY\n\nRain traces the reinforced windows. DR. JANE MORROW, 42, studies a silent monitor.\n\nJANE\nHow long have you been having these dreams?\n\nMILLER\nSince I died.\n\nJANE\nThat is not the answer I expected.\n\nINT. MILITARY BASE - WARD - NIGHT\n\nOrderlies hurry between curtained beds as an alarm begins to pulse.\n\nREEVES\nMiller is awake.\n\nJANE\nI'll be there.\n\nEXT. MILITARY BASE - PARADE GROUND - DAWN\n\nThe rain has stopped. Miller stands alone beneath the first pale light.\n\n`,
+  { flag: "wx" },
+).catch((error) => {
+  if (error?.code !== "EEXIST") throw error;
+});
+await writeFile(
+  path.join(vaultRoot, "Milestone 3 Settings Demo.md"),
+  `---\nscreenplay: true\n---\n\n${settingsDemo}`,
   { flag: "wx" },
 ).catch((error) => {
   if (error?.code !== "EEXIST") throw error;

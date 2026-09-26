@@ -64,6 +64,8 @@ Expected result:
   by character;
 - switch page size, minutes per page, or individual status fields under
   Settings → First Draft and confirm the display updates;
+- use `Milestone 3 Settings Demo.md` when comparing Letter/A4 or runtime ratios;
+  its length makes the differences visible without editing the fixture;
 - type `JA` on the final blank line: choose `JANE` with Tab or Enter and start
   typing dialogue on the next line;
 - type `INT. MIL`, accept a known location, then accept a time;
