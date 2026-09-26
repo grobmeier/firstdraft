@@ -2,6 +2,7 @@ import { isSceneHeading } from "./parser";
 
 const HAS_LETTER = /\p{L}/u;
 const LOWERCASE_LETTER = /\p{Ll}/u;
+const STANDARD_TRANSITION = /(?:TO:|FADE IN:|FADE OUT\.)$/u;
 
 export function isLikelyCharacterCue(line: string): boolean {
   const text = line.trim();
@@ -15,6 +16,8 @@ export function isLikelyCharacterCue(line: string): boolean {
     Boolean(candidate) &&
     HAS_LETTER.test(candidate) &&
     !isSceneHeading(candidate) &&
+    !text.startsWith(">") &&
+    !STANDARD_TRANSITION.test(candidate) &&
     (forced || !LOWERCASE_LETTER.test(candidate))
   );
 }

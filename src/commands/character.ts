@@ -43,6 +43,6 @@ export function openCharacterPicker(
   }).open();
 }
 
-function insertCharacter(editor: Editor, name: string): void {
+export function insertCharacter(editor: Editor, name: string): void {
   insertBlock(editor, name.trim().toLocaleUpperCase(), 1);
 }

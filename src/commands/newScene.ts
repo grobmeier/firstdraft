@@ -39,6 +39,22 @@ export function openNewScene(plugin: FirstDraftPlugin, editor: Editor): void {
   }).open();
 }
 
+export function openNewSceneAtLocation(
+  plugin: FirstDraftPlugin,
+  editor: Editor,
+  location: string,
+): void {
+  const index = buildScreenplayIndex(parseFountain(editor.getValue()));
+  new PickerModal(plugin.app, {
+    title: "New Scene — Scene type",
+    placeholder: "Choose INT., EXT., or another scene type",
+    items: plugin.settings.preferredSceneTypes,
+    itemText: (item) => item,
+    onChoose: (sceneType) =>
+      chooseTime(plugin, editor, index, sceneType, location),
+  }).open();
+}
+
 function chooseLocation(
   plugin: FirstDraftPlugin,
   editor: Editor,

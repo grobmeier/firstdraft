@@ -61,7 +61,7 @@ export function openParenthetical(
   }).open();
 }
 
-function insertParenthetical(editor: Editor, value: string): void {
+export function insertParenthetical(editor: Editor, value: string): void {
   if (!normalizeParenthetical(value)) return;
   const source = editor.getValue();
   const edit = buildParentheticalEdit(

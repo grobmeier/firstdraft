@@ -56,7 +56,7 @@ export function openTransition(plugin: FirstDraftPlugin, editor: Editor): void {
   }).open();
 }
 
-function insertTransition(editor: Editor, value: string): void {
+export function insertTransition(editor: Editor, value: string): void {
   const transition = normalizeTransition(value);
   if (!transition) return;
   insertBlock(editor, transition, 2);

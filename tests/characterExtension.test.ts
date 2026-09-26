@@ -17,6 +17,8 @@ describe("character extensions", () => {
   it("rejects scene headings and ordinary mixed-case text", () => {
     expect(isLikelyCharacterCue("JANE")).toBe(true);
     expect(isLikelyCharacterCue("INT. ROOM - DAY")).toBe(false);
+    expect(isLikelyCharacterCue("CUT TO:")).toBe(false);
+    expect(isLikelyCharacterCue(">MEMORY CUT TO:")).toBe(false);
     expect(isLikelyCharacterCue("Jane walks in.")).toBe(false);
   });
 });
