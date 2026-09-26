@@ -65,6 +65,7 @@ describe("Final Draft FDX export", () => {
     );
     expect(texts).toContain(`A monitor reads: 2 < 3, then "READY" > 'WAIT'.`);
     expect(texts).toContain("INT. RESEARCH & DEVELOPMENT LAB - NIGHT");
+    expect(texts).toContain("DR. JANE MORROW (O.S.)");
     expect(texts).toContain("MEMORY CUT TO:");
   });
 

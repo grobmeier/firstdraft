@@ -43,19 +43,29 @@ function isTransition(
   );
 }
 
-function characterName(line: string): string | null {
+interface CharacterCue {
+  name: string;
+  extension: string | null;
+}
+
+function characterCue(line: string): CharacterCue | null {
   const text = line.trim();
   const forced = text.startsWith("@");
-  const candidate = forced ? text.slice(1).trim() : text;
+  const candidate = (forced ? text.slice(1).trim() : text)
+    .replace(/\s*\^\s*$/u, "")
+    .trim();
   if (!candidate || isSceneHeading(candidate) || !HAS_LETTER.test(candidate))
     return null;
   if (!forced && LOWERCASE_LETTER.test(candidate)) return null;
   if (!forced && !UPPERCASE_LETTER.test(candidate)) return null;
 
-  return candidate
-    .replace(/\s*\^\s*$/u, "")
-    .replace(/\s+\([^)]*\)\s*$/u, "")
-    .trim();
+  const extensionMatch = /(?:\s+\([^)]*\))+\s*$/u.exec(candidate);
+  const extension = extensionMatch?.[0].trim() ?? null;
+  const name = extensionMatch
+    ? candidate.slice(0, extensionMatch.index).trim()
+    : candidate;
+
+  return name ? { name, extension } : null;
 }
 
 function pushElement(
@@ -108,9 +118,14 @@ export function parseFountain(source: string): ScreenplayDocument {
       continue;
     }
 
-    const name = beforeBlank && !afterBlank ? characterName(text) : null;
-    if (name !== null) {
-      pushElement(elements, "character", name, index + 1);
+    const cue = beforeBlank && !afterBlank ? characterCue(text) : null;
+    if (cue !== null) {
+      elements.push({
+        type: "character",
+        text: cue.name,
+        line: index + 1,
+        ...(cue.extension ? { characterExtension: cue.extension } : {}),
+      });
       inDialogue = true;
       continue;
     }

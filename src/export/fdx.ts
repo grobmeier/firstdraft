@@ -38,6 +38,9 @@ export function escapeXmlText(value: string): string {
 }
 
 function fdxText(element: ScreenplayElement): string {
+  if (element.type === "character" && element.characterExtension) {
+    return `${element.text} ${element.characterExtension}`;
+  }
   if (element.type === "scene-heading" && element.text.startsWith(".")) {
     return element.text.slice(1);
   }

@@ -10,6 +10,7 @@ export interface ScreenplayElement {
   type: ScreenplayElementType;
   text: string;
   line: number;
+  characterExtension?: string;
 }
 
 export interface ScreenplayDocument {

@@ -29,7 +29,10 @@ EXT. PARADE GROUND - NIGHT
     ]);
     expect(
       document.elements.filter((element) => element.type === "character"),
-    ).toMatchObject([{ text: "JANE" }, { text: "MILLER" }]);
+    ).toMatchObject([
+      { text: "JANE", characterExtension: "(O.S.)" },
+      { text: "MILLER" },
+    ]);
   });
 
   it("does not treat standalone uppercase action as a character", () => {
