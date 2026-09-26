@@ -8,6 +8,7 @@ import {
   openCharacterExtension,
 } from "./commands/characterExtension";
 import { openCharacterDossier } from "./commands/characterPage";
+import { checkCharacters } from "./commands/checkCharacters";
 import { openNewScene } from "./commands/newScene";
 import { openParenthetical } from "./commands/parenthetical";
 import { openTransition } from "./commands/transition";
@@ -69,6 +70,17 @@ export default class FirstDraftPlugin extends Plugin {
       editorCheckCallback: (checking, editor, context) => {
         if (!this.isScreenplayFile(context.file)) return false;
         if (!checking) openCharacterPicker(this, editor);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-check-characters",
+      name: "Screenplay: Check Characters",
+      editorCheckCallback: (checking, editor, context) => {
+        if (!this.isScreenplayFile(context.file) || context.file === null) {
+          return false;
+        }
+        if (!checking) checkCharacters(this, editor, context.file);
         return true;
       },
     });

@@ -4,6 +4,7 @@ import { characterPages } from "../characters/vault";
 import { insertCharacter, openCharacterPicker } from "../commands/character";
 import { openCharacterExtension } from "../commands/characterExtension";
 import { openCharacterDossier } from "../commands/characterPage";
+import { checkCharacters } from "../commands/checkCharacters";
 import { openNewScene, openNewSceneAtLocation } from "../commands/newScene";
 import {
   insertParenthetical,
@@ -112,6 +113,13 @@ export class FirstDraftPaletteView extends ItemView {
         this.runAction(action, editor, screenplay),
       );
     }
+    const check = actions.createEl("button", {
+      cls: "firstdraft-palette-action firstdraft-palette-check",
+      text: "Check Characters",
+    });
+    check.addEventListener("click", () =>
+      checkCharacters(this.plugin, editor, screenplay),
+    );
   }
 
   private renderRecent(

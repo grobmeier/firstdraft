@@ -85,3 +85,16 @@
 .firstdraft-palette-empty {
   color: var(--text-muted);
 }
+
+.firstdraft-palette-check {
+  color: var(--text-normal);
+  background: var(--interactive-normal);
+}
+
+.firstdraft-character-check-link {
+  width: auto;
+  height: auto;
+  padding: 0;
+  color: var(--text-accent);
+  text-align: start;
+}

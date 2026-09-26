@@ -6,7 +6,9 @@ import {
   characterPageTemplate,
   matchingCharacterPages,
   type CharacterPage,
+  wikiLinkTarget,
 } from "./catalogue";
+import type { VerifiableCharacterPage } from "./verification";
 
 export function characterPages(app: App): CharacterPage[] {
   return app.vault.getMarkdownFiles().flatMap((file) => {
@@ -20,6 +22,29 @@ export function characterPages(app: App): CharacterPage[] {
 export function characterPageFile(app: App, page: CharacterPage): TFile | null {
   const file = app.vault.getAbstractFileByPath(page.path);
   return file instanceof TFile ? file : null;
+}
+
+export function verifiableCharacterPages(
+  app: App,
+  screenplay: TFile,
+): VerifiableCharacterPage[] {
+  return characterPages(app).map((page) => ({
+    ...page,
+    linkedToScreenplay: page.screenplays.some((link) => {
+      const target = wikiLinkTarget(link);
+      return (
+        app.metadataCache.getFirstLinkpathDest(target, page.path)?.path ===
+        screenplay.path
+      );
+    }),
+    unresolvedRelated: page.related.filter((link) => {
+      const target = wikiLinkTarget(link);
+      return (
+        !target ||
+        app.metadataCache.getFirstLinkpathDest(target, page.path) === null
+      );
+    }),
+  }));
 }
 
 async function ensureFolder(app: App, folder: string): Promise<void> {
