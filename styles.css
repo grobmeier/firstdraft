@@ -86,6 +86,14 @@
   color: var(--text-muted);
 }
 
+.firstdraft-palette-muted {
+  color: var(--text-muted);
+}
+
+.firstdraft-character-graph {
+  width: 100%;
+}
+
 .firstdraft-palette-check {
   color: var(--text-normal);
   background: var(--interactive-normal);

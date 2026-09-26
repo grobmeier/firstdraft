@@ -8,11 +8,13 @@ import {
   openCharacterExtension,
 } from "./commands/characterExtension";
 import { openCharacterDossier } from "./commands/characterPage";
+import { openCharacterGraph } from "./commands/characterGraph";
 import { checkCharacters } from "./commands/checkCharacters";
 import { openNewScene } from "./commands/newScene";
 import { openParenthetical } from "./commands/parenthetical";
 import { openTransition } from "./commands/transition";
 import { createScreenplayCompletionExtension } from "./editor/completion";
+import { isCharacterFrontmatter } from "./characters/catalogue";
 import { isScreenplayMode } from "./screenplay/mode";
 import { parseFountain } from "./screenplay/parser";
 import { calculateStatistics } from "./screenplay/statistics";
@@ -70,6 +72,16 @@ export default class FirstDraftPlugin extends Plugin {
       editorCheckCallback: (checking, editor, context) => {
         if (!this.isScreenplayFile(context.file)) return false;
         if (!checking) openCharacterPicker(this, editor);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "character-open-local-graph",
+      name: "Character: Open Local Graph",
+      checkCallback: (checking) => {
+        const file = this.activeFile();
+        if (!this.isCharacterFile(file) || file === null) return false;
+        if (!checking) void openCharacterGraph(this, file);
         return true;
       },
     });
@@ -210,6 +222,13 @@ export default class FirstDraftPlugin extends Plugin {
       ? this.app.metadataCache.getFileCache(file)?.frontmatter
       : undefined;
     return isScreenplayMode(file, frontmatter, this.settings);
+  }
+
+  isCharacterFile(file: TFile | null): boolean {
+    if (file === null || file.extension !== "md") return false;
+    const frontmatter = this.app.metadataCache.getFileCache(file)
+      ?.frontmatter as Record<string, unknown> | undefined;
+    return isCharacterFrontmatter(frontmatter);
   }
 
   refreshStatus(): void {

@@ -1,6 +1,12 @@
 import { ItemView } from "obsidian";
 import type { Editor, IconName, TFile, WorkspaceLeaf } from "obsidian";
+import {
+  characterPageFromFrontmatter,
+  wikiLinkTarget,
+  type CharacterPage,
+} from "../characters/catalogue";
 import { characterPages } from "../characters/vault";
+import { openCharacterGraph } from "../commands/characterGraph";
 import { insertCharacter, openCharacterPicker } from "../commands/character";
 import { openCharacterExtension } from "../commands/characterExtension";
 import { openCharacterDossier } from "../commands/characterPage";
@@ -75,6 +81,10 @@ export class FirstDraftPaletteView extends ItemView {
     container.createEl("h2", { text: "First Draft" });
 
     const view = this.plugin.activeMarkdownView();
+    if (view?.file && this.plugin.isCharacterFile(view.file)) {
+      this.renderCharacterPage(container, view.file);
+      return;
+    }
     if (
       view === null ||
       view.file === null ||
@@ -92,6 +102,62 @@ export class FirstDraftPaletteView extends ItemView {
     const cursorOffset = editor.posToOffset(editor.getCursor());
     this.renderActions(container, editor, view.file, source, cursorOffset);
     this.renderRecent(container, editor, view.file, source);
+  }
+
+  private renderCharacterPage(container: HTMLElement, file: TFile): void {
+    const frontmatter = this.plugin.app.metadataCache.getFileCache(file)
+      ?.frontmatter as Record<string, unknown> | undefined;
+    const page = characterPageFromFrontmatter(file.path, frontmatter);
+    if (page === null) return;
+
+    container.createEl("h3", { text: page.character });
+    if (page.aliases.length > 0) {
+      container.createEl("p", {
+        cls: "firstdraft-palette-muted",
+        text: `Aliases: ${page.aliases.join(", ")}`,
+      });
+    }
+    const graph = container.createEl("button", {
+      cls: "mod-cta firstdraft-character-graph",
+      text: "Open Local Graph",
+    });
+    graph.addEventListener(
+      "click",
+      () => void openCharacterGraph(this.plugin, file),
+    );
+    this.renderCharacterLinks(container, "Screenplays", page.screenplays, page);
+    this.renderCharacterLinks(container, "Relationships", page.related, page);
+  }
+
+  private renderCharacterLinks(
+    container: HTMLElement,
+    heading: string,
+    links: readonly string[],
+    page: CharacterPage,
+  ): void {
+    container.createEl("h3", { text: heading });
+    if (links.length === 0) {
+      container.createEl("p", {
+        cls: "firstdraft-palette-empty",
+        text: `No ${heading.toLocaleLowerCase()} linked yet.`,
+      });
+      return;
+    }
+    const list = container.createDiv({ cls: "firstdraft-palette-items" });
+    for (const link of links) {
+      const target = wikiLinkTarget(link);
+      const button = list.createEl("button", {
+        cls: "firstdraft-palette-item",
+        text: target.split("/").at(-1) ?? target,
+      });
+      button.addEventListener("click", () => {
+        const file = this.plugin.app.metadataCache.getFirstLinkpathDest(
+          target,
+          page.path,
+        );
+        if (file) void this.plugin.app.workspace.getLeaf("tab").openFile(file);
+      });
+    }
   }
 
   private renderActions(
