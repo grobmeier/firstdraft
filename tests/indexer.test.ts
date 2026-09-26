@@ -7,12 +7,15 @@ import {
 import { parseFountain } from "../src/screenplay/parser";
 
 describe("screenplay index", () => {
-  it("extracts character, location, and time usage", () => {
+  it("extracts screenplay element usage", () => {
     const index = buildScreenplayIndex(
       parseFountain(`INT. MILITARY BASE - THERAPY ROOM - DAY
 
 JANE
+(quietly)
 Hello.
+
+CUT TO:
 
 EXT. PARADE GROUND - NIGHT
 
@@ -38,6 +41,10 @@ Ready.
       { value: "DAY", count: 1 },
       { value: "NIGHT", count: 2 },
     ]);
+    expect(index.parentheticals).toMatchObject([
+      { value: "(quietly)", count: 1 },
+    ]);
+    expect(index.transitions).toMatchObject([{ value: "CUT TO:", count: 1 }]);
   });
 
   it("splits the final scene-heading segment as time", () => {

@@ -58,6 +58,8 @@ export function buildScreenplayIndex(
   const characters = new Map<string, Usage>();
   const locations = new Map<string, Usage>();
   const timesOfDay = new Map<string, Usage>();
+  const parentheticals = new Map<string, Usage>();
+  const transitions = new Map<string, Usage>();
 
   for (const element of document.elements) {
     if (element.type === "character") {
@@ -71,12 +73,20 @@ export function buildScreenplayIndex(
         addUsage(timesOfDay, parts.timeOfDay, element.line);
       }
     }
+    if (element.type === "parenthetical") {
+      addUsage(parentheticals, element.text, element.line);
+    }
+    if (element.type === "transition") {
+      addUsage(transitions, element.text, element.line);
+    }
   }
 
   return {
     characters: [...characters.values()],
     locations: [...locations.values()],
     timesOfDay: [...timesOfDay.values()],
+    parentheticals: [...parentheticals.values()],
+    transitions: [...transitions.values()],
   };
 }
 

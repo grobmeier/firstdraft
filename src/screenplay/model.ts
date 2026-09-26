@@ -50,6 +50,8 @@ export interface ScreenplayIndex {
   characters: Usage[];
   locations: Usage[];
   timesOfDay: Usage[];
+  parentheticals: Usage[];
+  transitions: Usage[];
 }
 
 export interface ScreenplayStatistics {

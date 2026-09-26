@@ -6,6 +6,7 @@ import {
   openCharacterExtension,
 } from "./commands/characterExtension";
 import { openNewScene } from "./commands/newScene";
+import { openParenthetical } from "./commands/parenthetical";
 import { createScreenplayCompletionExtension } from "./editor/completion";
 import { isScreenplayMode } from "./screenplay/mode";
 import { parseFountain } from "./screenplay/parser";
@@ -61,6 +62,15 @@ export default class FirstDraftPlugin extends Plugin {
           return false;
         }
         if (!checking) openCharacterExtension(this, editor);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-parenthetical",
+      name: "Screenplay: Parenthetical",
+      editorCheckCallback: (checking, editor, context) => {
+        if (!this.isScreenplayFile(context.file)) return false;
+        if (!checking) openParenthetical(this, editor);
         return true;
       },
     });
