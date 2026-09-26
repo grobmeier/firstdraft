@@ -20,6 +20,10 @@ import {
   FirstDraftSettingTab,
   type FirstDraftSettings,
 } from "./settings/settings";
+import {
+  FIRST_DRAFT_PALETTE_VIEW_TYPE,
+  FirstDraftPaletteView,
+} from "./ui/firstDraftPaletteView";
 import { StatisticsModal } from "./ui/statisticsModal";
 
 export default class FirstDraftPlugin extends Plugin {
@@ -35,6 +39,19 @@ export default class FirstDraftPlugin extends Plugin {
     this.statusBarItem.hide();
     this.addSettingTab(new FirstDraftSettingTab(this.app, this));
     this.registerEditorExtension(createScreenplayCompletionExtension(this));
+    this.registerView(
+      FIRST_DRAFT_PALETTE_VIEW_TYPE,
+      (leaf) => new FirstDraftPaletteView(leaf, this),
+    );
+    this.addRibbonIcon("clapperboard", "Open First Draft Palette", () => {
+      void this.openPalette();
+    });
+
+    this.addCommand({
+      id: "open-first-draft-palette",
+      name: "Screenplay: Open First Draft Palette",
+      callback: () => void this.openPalette(),
+    });
 
     this.addCommand({
       id: "screenplay-new-scene",
@@ -136,12 +153,22 @@ export default class FirstDraftPlugin extends Plugin {
         if (file === this.activeFile()) this.scheduleRefresh();
       }),
     );
+    this.registerDomEvent(document, "selectionchange", () => {
+      const activeElement = document.activeElement;
+      if (
+        activeElement instanceof HTMLElement &&
+        activeElement.closest(".cm-editor")
+      ) {
+        this.scheduleRefresh();
+      }
+    });
 
     this.app.workspace.onLayoutReady(() => this.scheduleRefresh());
   }
 
   onunload(): void {
     if (this.refreshTimer !== null) clearTimeout(this.refreshTimer);
+    this.app.workspace.detachLeavesOfType(FIRST_DRAFT_PALETTE_VIEW_TYPE);
   }
 
   async loadSettings(): Promise<void> {
@@ -162,6 +189,7 @@ export default class FirstDraftPlugin extends Plugin {
   }
 
   refreshStatus(): void {
+    this.refreshPalettes();
     if (this.refreshTimer !== null) {
       clearTimeout(this.refreshTimer);
       this.refreshTimer = null;
@@ -209,7 +237,25 @@ export default class FirstDraftPlugin extends Plugin {
     });
   }
 
-  private activeMarkdownView(): MarkdownView | null {
+  async openPalette(): Promise<void> {
+    const existing = this.app.workspace.getLeavesOfType(
+      FIRST_DRAFT_PALETTE_VIEW_TYPE,
+    )[0];
+    if (existing) {
+      await this.app.workspace.revealLeaf(existing);
+      return;
+    }
+
+    const leaf = this.app.workspace.getRightLeaf(true);
+    if (leaf === null) return;
+    await leaf.setViewState({
+      type: FIRST_DRAFT_PALETTE_VIEW_TYPE,
+      active: true,
+    });
+    await this.app.workspace.revealLeaf(leaf);
+  }
+
+  activeMarkdownView(): MarkdownView | null {
     const direct = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (direct !== null) return direct;
 
@@ -227,5 +273,13 @@ export default class FirstDraftPlugin extends Plugin {
 
   private activeFile(): TFile | null {
     return this.app.workspace.getActiveFile();
+  }
+
+  private refreshPalettes(): void {
+    for (const leaf of this.app.workspace.getLeavesOfType(
+      FIRST_DRAFT_PALETTE_VIEW_TYPE,
+    )) {
+      if (leaf.view instanceof FirstDraftPaletteView) leaf.view.refresh();
+    }
   }
 }

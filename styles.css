@@ -25,3 +25,46 @@
 .firstdraft-character-statistics td:last-child {
   text-align: right;
 }
+
+.firstdraft-palette {
+  padding: var(--size-4-3);
+}
+
+.firstdraft-palette h2,
+.firstdraft-palette h3,
+.firstdraft-palette h4 {
+  margin-block: var(--size-4-3) var(--size-4-2);
+}
+
+.firstdraft-palette-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--size-4-2);
+}
+
+.firstdraft-palette-action:first-child {
+  color: var(--text-on-accent);
+  background: var(--interactive-accent);
+}
+
+.firstdraft-palette-search {
+  width: 100%;
+  margin-bottom: var(--size-4-2);
+}
+
+.firstdraft-palette-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-2-3);
+}
+
+.firstdraft-palette-item {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.firstdraft-palette-empty {
+  color: var(--text-muted);
+}
