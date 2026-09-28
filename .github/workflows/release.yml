@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 jobs:
   release:
@@ -39,20 +41,13 @@ jobs:
       - run: npm test
       - run: npm audit --audit-level=high
       - run: npm run build
-      - name: Package release assets
-        env:
-          VERSION: ${{ github.ref_name }}
-        run: |
-          mkdir -p "release/firstdraft"
-          cp main.js manifest.json styles.css LICENSE NOTICE "release/firstdraft/"
-          cd release
-          zip -r "firstdraft-$VERSION.zip" firstdraft
-          cd ..
-          sha256sum main.js manifest.json styles.css > SHA256SUMS.txt
-          (
-            cd release
-            sha256sum "firstdraft-$VERSION.zip"
-          ) >> SHA256SUMS.txt
+      - name: Attest Obsidian release assets
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            main.js
+            manifest.json
+            styles.css
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -62,8 +57,6 @@ jobs:
             main.js \
             manifest.json \
             styles.css \
-            "release/firstdraft-$VERSION.zip" \
-            SHA256SUMS.txt \
             --title "First Draft $VERSION" \
             --notes-file "docs/releases/$VERSION.md" \
             --verify-tag

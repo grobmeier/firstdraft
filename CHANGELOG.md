@@ -5,6 +5,18 @@ All notable changes to First Draft are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-09-28
+
+### Fixed
+
+- Preserve the user's dock placement when First Draft unloads.
+- Use popout-window-safe timers and remove unnecessary type assertions.
+- Make command names concise and searchable without repeating the plugin name.
+- Adopt Obsidian's declarative settings API and remove deprecated slider calls.
+- Check export-name collisions without enumerating every vault file.
+- Publish only Obsidian-supported assets with GitHub build-provenance
+  attestations.
+
 ## [0.10.0] - 2026-09-28
 
 ### Added
@@ -29,5 +41,6 @@ All notable changes to First Draft are documented here. This project follows
 - FDX export intentionally supports the six core screenplay element types; see
   `docs/FDX_COMPATIBILITY.md`.
 
-[Unreleased]: https://github.com/grobmeier/firstdraft/compare/0.10.0...HEAD
+[Unreleased]: https://github.com/grobmeier/firstdraft/compare/0.10.1...HEAD
+[0.10.1]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.1
 [0.10.0]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.0

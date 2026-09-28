@@ -1,6 +1,6 @@
 {
   "name": "firstdraft",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Screenplay-aware writing assistance for Obsidian, with portable Fountain source.",
   "type": "module",
   "main": "main.js",
@@ -35,6 +35,7 @@
     "@xmldom/xmldom": "^0.9.12",
     "esbuild": "0.25.5",
     "eslint": "^9.39.4",
+    "eslint-plugin-obsidianmd": "^0.4.2",
     "globals": "^17.6.0",
     "obsidian": "latest",
     "prettier": "^3.6.2",

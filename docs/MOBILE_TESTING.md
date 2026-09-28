@@ -11,7 +11,7 @@ is public and has a GitHub release.
 
 1. Install the **BRAT** community plugin in the mobile test vault.
 2. In BRAT, choose **Add Beta plugin**.
-3. Enter `grobmeier/firstdraft` and select the `0.10.0` release.
+3. Enter `grobmeier/firstdraft` and select the current release.
 4. Enable **First Draft** under **Settings → Community plugins**.
 5. Open the project fixture and complete the checklist below.
 

@@ -31,14 +31,14 @@ Create and push an annotated tag whose name exactly matches the manifest
 version:
 
 ```bash
-git tag -a 0.10.0 -m "First Draft 0.10.0"
-git push origin 0.10.0
+git tag -a 0.10.1 -m "First Draft 0.10.1"
+git push origin 0.10.1
 ```
 
 The Release workflow verifies that the tag is on `main`, repeats the complete
-quality gate, builds the plugin, and creates the GitHub release. It uploads the
-individual `main.js`, `manifest.json`, and `styles.css` files required by
-Obsidian, plus a convenience ZIP and SHA-256 checksums.
+quality gate, builds the plugin, creates build-provenance attestations, and
+creates the GitHub release. It uploads only the `main.js`, `manifest.json`, and
+`styles.css` files supported by Obsidian.
 
 Do not move or reuse a published tag. Correct a failed release with a new patch
 version unless the tag never produced a public release.
@@ -53,3 +53,10 @@ version unless the tag never produced a public release.
    community-plugin submission process.
 4. Confirm the GitHub release and CI checks remain green, and review Dependabot
    and security alerts.
+5. Verify the downloaded assets' provenance with:
+
+   ```bash
+   gh attestation verify main.js -R grobmeier/firstdraft
+   gh attestation verify manifest.json -R grobmeier/firstdraft
+   gh attestation verify styles.css -R grobmeier/firstdraft
+   ```

@@ -3,4 +3,5 @@ main.js
 *.map
 First Draft Test Vault/
 coverage/
+graphify-out/
 .DS_Store

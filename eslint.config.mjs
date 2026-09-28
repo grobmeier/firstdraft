@@ -14,18 +14,29 @@
  * limitations under the License.
  */
 
-import eslint from "@eslint/js";
 import globals from "globals";
+import obsidianmd from "eslint-plugin-obsidianmd";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["main.js", "node_modules", "First Draft Test Vault"] },
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
+  {
+    ignores: [
+      "main.js",
+      "node_modules",
+      "First Draft Test Vault",
+      "graphify-out",
+    ],
+  },
+  ...obsidianmd.configs.recommended,
   {
     files: ["**/*.{js,mjs,ts}"],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["*.config.mjs", "scripts/*.mjs"],
+        },
+      },
     },
   },
   {
@@ -35,6 +46,27 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_" },
+      ],
+    },
+  },
+  {
+    files: ["*.config.mjs", "scripts/**/*.mjs", "tests/**/*.ts"],
+    rules: {
+      "no-console": "off",
+      "obsidianmd/hardcoded-config-path": "off",
+      "obsidianmd/no-nodejs-modules": "off",
+      "obsidianmd/rule-custom-message": "off",
+    },
+  },
+  {
+    files: ["src/**/*.ts"],
+    rules: {
+      "obsidianmd/ui/sentence-case": [
+        "warn",
+        {
+          brands: ["First Draft", "Final Draft", "Fountain"],
+          acronyms: ["FDX"],
+        },
       ],
     },
   },
