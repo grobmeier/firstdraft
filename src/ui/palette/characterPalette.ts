@@ -169,7 +169,7 @@ function renderCharacterLinks(
     const target = wikiLinkTarget(link);
     const button = list.createEl("button", {
       cls: "firstdraft-palette-item",
-      text: target.split("/").at(-1) ?? target,
+      text: target.split("/").pop() ?? target,
     });
     button.addEventListener("click", () => {
       const file = plugin.app.metadataCache.getFirstLinkpathDest(

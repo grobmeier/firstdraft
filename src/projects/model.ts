@@ -49,7 +49,7 @@ export function screenplayProjectFromFrontmatter(
   frontmatter: Record<string, unknown> | undefined,
 ): ScreenplayProject | null {
   if (!isScreenplayProjectFrontmatter(frontmatter)) return null;
-  const fallbackTitle = path.split("/").at(-1)?.replace(/\.md$/u, "") ?? path;
+  const fallbackTitle = path.split("/").pop()?.replace(/\.md$/u, "") ?? path;
   const title =
     typeof frontmatter?.title === "string" && frontmatter.title.trim()
       ? frontmatter.title.trim()
