@@ -39,9 +39,12 @@ The current build provides:
 - native Obsidian Local Graph access for character relationships;
 - ordered multi-file screenplay projects whose parts can live in different
   vault folders;
+- vertically stacked project-part links for easier reading and ordering;
 - project-wide statistics, character checks, recent elements, autocomplete,
   Fountain/FDX export, and previous/next navigation;
 - project-local character folders with a Markdown `character-folder` override;
+- a conflict-safe example screenplay generator for first-time exploration;
+- an offline, copy-friendly screenplay and Fountain cheat sheet;
 - context-aware character, character-extension, scene-location, and time
   autocomplete;
 - keyboard-first Character, Character Extension, and New Scene commands;
@@ -71,6 +74,19 @@ character-folder: Characters
 `character-folder` is relative to the project note's folder. Start it with `/`
 to use a vault-relative folder. Project membership and order come only from the
 explicit `parts` list; ordinary backlinks remain free for research and notes.
+
+### Get started with an example
+
+Run `First Draft: Create Example Screenplay` from the command palette, or use
+**Create Example Screenplay** in the First Draft Palette while no screenplay is
+open. First Draft creates a new, self-contained `First Draft Example` folder and
+opens its `Start Here.md` tour. If that folder already exists, a numbered folder
+is used; existing vault content is never overwritten.
+
+Open **Cheat Sheet** in the First Draft Palette—or run
+`First Draft: Open Screenplay Cheat Sheet`—for quick screenplay terminology,
+copyable Fountain examples, and First Draft project concepts. The cheat sheet is
+bundled with the plugin, works offline, and does not create a vault note.
 
 ## Development
 
@@ -103,7 +119,8 @@ for the standalone-screenplay checks.
 Expected result:
 
 - the project note lists both ordered parts even though they live in different
-  folders, and opens either part from the palette;
+  folders, displays each part on its own line, and opens either part from the
+  palette;
 - project statistics, checks, recent items, and exports combine both parts;
 - Previous Part, Next Part, and Project Note navigate the project without the
   command palette;
@@ -156,6 +173,10 @@ Expected result:
 - removing `screenplay: true` and reopening the note hides the item;
 - creating a `.fountain` file activates it without frontmatter;
 - ordinary Markdown notes are unchanged.
+- from an ordinary note, create an example screenplay; repeat the command and
+  confirm the second example uses a numbered folder without changing the first;
+- open the cheat sheet from both its command and the sidebar, then copy one of
+  its Fountain examples.
 
 To use another dedicated test vault:
 

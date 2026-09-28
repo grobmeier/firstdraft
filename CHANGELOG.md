@@ -17,6 +17,8 @@ All notable changes to First Draft are documented here. This project follows
   and deterministic consistency checks.
 - Ordered multi-file screenplay projects with project-wide navigation,
   statistics, checks, exports, and project-local character folders.
+- Vertically stacked project-part links, a conflict-safe example screenplay
+  generator, and an offline screenplay/Fountain cheat sheet.
 - Local-only operation without telemetry, accounts, or network access.
 
 ### Compatibility
