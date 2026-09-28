@@ -192,4 +192,4 @@ the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Licence
 
-[MIT](LICENSE)
+[Apache License 2.0](LICENSE)

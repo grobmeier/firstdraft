@@ -9,6 +9,8 @@
     "dev": "node esbuild.config.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "license:headers": "node scripts/add-license-headers.mjs",
+    "license:headers:check": "node scripts/add-license-headers.mjs --check",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -21,7 +23,7 @@
     "screenwriting"
   ],
   "author": "Christian Grobmeier",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "engines": {
     "node": ">=22.12 <23 || >=24"
   },
