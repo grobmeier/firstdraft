@@ -10,6 +10,7 @@ import { EditorState, Prec, type Extension } from "@codemirror/state";
 import { keymap, type EditorView } from "@codemirror/view";
 import { editorInfoField } from "obsidian";
 import type FirstDraftPlugin from "../main";
+import { loadScreenplayContext } from "../projects/vault";
 import {
   getScreenplayCompletionPlan,
   type CompletionCandidate,
@@ -32,20 +33,32 @@ function applyCandidate(
 export function createScreenplayCompletionExtension(
   plugin: FirstDraftPlugin,
 ): Extension {
-  const source = (context: CompletionContext): CompletionResult | null => {
+  const source = async (
+    context: CompletionContext,
+  ): Promise<CompletionResult | null> => {
     const info = context.state.field(editorInfoField, false);
+    const file = info?.file ?? null;
     if (
       !plugin.settings.autocompleteEnabled ||
-      !plugin.isScreenplayFile(info?.file ?? null)
+      !plugin.isScreenplayFile(file) ||
+      file === null
     ) {
       return null;
     }
 
+    const editorSource = context.state.doc.toString();
+    const screenplay = await loadScreenplayContext(
+      plugin.app,
+      file,
+      plugin.settings.characterFolder,
+      editorSource,
+    );
     const plan = getScreenplayCompletionPlan(
-      context.state.doc.toString(),
+      editorSource,
       context.pos,
       plugin.settings,
       context.explicit,
+      screenplay.document,
     );
     if (!plan) return null;
 

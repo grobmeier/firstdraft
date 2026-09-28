@@ -3,6 +3,7 @@ import {
   DEFAULT_COMPLETION_PREFERENCES,
   getScreenplayCompletionPlan,
 } from "../src/editor/completionEngine";
+import { parseFountain } from "../src/screenplay/parser";
 
 const screenplay = `INT. MILITARY BASE - THERAPY ROOM - DAY
 
@@ -90,5 +91,20 @@ describe("screenplay completion engine", () => {
         DEFAULT_COMPLETION_PREFERENCES,
       ),
     ).toBeNull();
+  });
+
+  it("offers characters discovered in another project part", () => {
+    const source = "\nMI";
+    const plan = getScreenplayCompletionPlan(
+      source,
+      source.length,
+      DEFAULT_COMPLETION_PREFERENCES,
+      false,
+      parseFountain(screenplay),
+    );
+
+    expect(plan?.candidates.map((candidate) => candidate.label)).toContain(
+      "MILLER",
+    );
   });
 });

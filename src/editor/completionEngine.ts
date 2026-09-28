@@ -9,6 +9,7 @@ import {
   rankUsages,
 } from "../screenplay/indexer";
 import { parseFountain } from "../screenplay/parser";
+import type { ScreenplayDocument } from "../screenplay/model";
 
 export type ScreenplayCompletionKind =
   "character" | "character-extension" | "scene-location" | "scene-time";
@@ -154,12 +155,15 @@ export function getScreenplayCompletionPlan(
   cursorOffset: number,
   preferences: CompletionPreferences,
   explicit = false,
+  projectDocument?: ScreenplayDocument,
 ): ScreenplayCompletionPlan | null {
   const { before, from, indexSource, previousLine } = lineContext(
     source,
     cursorOffset,
   );
-  const index = buildScreenplayIndex(parseFountain(indexSource));
+  const index = buildScreenplayIndex(
+    projectDocument ?? parseFountain(indexSource),
+  );
   const characterNames = index.characters.map((usage) =>
     usage.value.toLocaleUpperCase(),
   );
