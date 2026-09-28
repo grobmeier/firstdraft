@@ -58,6 +58,12 @@
   gap: var(--size-4-2);
 }
 
+.firstdraft-palette-global-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--size-4-2);
+}
+
 .firstdraft-palette-action:first-child {
   color: var(--text-on-accent);
   background: var(--interactive-accent);
@@ -144,4 +150,44 @@
   padding: 0;
   color: var(--text-accent);
   text-align: start;
+}
+
+.firstdraft-cheat-sheet {
+  max-height: min(75vh, 48rem);
+  overflow-y: auto;
+}
+
+.firstdraft-cheat-sheet dl {
+  margin-block: var(--size-4-2) var(--size-4-5);
+}
+
+.firstdraft-cheat-sheet dt {
+  margin-top: var(--size-4-3);
+  font-weight: var(--font-semibold);
+}
+
+.firstdraft-cheat-sheet dd {
+  margin-inline-start: 0;
+  color: var(--text-muted);
+}
+
+.firstdraft-cheat-example {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--size-4-2);
+  margin-top: var(--size-4-1);
+}
+
+.firstdraft-cheat-example code {
+  flex: 1;
+  padding: var(--size-4-2);
+  overflow-x: auto;
+  color: var(--text-normal);
+  white-space: pre-wrap;
+  background: var(--code-background);
+  border-radius: var(--radius-s);
+}
+
+.firstdraft-cheat-copy {
+  flex: 0 0 auto;
 }

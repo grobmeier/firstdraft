@@ -51,6 +51,7 @@ import {
   FIRST_DRAFT_PALETTE_VIEW_TYPE,
   FirstDraftPaletteView,
 } from "./ui/firstDraftPaletteView";
+import { CheatSheetModal } from "./ui/cheatSheetModal";
 import { StatisticsModal } from "./ui/statisticsModal";
 
 export default class FirstDraftPlugin extends Plugin {
@@ -84,6 +85,12 @@ export default class FirstDraftPlugin extends Plugin {
       id: "create-example-screenplay",
       name: "First Draft: Create Example Screenplay",
       callback: () => void createExampleScreenplay(this),
+    });
+
+    this.addCommand({
+      id: "open-screenplay-cheat-sheet",
+      name: "First Draft: Open Screenplay Cheat Sheet",
+      callback: () => new CheatSheetModal(this.app).open(),
     });
 
     this.addCommand({

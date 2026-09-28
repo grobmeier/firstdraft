@@ -50,6 +50,7 @@ import { calculateStatistics } from "../screenplay/statistics";
 import type { ScreenplayDocument } from "../screenplay/model";
 import { orderPaletteActions, type PaletteAction } from "./paletteModel";
 import { StatisticsModal } from "./statisticsModal";
+import { CheatSheetModal } from "./cheatSheetModal";
 
 export const FIRST_DRAFT_PALETTE_VIEW_TYPE = "firstdraft-palette";
 
@@ -110,6 +111,16 @@ export class FirstDraftPaletteView extends ItemView {
     const container = this.contentEl;
     container.empty();
     container.createEl("h2", { text: "First Draft" });
+    const globalActions = container.createDiv({
+      cls: "firstdraft-palette-global-actions",
+    });
+    const cheatSheet = globalActions.createEl("button", {
+      cls: "firstdraft-palette-action",
+      text: "Cheat Sheet",
+    });
+    cheatSheet.addEventListener("click", () => {
+      new CheatSheetModal(this.plugin.app).open();
+    });
 
     const view = this.plugin.activeMarkdownView();
     if (view?.file && this.plugin.isCharacterFile(view.file)) {
