@@ -2,7 +2,7 @@ import { Notice } from "obsidian";
 import type { MarkdownView } from "obsidian";
 import type FirstDraftPlugin from "../main";
 import { fdxExportPath, serializeFdx } from "../export/fdx";
-import { parseFountain } from "../screenplay/parser";
+import { loadScreenplayContext } from "../projects/vault";
 
 export async function exportFdx(
   plugin: FirstDraftPlugin,
@@ -14,8 +14,14 @@ export async function exportFdx(
   const existingPaths = new Set(
     plugin.app.vault.getFiles().map((candidate) => candidate.path),
   );
-  const path = fdxExportPath(file.path, existingPaths);
-  const content = serializeFdx(parseFountain(view.editor.getValue()));
+  const context = await loadScreenplayContext(
+    plugin.app,
+    file,
+    plugin.settings.characterFolder,
+    plugin.isScreenplayFile(file) ? view.editor.getValue() : undefined,
+  );
+  const path = fdxExportPath(context.owner.path, existingPaths);
+  const content = serializeFdx(context.document);
 
   try {
     await plugin.app.vault.create(path, content);

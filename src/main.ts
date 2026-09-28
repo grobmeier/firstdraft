@@ -15,8 +15,14 @@ import { openParenthetical } from "./commands/parenthetical";
 import { openTransition } from "./commands/transition";
 import { createScreenplayCompletionExtension } from "./editor/completion";
 import { isCharacterFrontmatter } from "./characters/catalogue";
+import {
+  loadScreenplayContext,
+  openAdjacentProjectPart,
+  projectForFile,
+  projectForPart,
+} from "./projects/vault";
+import { isScreenplayProjectFrontmatter } from "./projects/model";
 import { isScreenplayMode } from "./screenplay/mode";
-import { parseFountain } from "./screenplay/parser";
 import { calculateStatistics } from "./screenplay/statistics";
 import { formatScreenplayStatus } from "./screenplay/status";
 import {
@@ -88,11 +94,15 @@ export default class FirstDraftPlugin extends Plugin {
     this.addCommand({
       id: "screenplay-check-characters",
       name: "Screenplay: Check Characters",
-      editorCheckCallback: (checking, editor, context) => {
-        if (!this.isScreenplayFile(context.file) || context.file === null) {
+      checkCallback: (checking) => {
+        const view = this.activeMarkdownView();
+        if (
+          view?.file === null ||
+          view === null ||
+          (!this.isScreenplayFile(view.file) && !this.isProjectFile(view.file))
+        )
           return false;
-        }
-        if (!checking) checkCharacters(this, editor, context.file);
+        if (!checking) checkCharacters(this, view.editor, view.file);
         return true;
       },
     });
@@ -144,10 +154,12 @@ export default class FirstDraftPlugin extends Plugin {
       name: "Screenplay: Show Statistics",
       checkCallback: (checking) => {
         const view = this.activeMarkdownView();
-        if (view === null || !this.isScreenplayFile(view.file)) return false;
-        if (!checking) {
-          new StatisticsModal(this.app, this.statisticsFor(view)).open();
-        }
+        if (
+          view === null ||
+          (!this.isScreenplayFile(view.file) && !this.isProjectFile(view.file))
+        )
+          return false;
+        if (!checking) void this.showStatistics(view);
         return true;
       },
     });
@@ -156,7 +168,11 @@ export default class FirstDraftPlugin extends Plugin {
       name: "Screenplay: Export to Fountain",
       checkCallback: (checking) => {
         const view = this.activeMarkdownView();
-        if (view === null || !this.isScreenplayFile(view.file)) return false;
+        if (
+          view === null ||
+          (!this.isScreenplayFile(view.file) && !this.isProjectFile(view.file))
+        )
+          return false;
         if (!checking) void exportFountain(this, view);
         return true;
       },
@@ -166,8 +182,47 @@ export default class FirstDraftPlugin extends Plugin {
       name: "Screenplay: Export to Final Draft FDX",
       checkCallback: (checking) => {
         const view = this.activeMarkdownView();
-        if (view === null || !this.isScreenplayFile(view.file)) return false;
+        if (
+          view === null ||
+          (!this.isScreenplayFile(view.file) && !this.isProjectFile(view.file))
+        )
+          return false;
         if (!checking) void exportFdx(this, view);
+        return true;
+      },
+    });
+
+    this.addCommand({
+      id: "screenplay-project-previous-part",
+      name: "Screenplay Project: Previous Part",
+      checkCallback: (checking) => {
+        const file = this.activeFile();
+        if (file === null || projectForPart(this.app, file) === null)
+          return false;
+        if (!checking) void openAdjacentProjectPart(this.app, file, -1);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-project-next-part",
+      name: "Screenplay Project: Next Part",
+      checkCallback: (checking) => {
+        const file = this.activeFile();
+        if (file === null || projectForPart(this.app, file) === null)
+          return false;
+        if (!checking) void openAdjacentProjectPart(this.app, file, 1);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-project-open-project-note",
+      name: "Screenplay Project: Open Project Note",
+      checkCallback: (checking) => {
+        const file = this.activeFile();
+        const project = file ? projectForPart(this.app, file) : null;
+        if (project === null) return false;
+        if (!checking)
+          void this.app.workspace.getLeaf(false).openFile(project.file);
         return true;
       },
     });
@@ -231,6 +286,13 @@ export default class FirstDraftPlugin extends Plugin {
     return isCharacterFrontmatter(frontmatter);
   }
 
+  isProjectFile(file: TFile | null): boolean {
+    if (file === null || file.extension !== "md") return false;
+    const frontmatter = this.app.metadataCache.getFileCache(file)
+      ?.frontmatter as Record<string, unknown> | undefined;
+    return isScreenplayProjectFrontmatter(frontmatter);
+  }
+
   refreshStatus(): void {
     this.refreshPalettes();
     if (this.refreshTimer !== null) {
@@ -245,12 +307,55 @@ export default class FirstDraftPlugin extends Plugin {
 
     const view = this.activeMarkdownView();
     const file = view?.file ?? null;
-    if (view === null || !this.isScreenplayFile(file)) {
+    if (
+      view === null ||
+      (!this.isScreenplayFile(file) && !this.isProjectFile(file))
+    ) {
       this.statusBarItem?.hide();
       return;
     }
 
-    const statistics = this.statisticsFor(view);
+    void this.refreshStatusFor(view);
+  }
+
+  private scheduleRefresh(): void {
+    if (this.refreshTimer !== null) clearTimeout(this.refreshTimer);
+    this.refreshTimer = setTimeout(
+      () => this.refreshStatus(),
+      this.settings.updateDelayMs,
+    );
+  }
+
+  private async statisticsFor(view: MarkdownView) {
+    const file = view.file;
+    if (file === null) return null;
+    const context = await loadScreenplayContext(
+      this.app,
+      file,
+      this.settings.characterFolder,
+      this.isScreenplayFile(file) ? view.editor.getValue() : undefined,
+    );
+    return calculateStatistics(context.document, {
+      pageSize: this.settings.pageSize,
+      minutesPerPage: this.settings.minutesPerPage,
+    });
+  }
+
+  private async showStatistics(view: MarkdownView): Promise<void> {
+    const statistics = await this.statisticsFor(view);
+    if (statistics) new StatisticsModal(this.app, statistics).open();
+  }
+
+  private async refreshStatusFor(view: MarkdownView): Promise<void> {
+    const file = view.file;
+    const statistics = await this.statisticsFor(view);
+    if (
+      statistics === null ||
+      file === null ||
+      file !== this.activeFile() ||
+      (projectForFile(this.app, file) === null && !this.isScreenplayFile(file))
+    )
+      return;
     const status = formatScreenplayStatus(statistics, {
       estimatedPages: this.settings.showEstimatedPages,
       estimatedRuntime: this.settings.showEstimatedRuntime,
@@ -263,21 +368,6 @@ export default class FirstDraftPlugin extends Plugin {
       `First Draft screenplay statistics: ${status}`,
     );
     this.statusBarItem?.show();
-  }
-
-  private scheduleRefresh(): void {
-    if (this.refreshTimer !== null) clearTimeout(this.refreshTimer);
-    this.refreshTimer = setTimeout(
-      () => this.refreshStatus(),
-      this.settings.updateDelayMs,
-    );
-  }
-
-  private statisticsFor(view: MarkdownView) {
-    return calculateStatistics(parseFountain(view.editor.getValue()), {
-      pageSize: this.settings.pageSize,
-      minutesPerPage: this.settings.minutesPerPage,
-    });
   }
 
   async openPalette(): Promise<void> {
