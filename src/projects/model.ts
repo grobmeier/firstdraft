@@ -1,0 +1,82 @@
+import type { ScreenplayDocument } from "../screenplay/model";
+import { wikiLinkTarget } from "../characters/catalogue";
+
+export const SCREENPLAY_PROJECT_KIND = "screenplay-project";
+
+export interface ScreenplayProject {
+  path: string;
+  title: string;
+  parts: string[];
+  characterFolder: string | null;
+}
+
+function stringList(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+  return typeof value === "string" && value.trim() ? [value] : [];
+}
+
+function parentPath(path: string): string {
+  const separator = path.lastIndexOf("/");
+  return separator === -1 ? "" : path.slice(0, separator);
+}
+
+export function isScreenplayProjectFrontmatter(
+  frontmatter: Record<string, unknown> | undefined,
+): boolean {
+  return frontmatter?.firstdraft === SCREENPLAY_PROJECT_KIND;
+}
+
+export function screenplayProjectFromFrontmatter(
+  path: string,
+  frontmatter: Record<string, unknown> | undefined,
+): ScreenplayProject | null {
+  if (!isScreenplayProjectFrontmatter(frontmatter)) return null;
+  const fallbackTitle = path.split("/").at(-1)?.replace(/\.md$/u, "") ?? path;
+  const title =
+    typeof frontmatter?.title === "string" && frontmatter.title.trim()
+      ? frontmatter.title.trim()
+      : fallbackTitle;
+  const characterFolder = frontmatter?.["character-folder"];
+  return {
+    path,
+    title,
+    parts: stringList(frontmatter?.parts).map(wikiLinkTarget).filter(Boolean),
+    characterFolder:
+      typeof characterFolder === "string" && characterFolder.trim()
+        ? characterFolder.trim()
+        : null,
+  };
+}
+
+export function resolveCharacterFolder(
+  ownerPath: string,
+  configuredFolder: string,
+): string {
+  const normalized = configuredFolder.trim().replace(/\/+$/gu, "");
+  if (normalized.startsWith("/")) return normalized.replace(/^\/+|\/+$/gu, "");
+  const parent = parentPath(ownerPath);
+  return [parent, normalized].filter(Boolean).join("/");
+}
+
+export function combineScreenplayDocuments(
+  documents: readonly ScreenplayDocument[],
+): ScreenplayDocument {
+  let lineOffset = 0;
+  return {
+    elements: documents.flatMap((document) => {
+      const elements = document.elements.map((element) => ({
+        ...element,
+        line: element.line + lineOffset,
+      }));
+      lineOffset +=
+        Math.max(1, ...document.elements.map((item) => item.line)) + 1;
+      return elements;
+    }),
+    blankLines: documents.reduce(
+      (sum, document) => sum + document.blankLines,
+      0,
+    ),
+  };
+}
