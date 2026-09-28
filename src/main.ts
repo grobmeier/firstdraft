@@ -26,6 +26,7 @@ import {
 import { openCharacterDossier } from "./commands/characterPage";
 import { openCharacterGraph } from "./commands/characterGraph";
 import { checkCharacters } from "./commands/checkCharacters";
+import { createExampleScreenplay } from "./commands/createExample";
 import { openNewScene } from "./commands/newScene";
 import { openParenthetical } from "./commands/parenthetical";
 import { openTransition } from "./commands/transition";
@@ -77,6 +78,12 @@ export default class FirstDraftPlugin extends Plugin {
       id: "open-first-draft-palette",
       name: "Screenplay: Open First Draft Palette",
       callback: () => void this.openPalette(),
+    });
+
+    this.addCommand({
+      id: "create-example-screenplay",
+      name: "First Draft: Create Example Screenplay",
+      callback: () => void createExampleScreenplay(this),
     });
 
     this.addCommand({

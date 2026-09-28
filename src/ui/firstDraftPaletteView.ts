@@ -28,6 +28,7 @@ import { insertCharacter, openCharacterPicker } from "../commands/character";
 import { openCharacterExtension } from "../commands/characterExtension";
 import { openCharacterDossier } from "../commands/characterPage";
 import { checkCharacters } from "../commands/checkCharacters";
+import { createExampleScreenplay } from "../commands/createExample";
 import { exportFdx } from "../commands/exportFdx";
 import { exportFountain } from "../commands/exportFountain";
 import { openNewScene, openNewSceneAtLocation } from "../commands/newScene";
@@ -128,6 +129,17 @@ export class FirstDraftPaletteView extends ItemView {
         cls: "firstdraft-palette-empty",
         text: "Open a screenplay note to use writing actions and recent elements.",
       });
+      const actions = container.createDiv({
+        cls: "firstdraft-palette-actions",
+      });
+      const example = actions.createEl("button", {
+        cls: "firstdraft-palette-action",
+        text: "Create Example Screenplay",
+      });
+      example.addEventListener(
+        "click",
+        () => void createExampleScreenplay(this.plugin),
+      );
       return;
     }
 
