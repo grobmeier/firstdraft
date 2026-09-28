@@ -1,5 +1,6 @@
 import type { Editor } from "obsidian";
 import type FirstDraftPlugin from "../main";
+import { loadScreenplayContext } from "../projects/vault";
 import { buildScreenplayIndex, rankUsages } from "../screenplay/indexer";
 import { parseFountain } from "../screenplay/parser";
 import { PickerModal, TextInputModal } from "../ui/pickers";
@@ -14,7 +15,25 @@ export function openCharacterPicker(
   plugin: FirstDraftPlugin,
   editor: Editor,
 ): void {
-  const index = buildScreenplayIndex(parseFountain(editor.getValue()));
+  void openCharacterPickerForContext(plugin, editor);
+}
+
+async function openCharacterPickerForContext(
+  plugin: FirstDraftPlugin,
+  editor: Editor,
+): Promise<void> {
+  const file = plugin.activeMarkdownView()?.file ?? null;
+  const document = file
+    ? (
+        await loadScreenplayContext(
+          plugin.app,
+          file,
+          plugin.settings.characterFolder,
+          editor.getValue(),
+        )
+      ).document
+    : parseFountain(editor.getValue());
+  const index = buildScreenplayIndex(document);
   const characters: CharacterChoice[] = rankUsages(
     index.characters,
     "",

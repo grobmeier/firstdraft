@@ -5,13 +5,15 @@ import {
   wikiLinkTarget,
   type CharacterPage,
 } from "../characters/catalogue";
-import { characterPages } from "../characters/vault";
+import { characterPagesForScope } from "../characters/vault";
 import { characterDocumentUsage } from "../characters/usage";
 import { openCharacterGraph } from "../commands/characterGraph";
 import { insertCharacter, openCharacterPicker } from "../commands/character";
 import { openCharacterExtension } from "../commands/characterExtension";
 import { openCharacterDossier } from "../commands/characterPage";
 import { checkCharacters } from "../commands/checkCharacters";
+import { exportFdx } from "../commands/exportFdx";
+import { exportFountain } from "../commands/exportFountain";
 import { openNewScene, openNewSceneAtLocation } from "../commands/newScene";
 import {
   insertParenthetical,
@@ -19,9 +21,18 @@ import {
 } from "../commands/parenthetical";
 import { insertTransition, openTransition } from "../commands/transition";
 import type FirstDraftPlugin from "../main";
+import {
+  loadScreenplayContext,
+  openAdjacentProjectPart,
+  projectForPart,
+  projectMembershipIssue,
+} from "../projects/vault";
 import { buildScreenplayIndex, rankUsages } from "../screenplay/indexer";
 import { parseFountain } from "../screenplay/parser";
+import { calculateStatistics } from "../screenplay/statistics";
+import type { ScreenplayDocument } from "../screenplay/model";
 import { orderPaletteActions, type PaletteAction } from "./paletteModel";
+import { StatisticsModal } from "./statisticsModal";
 
 export const FIRST_DRAFT_PALETTE_VIEW_TYPE = "firstdraft-palette";
 
@@ -88,6 +99,10 @@ export class FirstDraftPaletteView extends ItemView {
       this.renderCharacterPage(container, view.file, generation);
       return;
     }
+    if (view?.file && this.plugin.isProjectFile(view.file)) {
+      this.renderProject(container, view.editor, view.file, generation);
+      return;
+    }
     if (
       view === null ||
       view.file === null ||
@@ -104,7 +119,19 @@ export class FirstDraftPaletteView extends ItemView {
     const source = editor.getValue();
     const cursorOffset = editor.posToOffset(editor.getCursor());
     this.renderActions(container, editor, view.file, source, cursorOffset);
-    this.renderRecent(container, editor, view.file, source);
+    this.renderProjectNavigation(container, view.file);
+    const loading = container.createEl("p", {
+      cls: "firstdraft-palette-muted",
+      text: "Loading screenplay project…",
+    });
+    void this.renderRecentContext(
+      container,
+      loading,
+      editor,
+      view.file,
+      source,
+      generation,
+    );
   }
 
   private renderCharacterPage(
@@ -139,6 +166,8 @@ export class FirstDraftPaletteView extends ItemView {
     void this.renderCharacterUsage(usage, page, generation);
     this.renderCharacterLinks(container, "Screenplays", page.screenplays, page);
     this.renderCharacterLinks(container, "Relationships", page.related, page);
+    const appearances = container.createDiv();
+    void this.renderCharacterAppearances(appearances, page, generation);
   }
 
   private async renderCharacterUsage(
@@ -156,8 +185,12 @@ export class FirstDraftPaletteView extends ItemView {
         page.path,
       );
       if (!file) continue;
-      const source = await this.plugin.app.vault.cachedRead(file);
-      const usage = characterDocumentUsage(page, parseFountain(source));
+      const context = await loadScreenplayContext(
+        this.plugin.app,
+        file,
+        this.plugin.settings.characterFolder,
+      );
+      const usage = characterDocumentUsage(page, context.document);
       cueAppearances += usage.cueAppearances;
       dialogueBlocks += usage.dialogueBlocks;
       scenes += usage.scenes;
@@ -169,6 +202,214 @@ export class FirstDraftPaletteView extends ItemView {
         `${scenes} scene${scenes === 1 ? "" : "s"} · ` +
         `${cueAppearances} cue${cueAppearances === 1 ? "" : "s"} · ` +
         `${dialogueBlocks} dialogue block${dialogueBlocks === 1 ? "" : "s"}`,
+    );
+  }
+
+  private async renderCharacterAppearances(
+    container: HTMLElement,
+    page: CharacterPage,
+    generation: number,
+  ): Promise<void> {
+    const appearances: Array<{ file: TFile; label: string; cues: number }> = [];
+    const seen = new Set<string>();
+    for (const link of page.screenplays) {
+      const owner = this.plugin.app.metadataCache.getFirstLinkpathDest(
+        wikiLinkTarget(link),
+        page.path,
+      );
+      if (!owner) continue;
+      const context = await loadScreenplayContext(
+        this.plugin.app,
+        owner,
+        this.plugin.settings.characterFolder,
+      );
+      for (const part of context.parts) {
+        if (seen.has(part.path)) continue;
+        const source = await this.plugin.app.vault.cachedRead(part);
+        const usage = characterDocumentUsage(page, parseFountain(source));
+        if (usage.cueAppearances === 0) continue;
+        seen.add(part.path);
+        appearances.push({
+          file: part,
+          label: part.basename,
+          cues: usage.cueAppearances,
+        });
+      }
+    }
+    if (generation !== this.renderGeneration || appearances.length === 0)
+      return;
+    container.createEl("h3", { text: "Appearances" });
+    const list = container.createDiv({ cls: "firstdraft-palette-items" });
+    for (const appearance of appearances) {
+      const button = list.createEl("button", {
+        cls: "firstdraft-palette-item",
+        text: `${appearance.label} · ${appearance.cues} cue${appearance.cues === 1 ? "" : "s"}`,
+      });
+      button.addEventListener(
+        "click",
+        () =>
+          void this.plugin.app.workspace
+            .getLeaf(false)
+            .openFile(appearance.file),
+      );
+    }
+  }
+
+  private renderProject(
+    container: HTMLElement,
+    editor: Editor,
+    file: TFile,
+    generation: number,
+  ): void {
+    const loading = container.createEl("p", {
+      cls: "firstdraft-palette-muted",
+      text: "Loading screenplay project…",
+    });
+    void this.renderProjectContext(
+      container,
+      loading,
+      editor,
+      file,
+      generation,
+    );
+  }
+
+  private async renderProjectContext(
+    container: HTMLElement,
+    loading: HTMLElement,
+    editor: Editor,
+    file: TFile,
+    generation: number,
+  ): Promise<void> {
+    const context = await loadScreenplayContext(
+      this.plugin.app,
+      file,
+      this.plugin.settings.characterFolder,
+    );
+    if (generation !== this.renderGeneration || context.project === null)
+      return;
+    loading.remove();
+    container.createEl("h3", { text: context.project.project.title });
+    const issues = [...context.project.issues];
+    for (const part of context.parts) {
+      const issue = projectMembershipIssue(this.plugin.app, part);
+      if (issue) issues.push(`${part.basename}: ${issue}`);
+    }
+    if (issues.length > 0) {
+      const warning = container.createEl("ul", {
+        cls: "firstdraft-palette-empty",
+      });
+      for (const issue of issues) warning.createEl("li", { text: issue });
+    }
+    container.createEl("h3", { text: "Parts" });
+    const parts = container.createDiv({ cls: "firstdraft-palette-items" });
+    for (const [index, part] of context.project.parts.entries()) {
+      const button = parts.createEl("button", {
+        cls: "firstdraft-palette-item",
+        text: `${index + 1}. ${part.file?.basename ?? part.link}`,
+      });
+      button.disabled = part.file === null;
+      if (part.file) {
+        button.addEventListener(
+          "click",
+          () =>
+            void this.plugin.app.workspace.getLeaf(false).openFile(part.file!),
+        );
+      }
+    }
+    const actions = container.createDiv({ cls: "firstdraft-palette-actions" });
+    const addAction = (label: string, action: () => void): void => {
+      const button = actions.createEl("button", {
+        cls: "firstdraft-palette-action",
+        text: label,
+      });
+      button.addEventListener("click", action);
+    };
+    addAction("Statistics", () => {
+      new StatisticsModal(
+        this.plugin.app,
+        calculateStatistics(context.document, {
+          pageSize: this.plugin.settings.pageSize,
+          minutesPerPage: this.plugin.settings.minutesPerPage,
+        }),
+      ).open();
+    });
+    addAction("Check Characters", () =>
+      checkCharacters(this.plugin, editor, file),
+    );
+    addAction("Export Fountain", () => {
+      const view = this.plugin.activeMarkdownView();
+      if (view) void exportFountain(this.plugin, view);
+    });
+    addAction("Export FDX", () => {
+      const view = this.plugin.activeMarkdownView();
+      if (view) void exportFdx(this.plugin, view);
+    });
+    container.createEl("p", {
+      cls: "firstdraft-palette-muted",
+      text: `Character pages: ${context.characterFolder}`,
+    });
+    this.renderRecent(
+      container,
+      editor,
+      file,
+      context.document,
+      characterPagesForScope(this.plugin.app, context.scopeFiles),
+    );
+  }
+
+  private renderProjectNavigation(container: HTMLElement, file: TFile): void {
+    const project = projectForPart(this.plugin.app, file);
+    if (project === null) return;
+    const navigation = container.createDiv({
+      cls: "firstdraft-palette-actions",
+    });
+    for (const [label, offset] of [
+      ["Previous Part", -1],
+      ["Next Part", 1],
+    ] as const) {
+      const button = navigation.createEl("button", {
+        cls: "firstdraft-palette-action",
+        text: label,
+      });
+      button.addEventListener(
+        "click",
+        () => void openAdjacentProjectPart(this.plugin.app, file, offset),
+      );
+    }
+    const projectButton = navigation.createEl("button", {
+      cls: "firstdraft-palette-action",
+      text: "Project Note",
+    });
+    projectButton.addEventListener(
+      "click",
+      () =>
+        void this.plugin.app.workspace.getLeaf(false).openFile(project.file),
+    );
+  }
+
+  private async renderRecentContext(
+    container: HTMLElement,
+    loading: HTMLElement,
+    editor: Editor,
+    file: TFile,
+    source: string,
+    generation: number,
+  ): Promise<void> {
+    const context = await loadScreenplayContext(
+      this.plugin.app,
+      file,
+      this.plugin.settings.characterFolder,
+      source,
+    );
+    if (generation !== this.renderGeneration) return;
+    loading.remove();
+    this.renderRecent(
+      container,
+      editor,
+      file,
+      context.document,
+      characterPagesForScope(this.plugin.app, context.scopeFiles),
     );
   }
 
@@ -235,9 +476,10 @@ export class FirstDraftPaletteView extends ItemView {
     container: HTMLElement,
     editor: Editor,
     screenplay: TFile,
-    source: string,
+    document: ScreenplayDocument,
+    pages: readonly CharacterPage[],
   ): void {
-    const index = buildScreenplayIndex(parseFountain(source));
+    const index = buildScreenplayIndex(document);
     const limit = Math.min(6, this.plugin.settings.maximumSuggestions);
     const ranked = (values: typeof index.characters): string[] =>
       rankUsages(
@@ -246,7 +488,6 @@ export class FirstDraftPaletteView extends ItemView {
         this.plugin.settings.recentItemsWeighting,
         limit,
       ).map((usage) => usage.value);
-    const pages = characterPages(this.plugin.app);
     const sections: RecentSection[] = [
       {
         title: "Characters",

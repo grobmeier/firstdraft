@@ -1,5 +1,6 @@
 import type { Editor } from "obsidian";
 import type FirstDraftPlugin from "../main";
+import { loadScreenplayContext } from "../projects/vault";
 import { buildScreenplayIndex, rankUsages } from "../screenplay/indexer";
 import { parseFountain } from "../screenplay/parser";
 import { PickerModal, TextInputModal } from "../ui/pickers";
@@ -29,7 +30,30 @@ function unique(values: readonly string[]): string[] {
 }
 
 export function openNewScene(plugin: FirstDraftPlugin, editor: Editor): void {
-  const index = buildScreenplayIndex(parseFountain(editor.getValue()));
+  void openNewSceneForContext(plugin, editor);
+}
+
+async function projectIndex(
+  plugin: FirstDraftPlugin,
+  editor: Editor,
+): Promise<ReturnType<typeof buildScreenplayIndex>> {
+  const file = plugin.activeMarkdownView()?.file ?? null;
+  if (file === null)
+    return buildScreenplayIndex(parseFountain(editor.getValue()));
+  const context = await loadScreenplayContext(
+    plugin.app,
+    file,
+    plugin.settings.characterFolder,
+    editor.getValue(),
+  );
+  return buildScreenplayIndex(context.document);
+}
+
+async function openNewSceneForContext(
+  plugin: FirstDraftPlugin,
+  editor: Editor,
+): Promise<void> {
+  const index = await projectIndex(plugin, editor);
   new PickerModal(plugin.app, {
     title: "New Scene — Scene type",
     placeholder: "Choose INT., EXT., or another scene type",
@@ -44,7 +68,15 @@ export function openNewSceneAtLocation(
   editor: Editor,
   location: string,
 ): void {
-  const index = buildScreenplayIndex(parseFountain(editor.getValue()));
+  void openNewSceneAtLocationForContext(plugin, editor, location);
+}
+
+async function openNewSceneAtLocationForContext(
+  plugin: FirstDraftPlugin,
+  editor: Editor,
+  location: string,
+): Promise<void> {
+  const index = await projectIndex(plugin, editor);
   new PickerModal(plugin.app, {
     title: "New Scene — Scene type",
     placeholder: "Choose INT., EXT., or another scene type",
