@@ -5,6 +5,15 @@ All notable changes to First Draft are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-09-28
+
+### Changed
+
+- Split the First Draft Palette into focused character, project, screenplay,
+  and recent-item modules while preserving its existing behaviour.
+- Update the GitHub Actions runtime and compatible development dependencies.
+- Adopt TypeScript 6 and remove deprecated compiler configuration.
+
 ## [0.10.1] - 2026-09-28
 
 ### Fixed
@@ -41,6 +50,7 @@ All notable changes to First Draft are documented here. This project follows
 - FDX export intentionally supports the six core screenplay element types; see
   `docs/FDX_COMPATIBILITY.md`.
 
-[Unreleased]: https://github.com/grobmeier/firstdraft/compare/0.10.1...HEAD
+[Unreleased]: https://github.com/grobmeier/firstdraft/compare/0.10.2...HEAD
+[0.10.2]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.2
 [0.10.1]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.1
 [0.10.0]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.0
