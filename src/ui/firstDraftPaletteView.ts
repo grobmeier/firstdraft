@@ -318,7 +318,9 @@ export class FirstDraftPaletteView extends ItemView {
       for (const issue of issues) warning.createEl("li", { text: issue });
     }
     container.createEl("h3", { text: "Parts" });
-    const parts = container.createDiv({ cls: "firstdraft-palette-items" });
+    const parts = container.createDiv({
+      cls: "firstdraft-palette-items firstdraft-project-parts",
+    });
     for (const [index, part] of context.project.parts.entries()) {
       const button = parts.createEl("button", {
         cls: "firstdraft-palette-item",

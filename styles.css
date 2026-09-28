@@ -74,6 +74,29 @@
   gap: var(--size-2-3);
 }
 
+.firstdraft-project-parts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.firstdraft-project-parts .firstdraft-palette-item {
+  width: 100%;
+  text-align: start;
+}
+
+.firstdraft-project-note
+  .metadata-property[data-property-key="parts"]
+  .multi-select-container {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.firstdraft-project-note
+  .metadata-property[data-property-key="parts"]
+  .multi-select-pill {
+  max-width: 100%;
+}
+
 .firstdraft-palette-item-row {
   display: inline-flex;
   max-width: 100%;

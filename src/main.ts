@@ -275,6 +275,7 @@ export default class FirstDraftPlugin extends Plugin {
 
   onunload(): void {
     if (this.refreshTimer !== null) clearTimeout(this.refreshTimer);
+    this.clearProjectViewClasses();
     this.app.workspace.detachLeavesOfType(FIRST_DRAFT_PALETTE_VIEW_TYPE);
   }
 
@@ -310,6 +311,7 @@ export default class FirstDraftPlugin extends Plugin {
   }
 
   refreshStatus(): void {
+    this.refreshProjectViewClasses();
     this.refreshPalettes();
     if (this.refreshTimer !== null) {
       clearTimeout(this.refreshTimer);
@@ -429,6 +431,25 @@ export default class FirstDraftPlugin extends Plugin {
       FIRST_DRAFT_PALETTE_VIEW_TYPE,
     )) {
       if (leaf.view instanceof FirstDraftPaletteView) leaf.view.refresh();
+    }
+  }
+
+  private refreshProjectViewClasses(): void {
+    for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
+      if (leaf.view instanceof MarkdownView) {
+        leaf.view.containerEl.classList.toggle(
+          "firstdraft-project-note",
+          this.isProjectFile(leaf.view.file),
+        );
+      }
+    }
+  }
+
+  private clearProjectViewClasses(): void {
+    for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
+      if (leaf.view instanceof MarkdownView) {
+        leaf.view.containerEl.classList.remove("firstdraft-project-note");
+      }
     }
   }
 }
