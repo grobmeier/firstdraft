@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
  * Copyright 2026 Christian Grobmeier
  *
@@ -47,6 +48,22 @@ const ROOT_FILES = ["esbuild.config.mjs", "eslint.config.mjs", "styles.css"];
 const SOURCE_DIRECTORIES = ["scripts", "src", "tests"];
 const checkOnly = process.argv.includes("--check");
 
+function sourceWithoutShebang(source) {
+  if (!source.startsWith("#!")) return source;
+
+  const firstNewline = source.indexOf("\n");
+  return firstNewline === -1 ? "" : source.slice(firstNewline + 1);
+}
+
+function addHeader(source) {
+  if (!source.startsWith("#!")) return `${HEADER}\n\n${source}`;
+
+  const firstNewline = source.indexOf("\n");
+  const shebang = firstNewline === -1 ? source : source.slice(0, firstNewline);
+  const body = firstNewline === -1 ? "" : source.slice(firstNewline + 1);
+  return `${shebang}\n${HEADER}\n\n${body}`;
+}
+
 async function collectFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = [];
@@ -71,11 +88,11 @@ for (const directory of SOURCE_DIRECTORIES) {
 const missing = [];
 for (const file of files.sort()) {
   const source = await readFile(file, "utf8");
-  if (source.startsWith(HEADER)) continue;
+  if (sourceWithoutShebang(source).startsWith(HEADER)) continue;
 
   missing.push(file);
   if (!checkOnly) {
-    await writeFile(file, `${HEADER}\n\n${source}`);
+    await writeFile(file, addHeader(source));
   }
 }
 
