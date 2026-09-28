@@ -1,5 +1,4 @@
-import { TFile } from "obsidian";
-import type { App } from "obsidian";
+import type { App, TFile } from "obsidian";
 import { stripObsidianFrontmatter } from "../export/fountain";
 import { parseFountain } from "../screenplay/parser";
 import type { ScreenplayDocument } from "../screenplay/model";

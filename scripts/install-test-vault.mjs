@@ -12,6 +12,9 @@ const vaultRoot = path.resolve(
 );
 const pluginRoot = path.join(vaultRoot, ".obsidian", "plugins", "firstdraft");
 const characterRoot = path.join(vaultRoot, "Characters");
+const projectRootFolder = path.join(vaultRoot, "Long Night");
+const projectPartsFolder = path.join(projectRootFolder, "Parts");
+const projectElsewhereFolder = path.join(projectRootFolder, "Elsewhere");
 const settingsDemo = Array.from(
   { length: 18 },
   (_, index) => `INT. TEST STAGE ${index + 1} - DAY #${index + 1}#
@@ -28,6 +31,8 @@ The numbers move.
 
 await mkdir(pluginRoot, { recursive: true });
 await mkdir(characterRoot, { recursive: true });
+await mkdir(projectPartsFolder, { recursive: true });
+await mkdir(projectElsewhereFolder, { recursive: true });
 await copyFile(
   path.join(projectRoot, "main.js"),
   path.join(pluginRoot, "main.js"),
@@ -40,6 +45,67 @@ await copyFile(
   path.join(projectRoot, "styles.css"),
   path.join(pluginRoot, "styles.css"),
 );
+await writeFile(
+  path.join(projectRootFolder, "Screenplay Project.md"),
+  `---
+firstdraft: screenplay-project
+title: The Long Night
+parts:
+  - "[[Parts/01 - Opening]]"
+  - "[[Elsewhere/02 - The Ward]]"
+character-folder: Characters
+---
+
+# The Long Night
+
+This note owns the screenplay order. Its parts may live in different folders.
+`,
+  { flag: "wx" },
+).catch((error) => {
+  if (error?.code !== "EEXIST") throw error;
+});
+await writeFile(
+  path.join(projectPartsFolder, "01 - Opening.md"),
+  `---
+screenplay: true
+---
+
+FADE IN:
+
+EXT. COAST ROAD - NIGHT
+
+JANE
+We should have turned back.
+
+MILLER
+Too late now.
+`,
+  { flag: "wx" },
+).catch((error) => {
+  if (error?.code !== "EEXIST") throw error;
+});
+await writeFile(
+  path.join(projectElsewhereFolder, "02 - The Ward.md"),
+  `---
+screenplay: true
+---
+
+INT. ABANDONED WARD - DAWN
+
+REEVES waits beside the sealed door.
+
+REEVES
+Jane, you need to see this.
+
+JANE
+Open it.
+
+>CUT TO:
+`,
+  { flag: "wx" },
+).catch((error) => {
+  if (error?.code !== "EEXIST") throw error;
+});
 await writeFile(
   path.join(vaultRoot, "Milestone 1.md"),
   `---\nscreenplay: true\n---\n\nINT. TEST ROOM - DAY\n\nJANE\nIt works.\n`,

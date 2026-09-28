@@ -220,14 +220,16 @@ export class FirstDraftSettingTab extends PluginSettingTab {
 
     new Setting(this.containerEl)
       .setName("Character pages folder")
-      .setDesc("Vault-relative folder used for First Draft character dossiers.")
+      .setDesc(
+        "Folder relative to the screenplay or project note. Start with / for a vault-relative folder; projects can override it with character-folder.",
+      )
       .addText((text) =>
         text
           .setPlaceholder("Characters")
           .setValue(this.plugin.settings.characterFolder)
           .onChange(async (value) => {
-            const folder = value.trim().replace(/^\/+|\/+$/gu, "");
-            if (!folder) return;
+            const folder = value.trim().replace(/\/+$/gu, "");
+            if (!folder || folder === "/") return;
             this.plugin.settings.characterFolder = folder;
             await this.plugin.saveSettings();
           }),

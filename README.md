@@ -10,7 +10,7 @@ human-readable, and useful when the plugin is not installed.
 > First Draft is in early private development. It is not yet available in the
 > Obsidian community-plugin directory.
 
-## Version 0.9
+## Version 0.10
 
 The current build provides:
 
@@ -36,6 +36,11 @@ The current build provides:
   ambiguous aliases, broken relationships, unused pages, and likely spelling
   variants;
 - native Obsidian Local Graph access for character relationships;
+- ordered multi-file screenplay projects whose parts can live in different
+  vault folders;
+- project-wide statistics, character checks, recent elements, autocomplete,
+  Fountain/FDX export, and previous/next navigation;
+- project-local character folders with a Markdown `character-folder` override;
 - context-aware character, character-extension, scene-location, and time
   autocomplete;
 - keyboard-first Character, Character Extension, and New Scene commands;
@@ -44,6 +49,27 @@ The current build provides:
 
 See [FDX compatibility](docs/FDX_COMPATIBILITY.md) for the intentionally narrow
 MVP compatibility boundary.
+
+### Create a screenplay project
+
+Put a project note in the screenplay's folder and list its parts in reading
+order. The links resolve using normal Obsidian link rules, so the part files do
+not need to share a folder:
+
+```yaml
+---
+firstdraft: screenplay-project
+title: The Long Night
+parts:
+  - "[[Parts/01 - Opening]]"
+  - "[[Elsewhere/02 - The Ward]]"
+character-folder: Characters
+---
+```
+
+`character-folder` is relative to the project note's folder. Start it with `/`
+to use a vault-relative folder. Project membership and order come only from the
+explicit `parts` list; ordinary backlinks remain free for research and notes.
 
 ## Development
 
@@ -70,9 +96,20 @@ npm run test-vault
 
 Then open the visible `First Draft Test Vault` directory as a separate Obsidian
 vault, enable or reload **First Draft** in Settings → Community plugins, and
-open `Milestone 4.md`.
+open `Long Night/Screenplay Project.md` for project testing or `Milestone 4.md`
+for the standalone-screenplay checks.
 
 Expected result:
+
+- the project note lists both ordered parts even though they live in different
+  folders, and opens either part from the palette;
+- project statistics, checks, recent items, and exports combine both parts;
+- Previous Part, Next Part, and Project Note navigate the project without the
+  command palette;
+- creating JANE's page from either project part creates
+  `Long Night/Characters/Jane.md` and links it to the project note;
+- setting `character-folder: People` on the project changes the destination to
+  `Long Night/People`; a leading slash makes the override vault-relative;
 
 - click the clapperboard ribbon icon or run
   `Screenplay: Open First Draft Palette`; the panel opens in the right sidebar;
