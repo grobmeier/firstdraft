@@ -7,8 +7,9 @@ The guiding principle is simple: think about the movie, not the syntax. First
 Draft adds screenplay-aware assistance while keeping every document portable,
 human-readable, and useful when the plugin is not installed.
 
-> First Draft is in early private development. It is not yet available in the
-> Obsidian community-plugin directory.
+> First Draft is preparing its first public release. Until it is available in
+> the Obsidian community-plugin directory, install release builds manually in a
+> dedicated test vault.
 
 ## Version 0.10
 
@@ -174,6 +175,10 @@ an Electron desktop application rather than a website. A separate Electron UI
 harness is possible, but it would be platform-specific and more brittle than
 the model-level tests. The remaining acceptance check is therefore a short run
 in the isolated Obsidian vault; see [FDX compatibility](docs/FDX_COMPATIBILITY.md).
+
+First Draft keeps mobile support enabled. Before the public release, follow the
+[mobile testing checklist](docs/MOBILE_TESTING.md) on at least one physical
+device and record the Obsidian and operating-system versions used.
 
 ## Privacy
 

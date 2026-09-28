@@ -2,7 +2,7 @@
   "id": "firstdraft",
   "name": "First Draft",
   "version": "0.10.0",
-  "minAppVersion": "1.5.0",
+  "minAppVersion": "1.13.7",
   "description": "Write screenplays efficiently in portable Fountain text.",
   "author": "Christian Grobmeier",
   "isDesktopOnly": false
