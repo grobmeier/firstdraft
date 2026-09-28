@@ -26,25 +26,35 @@ export function characterPageFile(app: App, page: CharacterPage): TFile | null {
 
 export function verifiableCharacterPages(
   app: App,
-  screenplay: TFile,
+  scopeFiles: readonly TFile[],
 ): VerifiableCharacterPage[] {
-  return characterPages(app).map((page) => ({
-    ...page,
-    linkedToScreenplay: page.screenplays.some((link) => {
-      const target = wikiLinkTarget(link);
-      return (
-        app.metadataCache.getFirstLinkpathDest(target, page.path)?.path ===
-        screenplay.path
-      );
-    }),
-    unresolvedRelated: page.related.filter((link) => {
-      const target = wikiLinkTarget(link);
-      return (
-        !target ||
-        app.metadataCache.getFirstLinkpathDest(target, page.path) === null
-      );
-    }),
-  }));
+  const scopePaths = new Set(scopeFiles.map((file) => file.path));
+  return characterPages(app)
+    .filter((page) =>
+      page.screenplays.some((link) => {
+        const target = wikiLinkTarget(link);
+        const file = app.metadataCache.getFirstLinkpathDest(target, page.path);
+        return file !== null && scopePaths.has(file.path);
+      }),
+    )
+    .map((page) => ({
+      ...page,
+      linkedToScreenplay: true,
+      unresolvedRelated: page.related.filter((link) => {
+        const target = wikiLinkTarget(link);
+        return (
+          !target ||
+          app.metadataCache.getFirstLinkpathDest(target, page.path) === null
+        );
+      }),
+    }));
+}
+
+export function characterPagesForScope(
+  app: App,
+  scopeFiles: readonly TFile[],
+): CharacterPage[] {
+  return verifiableCharacterPages(app, scopeFiles);
 }
 
 async function ensureFolder(app: App, folder: string): Promise<void> {
@@ -72,19 +82,23 @@ function availablePath(app: App, folder: string, cue: string): string {
 export async function ensureCharacterPage(
   app: App,
   folder: string,
-  screenplay: TFile,
+  owner: TFile,
+  scopeFiles: readonly TFile[],
   cue: string,
 ): Promise<TFile | null> {
-  const matches = matchingCharacterPages(characterPages(app), cue);
+  const matches = matchingCharacterPages(
+    characterPagesForScope(app, scopeFiles),
+    cue,
+  );
   if (matches.length === 1) return characterPageFile(app, matches[0]);
   if (matches.length > 1) return null;
 
   await ensureFolder(app, folder);
   const path = availablePath(app, folder, cue);
   const screenplayLink = app.metadataCache.fileToLinktext(
-    screenplay,
+    owner,
     path,
-    screenplay.extension === "md",
+    owner.extension === "md",
   );
   return app.vault.create(path, characterPageTemplate(cue, screenplayLink));
 }

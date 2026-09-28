@@ -2,13 +2,13 @@ import { Notice } from "obsidian";
 import type { Editor, TFile } from "obsidian";
 import type FirstDraftPlugin from "../main";
 import {
-  characterPages,
+  characterPagesForScope,
   ensureCharacterPage,
   openCharacterPage,
 } from "../characters/vault";
+import { loadScreenplayContext } from "../projects/vault";
 import { characterNameFromCue } from "../screenplay/characterExtension";
 import { buildScreenplayIndex, rankUsages } from "../screenplay/indexer";
-import { parseFountain } from "../screenplay/parser";
 import { PickerModal } from "../ui/pickers";
 
 export function openCharacterDossier(
@@ -20,11 +20,25 @@ export function openCharacterDossier(
   const lineCue = characterNameFromCue(editor.getLine(editor.getCursor().line));
   const cue = preferredCue ?? lineCue;
   if (cue) {
-    void ensureAndOpen(plugin, screenplay, cue);
+    void ensureAndOpen(plugin, screenplay, editor.getValue(), cue);
     return;
   }
 
-  const index = buildScreenplayIndex(parseFountain(editor.getValue()));
+  void openDossierPicker(plugin, editor, screenplay);
+}
+
+async function openDossierPicker(
+  plugin: FirstDraftPlugin,
+  editor: Editor,
+  screenplay: TFile,
+): Promise<void> {
+  const context = await loadScreenplayContext(
+    plugin.app,
+    screenplay,
+    plugin.settings.characterFolder,
+    editor.getValue(),
+  );
+  const index = buildScreenplayIndex(context.document);
   const characters = rankUsages(
     index.characters,
     "",
@@ -40,16 +54,24 @@ export function openCharacterDossier(
     placeholder: "Choose a screenplay character",
     items: characters,
     itemText: (item) => item,
-    onChoose: (item) => void ensureAndOpen(plugin, screenplay, item),
+    onChoose: (item) =>
+      void ensureAndOpen(plugin, screenplay, editor.getValue(), item),
   }).open();
 }
 
 async function ensureAndOpen(
   plugin: FirstDraftPlugin,
   screenplay: TFile,
+  currentSource: string,
   cue: string,
 ): Promise<void> {
-  const matches = characterPages(plugin.app).filter(
+  const context = await loadScreenplayContext(
+    plugin.app,
+    screenplay,
+    plugin.settings.characterFolder,
+    currentSource,
+  );
+  const matches = characterPagesForScope(plugin.app, context.scopeFiles).filter(
     (page) =>
       page.character === cue.toLocaleUpperCase() ||
       page.aliases.includes(cue.toLocaleUpperCase()),
@@ -62,8 +84,9 @@ async function ensureAndOpen(
   }
   const file = await ensureCharacterPage(
     plugin.app,
-    plugin.settings.characterFolder,
-    screenplay,
+    context.characterFolder,
+    context.owner,
+    context.scopeFiles,
     cue,
   );
   if (file === null) {
