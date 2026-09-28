@@ -86,7 +86,7 @@ export class FirstDraftPaletteView extends ItemView {
   }
 
   getDisplayText(): string {
-    return "First Draft Palette";
+    return "First Draft palette";
   }
 
   getIcon(): IconName {
@@ -116,7 +116,7 @@ export class FirstDraftPaletteView extends ItemView {
     });
     const cheatSheet = globalActions.createEl("button", {
       cls: "firstdraft-palette-action",
-      text: "Cheat Sheet",
+      text: "Cheat sheet",
     });
     cheatSheet.addEventListener("click", () => {
       new CheatSheetModal(this.plugin.app).open();
@@ -145,7 +145,7 @@ export class FirstDraftPaletteView extends ItemView {
       });
       const example = actions.createEl("button", {
         cls: "firstdraft-palette-action",
-        text: "Create Example Screenplay",
+        text: "Create example screenplay",
       });
       example.addEventListener(
         "click",
@@ -178,8 +178,8 @@ export class FirstDraftPaletteView extends ItemView {
     file: TFile,
     generation: number,
   ): void {
-    const frontmatter = this.plugin.app.metadataCache.getFileCache(file)
-      ?.frontmatter as Record<string, unknown> | undefined;
+    const frontmatter =
+      this.plugin.app.metadataCache.getFileCache(file)?.frontmatter;
     const page = characterPageFromFrontmatter(file.path, frontmatter);
     if (page === null) return;
 
@@ -192,7 +192,7 @@ export class FirstDraftPaletteView extends ItemView {
     }
     const graph = container.createEl("button", {
       cls: "mod-cta firstdraft-character-graph",
-      text: "Open Local Graph",
+      text: "Open local graph",
     });
     graph.addEventListener(
       "click",
@@ -420,7 +420,7 @@ export class FirstDraftPaletteView extends ItemView {
     }
     const projectButton = navigation.createEl("button", {
       cls: "firstdraft-palette-action",
-      text: "Project Note",
+      text: "Project note",
     });
     projectButton.addEventListener(
       "click",
@@ -506,7 +506,7 @@ export class FirstDraftPaletteView extends ItemView {
     }
     const check = actions.createEl("button", {
       cls: "firstdraft-palette-action firstdraft-palette-check",
-      text: "Check Characters",
+      text: "Check characters",
     });
     check.addEventListener("click", () =>
       checkCharacters(this.plugin, editor, screenplay),

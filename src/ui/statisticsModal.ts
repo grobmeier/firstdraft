@@ -63,7 +63,7 @@ export class StatisticsModal extends Modal {
   onOpen(): void {
     const { contentEl } = this;
     contentEl.addClass("firstdraft-statistics");
-    contentEl.createEl("h2", { text: "Screenplay Statistics" });
+    contentEl.createEl("h2", { text: "Screenplay statistics" });
 
     const summary = contentEl.createEl("dl", {
       cls: "firstdraft-statistics-summary",
@@ -74,7 +74,7 @@ export class StatisticsModal extends Modal {
     }
 
     if (this.statistics.characters.length > 0) {
-      contentEl.createEl("h3", { text: "Dialogue by Character" });
+      contentEl.createEl("h3", { text: "Dialogue by character" });
       const table = contentEl.createEl("table", {
         cls: "firstdraft-character-statistics",
       });

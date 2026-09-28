@@ -49,8 +49,7 @@ export interface ScreenplayContext {
 
 export function screenplayProjects(app: App): ResolvedScreenplayProject[] {
   return app.vault.getMarkdownFiles().flatMap((file) => {
-    const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter as
-      Record<string, unknown> | undefined;
+    const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
     const project = screenplayProjectFromFrontmatter(file.path, frontmatter);
     if (project === null) return [];
     const parts = project.parts.map((link) => ({

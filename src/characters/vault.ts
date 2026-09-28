@@ -28,8 +28,7 @@ import type { VerifiableCharacterPage } from "./verification";
 
 export function characterPages(app: App): CharacterPage[] {
   return app.vault.getMarkdownFiles().flatMap((file) => {
-    const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter as
-      Record<string, unknown> | undefined;
+    const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
     const page = characterPageFromFrontmatter(file.path, frontmatter);
     return page ? [page] : [];
   });

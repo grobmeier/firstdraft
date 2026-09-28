@@ -24,7 +24,7 @@ export class CheatSheetModal extends Modal {
   }
 
   onOpen(): void {
-    this.setTitle("Screenplay Cheat Sheet");
+    this.setTitle("Screenplay cheat sheet");
     this.contentEl.addClass("firstdraft-cheat-sheet");
 
     for (const section of CHEAT_SHEET_SECTIONS) {

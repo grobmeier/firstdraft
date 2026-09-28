@@ -36,7 +36,7 @@ export class CharacterCheckModal extends Modal {
   }
 
   onOpen(): void {
-    this.setTitle("Character Check");
+    this.setTitle("Character check");
     this.contentEl.addClass("firstdraft-character-check");
     if (this.issues.length === 0) {
       this.contentEl.createEl("p", {

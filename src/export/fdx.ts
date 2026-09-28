@@ -89,7 +89,7 @@ export function serializeFdx(document: ScreenplayDocument): string {
 
 export function fdxExportPath(
   sourcePath: string,
-  existingPaths: ReadonlySet<string>,
+  existingPaths: Pick<ReadonlySet<string>, "has">,
 ): string {
   const slash = sourcePath.lastIndexOf("/");
   const directory = slash === -1 ? "" : sourcePath.slice(0, slash + 1);

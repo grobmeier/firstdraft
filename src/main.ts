@@ -57,7 +57,7 @@ import { StatisticsModal } from "./ui/statisticsModal";
 export default class FirstDraftPlugin extends Plugin {
   settings: FirstDraftSettings = { ...DEFAULT_SETTINGS };
   private statusBarItem: HTMLElement | null = null;
-  private refreshTimer: ReturnType<typeof setTimeout> | null = null;
+  private refreshTimer: number | null = null;
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -71,31 +71,31 @@ export default class FirstDraftPlugin extends Plugin {
       FIRST_DRAFT_PALETTE_VIEW_TYPE,
       (leaf) => new FirstDraftPaletteView(leaf, this),
     );
-    this.addRibbonIcon("clapperboard", "Open First Draft Palette", () => {
+    this.addRibbonIcon("clapperboard", "Open First Draft palette", () => {
       void this.openPalette();
     });
 
     this.addCommand({
       id: "open-first-draft-palette",
-      name: "Screenplay: Open First Draft Palette",
+      name: "Open palette",
       callback: () => void this.openPalette(),
     });
 
     this.addCommand({
       id: "create-example-screenplay",
-      name: "First Draft: Create Example Screenplay",
+      name: "Create example screenplay",
       callback: () => void createExampleScreenplay(this),
     });
 
     this.addCommand({
       id: "open-screenplay-cheat-sheet",
-      name: "First Draft: Open Screenplay Cheat Sheet",
+      name: "Open screenplay cheat sheet",
       callback: () => new CheatSheetModal(this.app).open(),
     });
 
     this.addCommand({
       id: "screenplay-new-scene",
-      name: "Screenplay: New Scene",
+      name: "Screenplay: New scene",
       editorCheckCallback: (checking, editor, context) => {
         if (!this.isScreenplayFile(context.file)) return false;
         if (!checking) openNewScene(this, editor);
@@ -113,7 +113,7 @@ export default class FirstDraftPlugin extends Plugin {
     });
     this.addCommand({
       id: "character-open-local-graph",
-      name: "Character: Open Local Graph",
+      name: "Character: Open local graph",
       checkCallback: (checking) => {
         const file = this.activeFile();
         if (!this.isCharacterFile(file) || file === null) return false;
@@ -123,7 +123,7 @@ export default class FirstDraftPlugin extends Plugin {
     });
     this.addCommand({
       id: "screenplay-check-characters",
-      name: "Screenplay: Check Characters",
+      name: "Screenplay: Check characters",
       checkCallback: (checking) => {
         const view = this.activeMarkdownView();
         if (
@@ -138,7 +138,7 @@ export default class FirstDraftPlugin extends Plugin {
     });
     this.addCommand({
       id: "screenplay-character-page",
-      name: "Screenplay: Open or Create Character Page",
+      name: "Screenplay: Open or create character page",
       editorCheckCallback: (checking, editor, context) => {
         if (!this.isScreenplayFile(context.file) || context.file === null) {
           return false;
@@ -149,7 +149,7 @@ export default class FirstDraftPlugin extends Plugin {
     });
     this.addCommand({
       id: "screenplay-character-extension",
-      name: "Screenplay: Character Extension",
+      name: "Screenplay: Character extension",
       editorCheckCallback: (checking, editor, context) => {
         if (
           !this.isScreenplayFile(context.file) ||
@@ -181,7 +181,7 @@ export default class FirstDraftPlugin extends Plugin {
     });
     this.addCommand({
       id: "screenplay-show-statistics",
-      name: "Screenplay: Show Statistics",
+      name: "Screenplay: Show statistics",
       checkCallback: (checking) => {
         const view = this.activeMarkdownView();
         if (
@@ -224,7 +224,7 @@ export default class FirstDraftPlugin extends Plugin {
 
     this.addCommand({
       id: "screenplay-project-previous-part",
-      name: "Screenplay Project: Previous Part",
+      name: "Screenplay project: Previous part",
       checkCallback: (checking) => {
         const file = this.activeFile();
         if (file === null || projectForPart(this.app, file) === null)
@@ -235,7 +235,7 @@ export default class FirstDraftPlugin extends Plugin {
     });
     this.addCommand({
       id: "screenplay-project-next-part",
-      name: "Screenplay Project: Next Part",
+      name: "Screenplay project: Next part",
       checkCallback: (checking) => {
         const file = this.activeFile();
         if (file === null || projectForPart(this.app, file) === null)
@@ -246,7 +246,7 @@ export default class FirstDraftPlugin extends Plugin {
     });
     this.addCommand({
       id: "screenplay-project-open-project-note",
-      name: "Screenplay Project: Open Project Note",
+      name: "Screenplay project: Open project note",
       checkCallback: (checking) => {
         const file = this.activeFile();
         const project = file ? projectForPart(this.app, file) : null;
@@ -288,9 +288,8 @@ export default class FirstDraftPlugin extends Plugin {
   }
 
   onunload(): void {
-    if (this.refreshTimer !== null) clearTimeout(this.refreshTimer);
+    if (this.refreshTimer !== null) window.clearTimeout(this.refreshTimer);
     this.clearProjectViewClasses();
-    this.app.workspace.detachLeavesOfType(FIRST_DRAFT_PALETTE_VIEW_TYPE);
   }
 
   async loadSettings(): Promise<void> {
@@ -312,15 +311,13 @@ export default class FirstDraftPlugin extends Plugin {
 
   isCharacterFile(file: TFile | null): boolean {
     if (file === null || file.extension !== "md") return false;
-    const frontmatter = this.app.metadataCache.getFileCache(file)
-      ?.frontmatter as Record<string, unknown> | undefined;
+    const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
     return isCharacterFrontmatter(frontmatter);
   }
 
   isProjectFile(file: TFile | null): boolean {
     if (file === null || file.extension !== "md") return false;
-    const frontmatter = this.app.metadataCache.getFileCache(file)
-      ?.frontmatter as Record<string, unknown> | undefined;
+    const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
     return isScreenplayProjectFrontmatter(frontmatter);
   }
 
@@ -328,7 +325,7 @@ export default class FirstDraftPlugin extends Plugin {
     this.refreshProjectViewClasses();
     this.refreshPalettes();
     if (this.refreshTimer !== null) {
-      clearTimeout(this.refreshTimer);
+      window.clearTimeout(this.refreshTimer);
       this.refreshTimer = null;
     }
 
@@ -351,8 +348,8 @@ export default class FirstDraftPlugin extends Plugin {
   }
 
   private scheduleRefresh(): void {
-    if (this.refreshTimer !== null) clearTimeout(this.refreshTimer);
-    this.refreshTimer = setTimeout(
+    if (this.refreshTimer !== null) window.clearTimeout(this.refreshTimer);
+    this.refreshTimer = window.setTimeout(
       () => this.refreshStatus(),
       this.settings.updateDelayMs,
     );

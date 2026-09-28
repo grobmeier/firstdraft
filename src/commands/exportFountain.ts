@@ -27,9 +27,10 @@ export async function exportFountain(
   const file = view.file;
   if (file === null) return;
 
-  const existingPaths = new Set(
-    plugin.app.vault.getFiles().map((candidate) => candidate.path),
-  );
+  const existingPaths = {
+    has: (path: string) =>
+      plugin.app.vault.getAbstractFileByPath(path) !== null,
+  };
   const context = await loadScreenplayContext(
     plugin.app,
     file,
