@@ -190,6 +190,10 @@ connection during ordinary use. See [PRIVACY.md](PRIVACY.md).
 See [CONTRIBUTING.md](CONTRIBUTING.md). By participating, you agree to follow
 the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+Release history is recorded in the [changelog](CHANGELOG.md). Security issues
+must be submitted through the private process in [SECURITY.md](SECURITY.md), not
+through a public issue.
+
 ## Licence
 
 [Apache License 2.0](LICENSE)

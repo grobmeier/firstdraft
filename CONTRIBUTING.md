@@ -21,3 +21,6 @@ npm run build
 
 Use a separate test vault for manual Obsidian checks. Do not include vault data,
 private screenplays, generated `main.js`, or credentials in a contribution.
+
+Maintainers should follow [docs/RELEASING.md](docs/RELEASING.md) rather than
+creating GitHub releases or assembling release assets by hand.
