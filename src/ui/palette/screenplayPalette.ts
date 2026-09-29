@@ -20,8 +20,10 @@ import { openCharacterPicker } from "../../commands/character";
 import { openCharacterExtension } from "../../commands/characterExtension";
 import { openCharacterDossier } from "../../commands/characterPage";
 import { checkCharacters } from "../../commands/checkCharacters";
+import { exportPdf } from "../../commands/exportPdf";
 import { openNewScene } from "../../commands/newScene";
 import { openParenthetical } from "../../commands/parenthetical";
+import { previewScreenplay } from "../../commands/previewScreenplay";
 import { openTransition } from "../../commands/transition";
 import type FirstDraftPlugin from "../../main";
 import {
@@ -90,7 +92,11 @@ async function renderRecentContext(
     editor,
     file,
     context.document,
-    characterPagesForScope(plugin.app, context.scopeFiles),
+    characterPagesForScope(
+      plugin.app,
+      context.characterFolder,
+      context.scopeFiles,
+    ),
     state,
   );
 }
@@ -122,6 +128,22 @@ function renderActions(
   check.addEventListener("click", () =>
     checkCharacters(plugin, editor, screenplay),
   );
+  const preview = actions.createEl("button", {
+    cls: "firstdraft-palette-action",
+    text: "Preview",
+  });
+  preview.addEventListener("click", () => {
+    const view = plugin.activeMarkdownView();
+    if (view) void previewScreenplay(plugin, view);
+  });
+  const pdf = actions.createEl("button", {
+    cls: "firstdraft-palette-action",
+    text: "Export PDF",
+  });
+  pdf.addEventListener("click", () => {
+    const view = plugin.activeMarkdownView();
+    if (view) void exportPdf(plugin, view);
+  });
 }
 
 function renderProjectNavigation(

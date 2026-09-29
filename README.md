@@ -7,11 +7,13 @@ The guiding principle is simple: think about the movie, not the syntax. First
 Draft adds screenplay-aware assistance while keeping every document portable,
 human-readable, and useful when the plugin is not installed.
 
-> First Draft is preparing its first public release. Until it is available in
-> the Obsidian community-plugin directory, install release builds manually in a
-> dedicated test vault.
+![First Draft preview and PDF export](docs/images/firstdraft-demo.gif)
 
-## Version 0.10
+Install First Draft from **Settings → Community plugins → Browse** in Obsidian.
+Search for **First Draft**, install it, and enable it. See the
+[visual feature tour](docs/FEATURE_TOUR.md) for the complete workflow.
+
+## Version 0.11
 
 The current build provides:
 
@@ -27,6 +29,10 @@ The current build provides:
 - non-destructive export to a clean `.fountain` file;
 - non-destructive Final Draft `.fdx` export for the six core screenplay element
   types;
+- a read-only, page-like screenplay preview for individual files and combined
+  multi-file projects;
+- local, non-destructive PDF export in US Letter or A4 with screenplay margins,
+  Courier typography, page breaks, and page numbers;
 - a dockable First Draft Palette with contextual actions and recent screenplay
   elements;
 - portable Markdown character dossiers with aliases, screenplay links, and
@@ -51,8 +57,9 @@ The current build provides:
 - settings for activation, autocomplete ranking, result limits, scene types,
   and times of day.
 
-See [FDX compatibility](docs/FDX_COMPATIBILITY.md) for the intentionally narrow
-MVP compatibility boundary.
+See [PDF compatibility](docs/PDF_COMPATIBILITY.md) and
+[FDX compatibility](docs/FDX_COMPATIBILITY.md) for the deliberately narrow
+format boundaries.
 
 ### Create a screenplay project
 
@@ -72,8 +79,22 @@ character-folder: Characters
 ```
 
 `character-folder` is relative to the project note's folder. Start it with `/`
-to use a vault-relative folder. Project membership and order come only from the
-explicit `parts` list; ordinary backlinks remain free for research and notes.
+to use a vault-relative folder. Project membership and order come from the
+explicit `parts` list.
+
+Parts inside the project note's folder tree are discovered without searching
+the whole vault. When a part lives elsewhere, add an explicit project link to
+that part's properties:
+
+```yaml
+---
+screenplay: true
+screenplay-project: "[[Long Night/Screenplay Project]]"
+---
+```
+
+The project note remains authoritative; the part-side link is only a scoped
+discovery hint and an ordinary Obsidian backlink.
 
 ### Get started with an example
 
@@ -85,8 +106,9 @@ is used; existing vault content is never overwritten.
 
 Open **Cheat Sheet** in the First Draft Palette—or run
 `First Draft: Open Screenplay Cheat Sheet`—for quick screenplay terminology,
-copyable Fountain examples, and First Draft project concepts. The cheat sheet is
-bundled with the plugin, works offline, and does not create a vault note.
+selectable Fountain examples, and First Draft project concepts. The cheat sheet
+is bundled with the plugin, works offline, and does not create a vault note or
+access the system clipboard.
 
 ## Development
 
@@ -158,6 +180,12 @@ Expected result:
   `.fdx` file without changing the source. Open that file in Final Draft and
   confirm the scene heading, action, character extension, parenthetical,
   dialogue, and transition retain their element types;
+- run `Screenplay: Preview` from a standalone screenplay, a project part, and a
+  project note; confirm the project preview combines its parts in order and the
+  source remains unchanged;
+- export from the preview or run `Screenplay: Export PDF`; confirm the PDF opens,
+  matches the configured Letter/A4 size, and a second export uses a numbered
+  filename rather than overwriting the first;
 - switch page size, minutes per page, or individual status fields under
   Settings → First Draft and confirm the display updates;
 - use `Milestone 3 Settings Demo.md` when comparing Letter/A4 or runtime ratios;
@@ -175,8 +203,8 @@ Expected result:
 - ordinary Markdown notes are unchanged.
 - from an ordinary note, create an example screenplay; repeat the command and
   confirm the second example uses a numbered folder without changing the first;
-- open the cheat sheet from both its command and the sidebar, then copy one of
-  its Fountain examples.
+- open the cheat sheet from both its command and the sidebar, select one of its
+  Fountain examples, and copy it with the normal system shortcut.
 
 To use another dedicated test vault:
 
@@ -187,9 +215,10 @@ node scripts/install-test-vault.mjs /absolute/path/to/test-vault
 ## Automated testing
 
 `npm test` covers parsing, estimation, helpers, character cataloguing and
-verification, derived dossier usage, both export formats, strict XML parsing,
-XML escaping, and structural FDX compatibility. `npm run test-vault` builds the
-production bundle and installs it into the isolated vault.
+verification, derived dossier usage, Fountain/FDX/PDF export, deterministic
+screenplay page layout, strict XML parsing, XML escaping, and structural FDX
+compatibility. `npm run test-vault` builds the production bundle and installs
+it into the isolated vault.
 
 Browser Playwright alone cannot exercise an Obsidian plugin because Obsidian is
 an Electron desktop application rather than a website. A separate Electron UI
@@ -218,3 +247,6 @@ through a public issue.
 ## Licence
 
 [Apache License 2.0](LICENSE)
+
+Third-party licences are recorded in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

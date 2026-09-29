@@ -46,6 +46,11 @@ describe("example screenplay project", () => {
     ).toContain('"[[First Draft Example 2/Screenplay Project]]"');
     expect(
       files.find((file) => file.path === "Parts/01 - Arrival.md")?.content,
+    ).toContain(
+      'screenplay-project: "[[First Draft Example 2/Screenplay Project]]"',
+    );
+    expect(
+      files.find((file) => file.path === "Parts/01 - Arrival.md")?.content,
     ).toContain("MARA (V.O.)\n(steadying herself)");
   });
 });

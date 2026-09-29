@@ -1,0 +1,74 @@
+/*
+ * Copyright 2026 Christian Grobmeier
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { Modal } from "obsidian";
+import type { App } from "obsidian";
+import type { PageSize, ScreenplayDocument } from "../screenplay/model";
+import { layoutScreenplay } from "../export/screenplayLayout";
+
+export class ScreenplayPreviewModal extends Modal {
+  constructor(
+    app: App,
+    private readonly screenplay: ScreenplayDocument,
+    private readonly pageSize: PageSize,
+    private readonly screenplayTitle: string,
+    private readonly exportPdf: () => Promise<void>,
+  ) {
+    super(app);
+  }
+
+  onOpen(): void {
+    this.setTitle(`${this.screenplayTitle} - screenplay preview`);
+    this.modalEl.addClass("firstdraft-preview-modal");
+    this.contentEl.addClass("firstdraft-preview");
+
+    const toolbar = this.contentEl.createDiv({
+      cls: "firstdraft-preview-toolbar",
+    });
+    toolbar.createEl("p", {
+      text: "Read-only preview. Your Fountain source remains unchanged.",
+    });
+    const exportButton = toolbar.createEl("button", { text: "Export PDF" });
+    exportButton.addEventListener("click", () => void this.exportPdf());
+
+    const layout = layoutScreenplay(this.screenplay, this.pageSize);
+    const pages = this.contentEl.createDiv({
+      cls: "firstdraft-preview-pages",
+    });
+    for (const [pageIndex, layoutPage] of layout.pages.entries()) {
+      const page = pages.createDiv({ cls: "firstdraft-preview-page" });
+      page.style.aspectRatio = `${layout.dimensions.width} / ${layout.dimensions.height}`;
+      for (const block of layoutPage.blocks) {
+        const element = page.createDiv({
+          cls: `firstdraft-preview-block firstdraft-preview-${block.type}`,
+          text: block.lines.join("\n"),
+        });
+        element.style.left = `${(block.left / layout.dimensions.width) * 100}%`;
+        element.style.top = `${(block.top / layout.dimensions.height) * 100}%`;
+        element.style.width = `${(block.width / layout.dimensions.width) * 100}%`;
+        element.style.textAlign = block.align;
+      }
+      page.createDiv({
+        cls: "firstdraft-preview-page-number",
+        text: String(pageIndex + 1),
+      });
+    }
+  }
+
+  onClose(): void {
+    this.contentEl.empty();
+  }
+}

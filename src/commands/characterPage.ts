@@ -87,7 +87,11 @@ async function ensureAndOpen(
     plugin.settings.characterFolder,
     currentSource,
   );
-  const matches = characterPagesForScope(plugin.app, context.scopeFiles).filter(
+  const matches = characterPagesForScope(
+    plugin.app,
+    context.characterFolder,
+    context.scopeFiles,
+  ).filter(
     (page) =>
       page.character === cue.toLocaleUpperCase() ||
       page.aliases.includes(cue.toLocaleUpperCase()),

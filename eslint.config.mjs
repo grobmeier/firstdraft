@@ -65,7 +65,7 @@ export default tseslint.config(
         "warn",
         {
           brands: ["First Draft", "Final Draft", "Fountain"],
-          acronyms: ["FDX"],
+          acronyms: ["FDX", "PDF"],
         },
       ],
     },

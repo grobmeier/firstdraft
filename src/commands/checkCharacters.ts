@@ -42,7 +42,11 @@ async function checkCharacterContext(
     editor.getValue(),
   );
   const index = buildScreenplayIndex(context.document);
-  const pages = verifiableCharacterPages(plugin.app, context.scopeFiles);
+  const pages = verifiableCharacterPages(
+    plugin.app,
+    context.characterFolder,
+    context.scopeFiles,
+  );
   const issues = verifyCharacterPages(
     index.characters.map((usage) => usage.value),
     pages,

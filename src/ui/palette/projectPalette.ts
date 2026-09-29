@@ -19,6 +19,8 @@ import { characterPagesForScope } from "../../characters/vault";
 import { checkCharacters } from "../../commands/checkCharacters";
 import { exportFdx } from "../../commands/exportFdx";
 import { exportFountain } from "../../commands/exportFountain";
+import { exportPdf } from "../../commands/exportPdf";
+import { previewScreenplay } from "../../commands/previewScreenplay";
 import type FirstDraftPlugin from "../../main";
 import {
   loadScreenplayContext,
@@ -98,7 +100,11 @@ async function renderProjectContext(
     editor,
     file,
     context.document,
-    characterPagesForScope(plugin.app, context.scopeFiles),
+    characterPagesForScope(
+      plugin.app,
+      context.characterFolder,
+      context.scopeFiles,
+    ),
     state,
   );
 }
@@ -128,6 +134,14 @@ function renderProjectActions(
     ).open();
   });
   addAction("Check Characters", () => checkCharacters(plugin, editor, file));
+  addAction("Preview", () => {
+    const view = plugin.activeMarkdownView();
+    if (view) void previewScreenplay(plugin, view);
+  });
+  addAction("Export PDF", () => {
+    const view = plugin.activeMarkdownView();
+    if (view) void exportPdf(plugin, view);
+  });
   addAction("Export Fountain", () => {
     const view = plugin.activeMarkdownView();
     if (view) void exportFountain(plugin, view);
