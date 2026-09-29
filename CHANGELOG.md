@@ -5,6 +5,14 @@ All notable changes to First Draft are documented here. This project follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Discover screenplay projects through explicit links and nearby project notes
+  instead of enumerating every Markdown file in the vault.
+- Limit character discovery to the configured character folder.
+- Present selectable cheat-sheet examples without reading or writing the system
+  clipboard.
+
 ## [0.10.2] - 2026-09-28
 
 ### Changed

@@ -72,8 +72,22 @@ character-folder: Characters
 ```
 
 `character-folder` is relative to the project note's folder. Start it with `/`
-to use a vault-relative folder. Project membership and order come only from the
-explicit `parts` list; ordinary backlinks remain free for research and notes.
+to use a vault-relative folder. Project membership and order come from the
+explicit `parts` list.
+
+Parts inside the project note's folder tree are discovered without searching
+the whole vault. When a part lives elsewhere, add an explicit project link to
+that part's properties:
+
+```yaml
+---
+screenplay: true
+screenplay-project: "[[Long Night/Screenplay Project]]"
+---
+```
+
+The project note remains authoritative; the part-side link is only a scoped
+discovery hint and an ordinary Obsidian backlink.
 
 ### Get started with an example
 
@@ -85,8 +99,9 @@ is used; existing vault content is never overwritten.
 
 Open **Cheat Sheet** in the First Draft Palette—or run
 `First Draft: Open Screenplay Cheat Sheet`—for quick screenplay terminology,
-copyable Fountain examples, and First Draft project concepts. The cheat sheet is
-bundled with the plugin, works offline, and does not create a vault note.
+selectable Fountain examples, and First Draft project concepts. The cheat sheet
+is bundled with the plugin, works offline, and does not create a vault note or
+access the system clipboard.
 
 ## Development
 
@@ -175,8 +190,8 @@ Expected result:
 - ordinary Markdown notes are unchanged.
 - from an ordinary note, create an example screenplay; repeat the command and
   confirm the second example uses a numbered folder without changing the first;
-- open the cheat sheet from both its command and the sidebar, then copy one of
-  its Fountain examples.
+- open the cheat sheet from both its command and the sidebar, select one of its
+  Fountain examples, and copy it with the normal system shortcut.
 
 To use another dedicated test vault:
 

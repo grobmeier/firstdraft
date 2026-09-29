@@ -19,6 +19,7 @@ import {
   combineScreenplayDocuments,
   resolveCharacterFolder,
   screenplayProjectFromFrontmatter,
+  screenplayProjectLinksFromFrontmatter,
 } from "../src/projects/model";
 import { parseFountain } from "../src/screenplay/parser";
 import { buildScreenplayIndex } from "../src/screenplay/indexer";
@@ -50,6 +51,19 @@ describe("screenplay projects", () => {
     expect(resolveCharacterFolder("Standalone.md", "Characters")).toBe(
       "Characters",
     );
+  });
+
+  it("parses explicit project links from screenplay parts", () => {
+    expect(
+      screenplayProjectLinksFromFrontmatter({
+        "screenplay-project": "[[Long Night/Screenplay Project]]",
+      }),
+    ).toEqual(["Long Night/Screenplay Project"]);
+    expect(
+      screenplayProjectLinksFromFrontmatter({
+        "screenplay-project": ["[[Project One]]", "[[Project Two|Two]]"],
+      }),
+    ).toEqual(["Project One", "Project Two"]);
   });
 
   it("combines documents in order while preserving recency", () => {
