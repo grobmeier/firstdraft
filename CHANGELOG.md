@@ -5,6 +5,18 @@ All notable changes to First Draft are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-29
+
+### Added
+
+- Add a read-only screenplay preview for standalone files and ordered
+  multi-file projects.
+- Export local, non-destructive US Letter or A4 PDFs with Courier typography,
+  screenplay element positioning, deterministic wrapping, page breaks, and
+  page numbers.
+- Add a visual feature tour, publication-ready screenshots, and a short
+  preview-to-PDF demo.
+
 ### Fixed
 
 - Discover screenplay projects through explicit links and nearby project notes
@@ -58,7 +70,8 @@ All notable changes to First Draft are documented here. This project follows
 - FDX export intentionally supports the six core screenplay element types; see
   `docs/FDX_COMPATIBILITY.md`.
 
-[Unreleased]: https://github.com/grobmeier/firstdraft/compare/0.10.2...HEAD
+[Unreleased]: https://github.com/grobmeier/firstdraft/compare/0.11.0...HEAD
+[0.11.0]: https://github.com/grobmeier/firstdraft/releases/tag/0.11.0
 [0.10.2]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.2
 [0.10.1]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.1
 [0.10.0]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.0

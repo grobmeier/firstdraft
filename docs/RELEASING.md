@@ -31,8 +31,8 @@ Create and push an annotated tag whose name exactly matches the manifest
 version:
 
 ```bash
-git tag -a 0.10.2 -m "First Draft 0.10.2"
-git push origin 0.10.2
+git tag -a 0.11.0 -m "First Draft 0.11.0"
+git push origin 0.11.0
 ```
 
 The Release workflow verifies that the tag is on `main`, repeats the complete
