@@ -35,6 +35,9 @@ const context = await esbuild.context({
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Includes pdf-lib, Copyright (c) 2019 Andrew Dillon, used under the MIT
+ * License. See THIRD_PARTY_NOTICES.md in the source repository.
  */`,
   },
   entryPoints: ["src/main.ts"],

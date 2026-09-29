@@ -19,6 +19,7 @@ import type { TFile } from "obsidian";
 import { openCharacterPicker } from "./commands/character";
 import { exportFdx } from "./commands/exportFdx";
 import { exportFountain } from "./commands/exportFountain";
+import { exportPdf } from "./commands/exportPdf";
 import {
   isLikelyCharacterCue,
   openCharacterExtension,
@@ -29,6 +30,7 @@ import { checkCharacters } from "./commands/checkCharacters";
 import { createExampleScreenplay } from "./commands/createExample";
 import { openNewScene } from "./commands/newScene";
 import { openParenthetical } from "./commands/parenthetical";
+import { previewScreenplay } from "./commands/previewScreenplay";
 import { openTransition } from "./commands/transition";
 import { createScreenplayCompletionExtension } from "./editor/completion";
 import { isCharacterFrontmatter } from "./characters/catalogue";
@@ -190,6 +192,34 @@ export default class FirstDraftPlugin extends Plugin {
         )
           return false;
         if (!checking) void this.showStatistics(view);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-preview",
+      name: "Screenplay: Preview",
+      checkCallback: (checking) => {
+        const view = this.activeMarkdownView();
+        if (
+          view === null ||
+          (!this.isScreenplayFile(view.file) && !this.isProjectFile(view.file))
+        )
+          return false;
+        if (!checking) void previewScreenplay(this, view);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "screenplay-export-pdf",
+      name: "Screenplay: Export PDF",
+      checkCallback: (checking) => {
+        const view = this.activeMarkdownView();
+        if (
+          view === null ||
+          (!this.isScreenplayFile(view.file) && !this.isProjectFile(view.file))
+        )
+          return false;
+        if (!checking) void exportPdf(this, view);
         return true;
       },
     });
