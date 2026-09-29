@@ -139,7 +139,7 @@ export const CHEAT_SHEET_SECTIONS: CheatSheetSection[] = [
       {
         term: "Part",
         explanation:
-          "One screenplay file in a project's explicit reading order, such as a chapter or act.",
+          "One screenplay file in a project's explicit reading order, such as a chapter or act. A screenplay-project property can link back when the part lives elsewhere.",
       },
       {
         term: "Character dossier",

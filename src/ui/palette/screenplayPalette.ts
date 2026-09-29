@@ -90,7 +90,11 @@ async function renderRecentContext(
     editor,
     file,
     context.document,
-    characterPagesForScope(plugin.app, context.scopeFiles),
+    characterPagesForScope(
+      plugin.app,
+      context.characterFolder,
+      context.scopeFiles,
+    ),
     state,
   );
 }

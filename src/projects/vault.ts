@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import type { App, TFile } from "obsidian";
+import { TFile } from "obsidian";
+import type { App, TFolder } from "obsidian";
 import { stripObsidianFrontmatter } from "../export/fountain";
 import { parseFountain } from "../screenplay/parser";
 import type { ScreenplayDocument } from "../screenplay/model";
@@ -22,6 +23,7 @@ import {
   combineScreenplayDocuments,
   resolveCharacterFolder,
   screenplayProjectFromFrontmatter,
+  screenplayProjectLinksFromFrontmatter,
   type ScreenplayProject,
 } from "./model";
 
@@ -47,31 +49,61 @@ export interface ScreenplayContext {
   scopeFiles: TFile[];
 }
 
-export function screenplayProjects(app: App): ResolvedScreenplayProject[] {
-  return app.vault.getMarkdownFiles().flatMap((file) => {
-    const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
-    const project = screenplayProjectFromFrontmatter(file.path, frontmatter);
-    if (project === null) return [];
-    const parts = project.parts.map((link) => ({
-      link,
-      file: app.metadataCache.getFirstLinkpathDest(link, file.path),
-    }));
-    const resolvedPaths = parts.flatMap((part) =>
-      part.file ? [part.file.path] : [],
-    );
-    const duplicatePaths = new Set(
-      resolvedPaths.filter(
-        (path, index) => resolvedPaths.indexOf(path) !== index,
-      ),
-    );
-    const issues = [
-      ...parts
-        .filter((part) => part.file === null)
-        .map((part) => `Unresolved part: ${part.link}`),
-      ...[...duplicatePaths].map((path) => `Duplicate part: ${path}`),
-    ];
-    if (parts.length === 0) issues.push("The project has no parts.");
-    return [{ project, file, parts, issues }];
+function resolveScreenplayProject(
+  app: App,
+  file: TFile,
+): ResolvedScreenplayProject | null {
+  const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
+  const project = screenplayProjectFromFrontmatter(file.path, frontmatter);
+  if (project === null) return null;
+  const parts = project.parts.map((link) => ({
+    link,
+    file: app.metadataCache.getFirstLinkpathDest(link, file.path),
+  }));
+  const resolvedPaths = parts.flatMap((part) =>
+    part.file ? [part.file.path] : [],
+  );
+  const duplicatePaths = new Set(
+    resolvedPaths.filter(
+      (path, index) => resolvedPaths.indexOf(path) !== index,
+    ),
+  );
+  const issues = [
+    ...parts
+      .filter((part) => part.file === null)
+      .map((part) => `Unresolved part: ${part.link}`),
+    ...[...duplicatePaths].map((path) => `Duplicate part: ${path}`),
+  ];
+  if (parts.length === 0) issues.push("The project has no parts.");
+  return { project, file, parts, issues };
+}
+
+function projectCandidatesForPart(app: App, file: TFile): TFile[] {
+  const candidates = new Map<string, TFile>();
+  const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
+  for (const link of screenplayProjectLinksFromFrontmatter(frontmatter)) {
+    const target = app.metadataCache.getFirstLinkpathDest(link, file.path);
+    if (target) candidates.set(target.path, target);
+  }
+
+  let folder: TFolder | null = file.parent;
+  while (folder !== null) {
+    for (const child of folder.children) {
+      if (child instanceof TFile && child.extension === "md") {
+        candidates.set(child.path, child);
+      }
+    }
+    folder = folder.parent;
+  }
+  return [...candidates.values()];
+}
+
+function projectsForPart(app: App, file: TFile): ResolvedScreenplayProject[] {
+  return projectCandidatesForPart(app, file).flatMap((candidate) => {
+    const project = resolveScreenplayProject(app, candidate);
+    return project?.parts.some((part) => part.file?.path === file.path)
+      ? [project]
+      : [];
   });
 }
 
@@ -79,9 +111,7 @@ export function projectForPart(
   app: App,
   file: TFile,
 ): ResolvedScreenplayProject | null {
-  const matches = screenplayProjects(app).filter((project) =>
-    project.parts.some((part) => part.file?.path === file.path),
-  );
+  const matches = projectsForPart(app, file);
   if (matches.length !== 1) return null;
   return matches[0] ?? null;
 }
@@ -90,17 +120,11 @@ export function projectForFile(
   app: App,
   file: TFile,
 ): ResolvedScreenplayProject | null {
-  return (
-    screenplayProjects(app).find(
-      (project) => project.file.path === file.path,
-    ) ?? projectForPart(app, file)
-  );
+  return resolveScreenplayProject(app, file) ?? projectForPart(app, file);
 }
 
 export function projectMembershipIssue(app: App, file: TFile): string | null {
-  const matches = screenplayProjects(app).filter((project) =>
-    project.parts.some((part) => part.file?.path === file.path),
-  );
+  const matches = projectsForPart(app, file);
   return matches.length > 1
     ? `This part belongs to ${matches.length} screenplay projects.`
     : null;

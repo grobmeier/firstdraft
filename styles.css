@@ -172,22 +172,18 @@
 }
 
 .firstdraft-cheat-example {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--size-4-2);
   margin-top: var(--size-4-1);
 }
 
-.firstdraft-cheat-example code {
-  flex: 1;
+.firstdraft-cheat-example-text {
+  width: 100%;
   padding: var(--size-4-2);
   overflow-x: auto;
   color: var(--text-normal);
+  font-family: var(--font-monospace);
   white-space: pre-wrap;
   background: var(--code-background);
+  border: 0;
   border-radius: var(--radius-s);
-}
-
-.firstdraft-cheat-copy {
-  flex: 0 0 auto;
+  resize: none;
 }

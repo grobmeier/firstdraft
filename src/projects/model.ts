@@ -44,6 +44,14 @@ export function isScreenplayProjectFrontmatter(
   return frontmatter?.firstdraft === SCREENPLAY_PROJECT_KIND;
 }
 
+export function screenplayProjectLinksFromFrontmatter(
+  frontmatter: Record<string, unknown> | undefined,
+): string[] {
+  return stringList(frontmatter?.["screenplay-project"])
+    .map(wikiLinkTarget)
+    .filter(Boolean);
+}
+
 export function screenplayProjectFromFrontmatter(
   path: string,
   frontmatter: Record<string, unknown> | undefined,

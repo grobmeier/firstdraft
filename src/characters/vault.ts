@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { normalizePath, TFile } from "obsidian";
+import { normalizePath, TFile, TFolder } from "obsidian";
 import type { App } from "obsidian";
 import {
   characterFilename,
@@ -26,8 +26,27 @@ import {
 } from "./catalogue";
 import type { VerifiableCharacterPage } from "./verification";
 
-export function characterPages(app: App): CharacterPage[] {
-  return app.vault.getMarkdownFiles().flatMap((file) => {
+function markdownFilesInFolder(app: App, folderPath: string): TFile[] {
+  const normalized = normalizePath(folderPath);
+  if (!normalized) return [];
+  const folder = app.vault.getFolderByPath(normalized);
+  if (folder === null) return [];
+
+  const files: TFile[] = [];
+  const pending = [...folder.children];
+  while (pending.length > 0) {
+    const child = pending.pop();
+    if (child instanceof TFile && child.extension === "md") files.push(child);
+    if (child instanceof TFolder) pending.push(...child.children);
+  }
+  return files;
+}
+
+export function characterPages(
+  app: App,
+  characterFolder: string,
+): CharacterPage[] {
+  return markdownFilesInFolder(app, characterFolder).flatMap((file) => {
     const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
     const page = characterPageFromFrontmatter(file.path, frontmatter);
     return page ? [page] : [];
@@ -41,10 +60,11 @@ export function characterPageFile(app: App, page: CharacterPage): TFile | null {
 
 export function verifiableCharacterPages(
   app: App,
+  characterFolder: string,
   scopeFiles: readonly TFile[],
 ): VerifiableCharacterPage[] {
   const scopePaths = new Set(scopeFiles.map((file) => file.path));
-  return characterPages(app)
+  return characterPages(app, characterFolder)
     .filter((page) =>
       page.screenplays.some((link) => {
         const target = wikiLinkTarget(link);
@@ -67,9 +87,10 @@ export function verifiableCharacterPages(
 
 export function characterPagesForScope(
   app: App,
+  characterFolder: string,
   scopeFiles: readonly TFile[],
 ): CharacterPage[] {
-  return verifiableCharacterPages(app, scopeFiles);
+  return verifiableCharacterPages(app, characterFolder, scopeFiles);
 }
 
 async function ensureFolder(app: App, folder: string): Promise<void> {
@@ -102,7 +123,7 @@ export async function ensureCharacterPage(
   cue: string,
 ): Promise<TFile | null> {
   const matches = matchingCharacterPages(
-    characterPagesForScope(app, scopeFiles),
+    characterPagesForScope(app, folder, scopeFiles),
     cue,
   );
   if (matches.length === 1) return characterPageFile(app, matches[0]);

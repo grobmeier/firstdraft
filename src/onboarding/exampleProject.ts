@@ -74,6 +74,7 @@ The project note owns the screenplay's reading order. Open the First Draft Palet
       path: "Parts/01 - Arrival.md",
       content: `---
 screenplay: true
+screenplay-project: "[[${projectLink}]]"
 ---
 
 FADE IN:
@@ -96,6 +97,7 @@ CUT TO:
       path: "Parts/02 - Choice.md",
       content: `---
 screenplay: true
+screenplay-project: "[[${projectLink}]]"
 ---
 
 INT. LAST TRAIN - NIGHT

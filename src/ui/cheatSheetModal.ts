@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Modal, Notice } from "obsidian";
+import { Modal } from "obsidian";
 import type { App } from "obsidian";
 import { CHEAT_SHEET_SECTIONS } from "../onboarding/cheatSheet";
 
@@ -26,6 +26,10 @@ export class CheatSheetModal extends Modal {
   onOpen(): void {
     this.setTitle("Screenplay cheat sheet");
     this.contentEl.addClass("firstdraft-cheat-sheet");
+    this.contentEl.createEl("p", {
+      cls: "firstdraft-palette-muted",
+      text: "Examples are selectable. Use your normal copy shortcut after selecting the text you need.",
+    });
 
     for (const section of CHEAT_SHEET_SECTIONS) {
       this.contentEl.createEl("h3", { text: section.title });
@@ -53,17 +57,14 @@ export class CheatSheetModal extends Modal {
     example: string,
   ): void {
     const row = container.createDiv({ cls: "firstdraft-cheat-example" });
-    row.createEl("code", { text: example });
-    const copy = row.createEl("button", {
-      cls: "firstdraft-cheat-copy",
-      text: "Copy",
-      attr: { "aria-label": `Copy ${term} example` },
+    const field = row.createEl("textarea", {
+      cls: "firstdraft-cheat-example-text",
+      attr: {
+        "aria-label": `${term} example`,
+        readonly: "",
+        rows: String(Math.max(1, example.split("\n").length)),
+      },
     });
-    copy.addEventListener("click", () => {
-      void navigator.clipboard
-        .writeText(example)
-        .then(() => new Notice(`Copied ${term} example.`))
-        .catch(() => new Notice("Could not copy the example."));
-    });
+    field.value = example;
   }
 }

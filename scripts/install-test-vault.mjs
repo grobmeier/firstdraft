@@ -84,6 +84,7 @@ await writeFile(
   path.join(projectPartsFolder, "01 - Opening.md"),
   `---
 screenplay: true
+screenplay-project: "[[Long Night/Screenplay Project]]"
 ---
 
 FADE IN:
@@ -104,6 +105,7 @@ await writeFile(
   path.join(projectElsewhereFolder, "02 - The Ward.md"),
   `---
 screenplay: true
+screenplay-project: "[[Long Night/Screenplay Project]]"
 ---
 
 INT. ABANDONED WARD - DAWN
