@@ -43,7 +43,10 @@ BRAT release-candidate path is the practical option there.
 - Create and open a character dossier.
 - Open a multi-part screenplay project and navigate between parts.
 - View project statistics and character checks.
-- Export Fountain and FDX files without changing the source document.
+- Preview a standalone screenplay and a multi-part project in both portrait
+  and landscape orientation without horizontal page clipping.
+- Export Fountain, FDX, and PDF files without changing the source document;
+  open the PDF and confirm its pages are readable.
 - Change First Draft settings, restart Obsidian, and confirm they persist.
 - Lock and resume the device, then confirm the active screenplay still works.
 
