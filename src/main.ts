@@ -28,6 +28,7 @@ import { openCharacterDossier } from "./commands/characterPage";
 import { openCharacterGraph } from "./commands/characterGraph";
 import { checkCharacters } from "./commands/checkCharacters";
 import { createExampleScreenplay } from "./commands/createExample";
+import { activateScreenplayNote } from "./commands/activateScreenplay";
 import { openNewScene } from "./commands/newScene";
 import { openParenthetical } from "./commands/parenthetical";
 import { previewScreenplay } from "./commands/previewScreenplay";
@@ -81,6 +82,24 @@ export default class FirstDraftPlugin extends Plugin {
       id: "open-first-draft-palette",
       name: "Open palette",
       callback: () => void this.openPalette(),
+    });
+
+    this.addCommand({
+      id: "use-note-as-screenplay",
+      name: "Use this note as a screenplay",
+      checkCallback: (checking) => {
+        const file = this.activeMarkdownView()?.file;
+        if (
+          !file ||
+          file.extension !== "md" ||
+          this.isScreenplayFile(file) ||
+          this.isCharacterFile(file) ||
+          this.isProjectFile(file)
+        )
+          return false;
+        if (!checking) void activateScreenplayNote(this, file);
+        return true;
+      },
     });
 
     this.addCommand({

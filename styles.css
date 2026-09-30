@@ -54,8 +54,23 @@
 
 .firstdraft-palette-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(8rem, 100%), 1fr));
   gap: var(--size-4-2);
+}
+
+.firstdraft-palette-onboarding-actions {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.firstdraft-palette .firstdraft-palette-action {
+  min-width: 0;
+  max-width: 100%;
+  height: auto;
+  min-height: var(--input-height);
+  padding: var(--size-4-2) var(--size-4-3);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 
 .firstdraft-palette-global-actions {

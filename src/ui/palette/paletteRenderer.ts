@@ -15,6 +15,7 @@
  */
 
 import { createExampleScreenplay } from "../../commands/createExample";
+import { activateScreenplayNote } from "../../commands/activateScreenplay";
 import type FirstDraftPlugin from "../../main";
 import { CheatSheetModal } from "../cheatSheetModal";
 import { renderCharacterPalette } from "./characterPalette";
@@ -72,11 +73,35 @@ function renderEmptyPalette(
   plugin: FirstDraftPlugin,
   container: HTMLElement,
 ): void {
+  const file = plugin.activeMarkdownView()?.file;
+  const eligible =
+    file?.extension === "md" &&
+    !plugin.isCharacterFile(file) &&
+    !plugin.isProjectFile(file);
   container.createEl("p", {
     cls: "firstdraft-palette-empty",
-    text: "Open a screenplay note to use writing actions and recent elements.",
+    text: eligible
+      ? "Use this note as a screenplay to unlock writing actions. This adds screenplay: true to its properties; your text is not converted or reformatted."
+      : "Open a Markdown note to enable screenplay mode, or try an example below.",
   });
-  const actions = container.createDiv({ cls: "firstdraft-palette-actions" });
+  const actions = container.createDiv({
+    cls: "firstdraft-palette-actions firstdraft-palette-onboarding-actions",
+  });
+  if (eligible) {
+    const activate = actions.createEl("button", {
+      cls: "firstdraft-palette-action",
+      text: "Use this note as a screenplay",
+    });
+    activate.disabled = !plugin.settings.activateFrontmatter;
+    if (activate.disabled) {
+      container.createEl("p", {
+        text: 'In First Draft settings, enable "use screenplay frontmatter" to use this action.',
+      });
+    }
+    activate.addEventListener("click", () => {
+      void activateScreenplayNote(plugin, file);
+    });
+  }
   const example = actions.createEl("button", {
     cls: "firstdraft-palette-action",
     text: "Create example screenplay",

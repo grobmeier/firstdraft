@@ -98,6 +98,16 @@ discovery hint and an ordinary Obsidian backlink.
 
 ### Get started with an example
 
+To use your own Markdown note, open it and click the clapperboard ribbon icon.
+In the First Draft Palette, choose **Use this note as a screenplay**. This adds
+`screenplay: true` to its properties without converting your text or changing
+other properties. Writing actions appear once Obsidian updates the note's
+metadata. Remove that property to return to ordinary-note mode. If the button
+is disabled, enable **Use screenplay frontmatter** in Settings → First Draft.
+You can also press **Cmd+P** (Ctrl+P on Windows/Linux) and choose
+**First Draft: Use this note as a screenplay** while an ordinary Markdown note
+is open.
+
 Run `First Draft: Create Example Screenplay` from the command palette, or use
 **Create Example Screenplay** in the First Draft Palette while no screenplay is
 open. First Draft creates a new, self-contained `First Draft Example` folder and
