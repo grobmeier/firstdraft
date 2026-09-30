@@ -27,8 +27,16 @@ page.
 
 This release does not yet format Fountain title-page metadata, dual dialogue,
 lyrics, centred text, notes, sections, synopses, boneyards, revision colours,
-locked pages, or production tags. Characters outside the built-in Courier
-font's encoding are replaced with `?` in the PDF; the source remains
-unchanged.
+locked pages, or production tags.
+
+### Next-build text safety
+
+The next build stops PDF export when the built-in Courier font cannot represent
+the text. It reports up to eight distinct unsupported characters with Unicode
+code points; no PDF is saved and the source remains unchanged. Genuine `?`
+characters and supported accents still export normally. Preview remains
+available, and Fountain export preserves text for use in another application.
+This is not complete Unicode font support. Published 0.11.0 still substitutes
+unsupported characters with `?`; the safety check is not released yet.
 
 For interchange with Final Draft, see [FDX compatibility](FDX_COMPATIBILITY.md).

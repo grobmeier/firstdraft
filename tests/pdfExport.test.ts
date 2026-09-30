@@ -16,10 +16,62 @@
 
 import { PDFDocument } from "pdf-lib";
 import { describe, expect, it } from "vitest";
-import { pdfExportPath, serializePdf } from "../src/export/pdf";
+import {
+  pdfExportPath,
+  serializePdf,
+  UnsupportedPdfTextError,
+} from "../src/export/pdf";
 import { parseFountain } from "../src/screenplay/parser";
 
 describe("PDF export", () => {
+  it.each(["us-letter", "a4"] as const)(
+    "preserves supported accents and genuine question marks on %s",
+    async (pageSize) => {
+      const bytes = await serializePdf(
+        parseFountain("INT. CAFÉ - DAY\n\nJANE\nÇa va? Grüße, señor."),
+        { pageSize, title: "Accents" },
+      );
+      expect((await PDFDocument.load(bytes)).getPageCount()).toBe(1);
+    },
+  );
+
+  it("rejects unsupported text with deduplicated Unicode diagnostics", async () => {
+    const source = "INT. ROOM - DAY\n\nJANE\n你好 🙂 你好 🙂";
+    const document = parseFountain(source);
+    const original = JSON.stringify(document);
+    let caught: unknown;
+    try {
+      await serializePdf(document, {
+        pageSize: "us-letter",
+        title: "Unsupported",
+      });
+    } catch (error) {
+      caught = error;
+    }
+    expect(caught).toBeInstanceOf(UnsupportedPdfTextError);
+    if (!(caught instanceof UnsupportedPdfTextError))
+      throw new Error("Expected PDF text error");
+    expect(caught.characters).toEqual(["你", "好", "🙂"]);
+    expect(caught.truncated).toBe(false);
+    expect(caught.message).toContain("U+1F642");
+    expect(caught.message).toContain("No PDF was saved");
+    expect(caught.message).toContain("Export to Fountain");
+    expect(JSON.stringify(document)).toBe(original);
+  });
+
+  it("bounds diagnostics and validates bold headings as well as dialogue", async () => {
+    await expect(
+      serializePdf(parseFountain("INT. 一二三四五六七八九十 - DAY"), {
+        pageSize: "a4",
+        title: "Bounded",
+      }),
+    ).rejects.toMatchObject({
+      name: "UnsupportedPdfTextError",
+      characters: ["一", "二", "三", "四", "五", "六", "七", "八"],
+      truncated: true,
+    });
+  });
+
   it("creates a readable PDF with metadata and pages", async () => {
     const bytes = await serializePdf(
       parseFountain(`INT. KITCHEN - DAY

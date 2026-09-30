@@ -15,7 +15,6 @@
  */
 
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import type { PDFFont } from "pdf-lib";
 import type { PageSize, ScreenplayDocument } from "../screenplay/model";
 import { layoutScreenplay } from "./screenplayLayout";
 
@@ -24,17 +23,26 @@ export interface PdfExportOptions {
   title: string;
 }
 
-function encodableText(font: PDFFont, value: string): string {
-  return [...value]
-    .map((character) => {
-      try {
-        font.encodeText(character);
-        return character;
-      } catch {
-        return "?";
-      }
-    })
-    .join("");
+export class UnsupportedPdfTextError extends Error {
+  constructor(
+    readonly characters: readonly string[],
+    readonly truncated: boolean,
+  ) {
+    const examples = characters
+      .map((character) => {
+        const code = character
+          .codePointAt(0)
+          ?.toString(16)
+          .toUpperCase()
+          .padStart(4, "0");
+        return `${JSON.stringify(character)} (U+${code})`;
+      })
+      .join(", ");
+    super(
+      `PDF export stopped: the current font cannot represent ${examples}${truncated ? ", and other characters" : ""}. No PDF was saved; your source is unchanged. Export to Fountain instead. Screenplay preview remains available.`,
+    );
+    this.name = "UnsupportedPdfTextError";
+  }
 }
 
 export async function serializePdf(
@@ -49,6 +57,32 @@ export async function serializePdf(
   const bold = await pdf.embedFont(StandardFonts.CourierBold);
   const layout = layoutScreenplay(document, options.pageSize);
 
+  // Validate precisely the text and fonts used below, before drawing or saving.
+  const unsupported = new Set<string>();
+  let truncated = false;
+  for (const layoutPage of layout.pages) {
+    for (const block of layoutPage.blocks) {
+      const font =
+        block.type === "scene-heading" || block.type === "character"
+          ? bold
+          : regular;
+      for (const line of block.lines) {
+        for (const character of line) {
+          try {
+            font.encodeText(character);
+          } catch {
+            if (unsupported.has(character)) continue;
+            if (unsupported.size < 8) unsupported.add(character);
+            else truncated = true;
+          }
+        }
+      }
+    }
+  }
+  if (unsupported.size > 0) {
+    throw new UnsupportedPdfTextError([...unsupported], truncated);
+  }
+
   for (const [pageIndex, layoutPage] of layout.pages.entries()) {
     const page = pdf.addPage([
       layout.dimensions.width,
@@ -60,7 +94,7 @@ export async function serializePdf(
           ? bold
           : regular;
       for (const [lineIndex, rawLine] of block.lines.entries()) {
-        const text = encodableText(font, rawLine);
+        const text = rawLine;
         const textWidth = font.widthOfTextAtSize(text, layout.fontSize);
         const x =
           block.align === "right"

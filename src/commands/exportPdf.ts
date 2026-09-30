@@ -17,7 +17,11 @@
 import { Notice } from "obsidian";
 import type { MarkdownView } from "obsidian";
 import type FirstDraftPlugin from "../main";
-import { pdfExportPath, serializePdf } from "../export/pdf";
+import {
+  pdfExportPath,
+  serializePdf,
+  UnsupportedPdfTextError,
+} from "../export/pdf";
 import { loadScreenplayContext } from "../projects/vault";
 
 export async function exportPdf(
@@ -55,6 +59,10 @@ export async function exportPdf(
     await plugin.app.vault.createBinary(path, buffer);
     new Notice(`Exported screenplay PDF to ${path}`);
   } catch (error) {
+    if (error instanceof UnsupportedPdfTextError) {
+      new Notice(error.message, 15000);
+      return;
+    }
     console.error("First Draft could not export PDF", error);
     new Notice("First Draft could not export the screenplay PDF.");
   }
