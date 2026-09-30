@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { PDFDocument } from "pdf-lib";
+import { PDFDict, PDFDocument, PDFName } from "pdf-lib";
 import { describe, expect, it } from "vitest";
 import {
   pdfExportPath,
@@ -22,8 +22,74 @@ import {
   UnsupportedPdfTextError,
 } from "../src/export/pdf";
 import { parseFountain } from "../src/screenplay/parser";
+import { embedScreenplayFonts } from "../src/export/pdfFonts";
+import { layoutScreenplay } from "../src/export/screenplayLayout";
 
 describe("PDF export", () => {
+  it.each(["us-letter", "a4"] as const)(
+    "embeds fonts for extended Latin, Greek and Cyrillic on %s",
+    async (pageSize) => {
+      const text =
+        "INT. ŁÓDŹ - DAY\n\nŻANETA\nPříliš žluťoučký kůň. Ελληνικά. Привет, мир. Cafe\u0301?";
+      const document = parseFountain(text);
+      const before = JSON.stringify(document);
+      const pdf = await PDFDocument.load(
+        await serializePdf(document, {
+          pageSize,
+          title: "International draft",
+        }),
+      );
+      expect(
+        pdf.context
+          .enumerateIndirectObjects()
+          .some(
+            ([, object]) =>
+              object instanceof PDFDict && object.has(PDFName.of("FontFile2")),
+          ),
+      ).toBe(true);
+      expect(pdf.getPageCount()).toBe(
+        layoutScreenplay(document, pageSize).pages.length,
+      );
+      expect(JSON.stringify(document)).toBe(before);
+    },
+  );
+
+  it("uses Courier-compatible fixed-width metrics and detects missing glyphs in both weights", async () => {
+    const { regular, bold } = await embedScreenplayFonts(
+      await PDFDocument.create(),
+    );
+    for (const font of [regular, bold]) {
+      expect(font.widthOfTextAtSize("MMMM", 12)).toBeCloseTo(28.8, 1);
+      expect(font.widthOfTextAtSize("iiii", 12)).toBe(
+        font.widthOfTextAtSize("MMMM", 12),
+      );
+      const characters = new Set(font.getCharacterSet());
+      for (const character of "ŁŻřůΕλΠривет\u0301")
+        expect(characters.has(character.codePointAt(0) ?? -1)).toBe(true);
+      expect(characters.has(0x1f642)).toBe(false);
+      expect(characters.has(0x4f60)).toBe(false);
+    }
+  });
+
+  it.each(["us-letter", "a4"] as const)(
+    "preserves multi-page pagination on %s",
+    async (pageSize) => {
+      const document = parseFountain(
+        Array.from(
+          { length: 30 },
+          (_, index) =>
+            `INT. OFFICE ${index + 1} - DAY\n\nJANE\n${"A consistent line of dialogue. ".repeat(8)}`,
+        ).join("\n\n"),
+      );
+      const layout = layoutScreenplay(document, pageSize);
+      const pdf = await PDFDocument.load(
+        await serializePdf(document, { pageSize, title: "Pagination" }),
+      );
+      expect(layout.pages.length).toBeGreaterThan(1);
+      expect(pdf.getPageCount()).toBe(layout.pages.length);
+    },
+  );
+
   it.each(["us-letter", "a4"] as const)(
     "preserves supported accents and genuine question marks on %s",
     async (pageSize) => {

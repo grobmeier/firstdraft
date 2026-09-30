@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
 import type { PageSize, ScreenplayDocument } from "../screenplay/model";
 import { layoutScreenplay } from "./screenplayLayout";
+import { embedScreenplayFonts } from "./pdfFonts";
 
 export interface PdfExportOptions {
   pageSize: PageSize;
@@ -53,8 +54,9 @@ export async function serializePdf(
   pdf.setTitle(options.title);
   pdf.setCreator("First Draft for Obsidian");
   pdf.setProducer("First Draft for Obsidian");
-  const regular = await pdf.embedFont(StandardFonts.Courier);
-  const bold = await pdf.embedFont(StandardFonts.CourierBold);
+  const { regular, bold } = await embedScreenplayFonts(pdf);
+  const regularCharacters = new Set(regular.getCharacterSet());
+  const boldCharacters = new Set(bold.getCharacterSet());
   const layout = layoutScreenplay(document, options.pageSize);
 
   // Validate precisely the text and fonts used below, before drawing or saving.
@@ -62,15 +64,13 @@ export async function serializePdf(
   let truncated = false;
   for (const layoutPage of layout.pages) {
     for (const block of layoutPage.blocks) {
-      const font =
+      const characters =
         block.type === "scene-heading" || block.type === "character"
-          ? bold
-          : regular;
+          ? boldCharacters
+          : regularCharacters;
       for (const line of block.lines) {
         for (const character of line) {
-          try {
-            font.encodeText(character);
-          } catch {
+          if (!characters.has(character.codePointAt(0) ?? -1)) {
             if (unsupported.has(character)) continue;
             if (unsupported.size < 8) unsupported.add(character);
             else truncated = true;

@@ -31,12 +31,19 @@ locked pages, or production tags.
 
 ### Next-build text safety
 
-The next build stops PDF export when the built-in Courier font cannot represent
+The next build embeds unmodified Liberation Mono 2.1.5 regular and bold fonts
+locally. It includes representative extended Latin (such as Polish and Czech),
+Greek and Cyrillic support, including tested combining accents. Font bytes are
+bundled with the plugin and PDFs embed only the glyphs they use; no downloads
+or installed fonts are needed. The editor and preview font are unchanged.
+
+PDF export stops when the embedded font cannot represent
 the text. It reports up to eight distinct unsupported characters with Unicode
 code points; no PDF is saved and the source remains unchanged. Genuine `?`
 characters and supported accents still export normally. Preview remains
 available, and Fountain export preserves text for use in another application.
-This is not complete Unicode font support. Published 0.11.0 still substitutes
+This is not complete Unicode font support: CJK and emoji remain unsupported,
+and right-to-left/complex-script layout is not guaranteed. Published 0.11.0 still substitutes
 unsupported characters with `?`; the safety check is not released yet.
 
 For interchange with Final Draft, see [FDX compatibility](FDX_COMPATIBILITY.md).

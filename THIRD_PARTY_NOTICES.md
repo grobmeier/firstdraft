@@ -1,5 +1,22 @@
 # Third-party notices
 
+## Liberation Mono 2.1.5
+
+First Draft bundles unmodified regular and bold fonts from
+[Liberation Fonts](https://github.com/liberationfonts/liberation-fonts/releases/tag/2.1.5).
+Digitized data copyright (c) 2010 Google Corporation; Copyright (c) 2012
+Red Hat, Inc. The fonts are under SIL Open Font License 1.1, not Apache-2.0.
+The complete upstream copyright and licence are in
+`assets/fonts/liberation-mono/LICENSE` and reproduced in the distributed
+`main.js` banner. See the font folder's README for archive provenance/checksum.
+
+## @pdf-lib/fontkit
+
+First Draft includes [@pdf-lib/fontkit](https://github.com/Hopding/fontkit),
+Copyright (c) 2014 Devon Govett, under the MIT License. The MIT permission and
+warranty terms reproduced for pdf-lib below also apply to this dependency.
+The distributed plugin banner reproduces these notices and permission terms.
+
 ## pdf-lib
 
 First Draft includes [pdf-lib](https://github.com/Hopding/pdf-lib), Copyright

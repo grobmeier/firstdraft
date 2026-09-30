@@ -61,6 +61,11 @@ See [PDF compatibility](docs/PDF_COMPATIBILITY.md) and
 [FDX compatibility](docs/FDX_COMPATIBILITY.md) for the deliberately narrow
 format boundaries.
 
+The next development build embeds a local Courier-compatible PDF font with
+broader Latin, Greek and Cyrillic coverage. Missing characters stop export
+with a clear diagnostic rather than silently becoming `?`. This is not yet
+released or universal Unicode support; see the PDF compatibility guide.
+
 ### Create a screenplay project
 
 Put a project note in the screenplay's folder and list its parts in reading

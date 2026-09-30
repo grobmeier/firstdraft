@@ -17,6 +17,16 @@
 import esbuild from "esbuild";
 import process from "node:process";
 import { builtinModules } from "node:module";
+import { readFileSync } from "node:fs";
+
+const fontLicense = readFileSync(
+  new URL("./assets/fonts/liberation-mono/LICENSE", import.meta.url),
+  "utf8",
+);
+const thirdPartyNotices = readFileSync(
+  new URL("./THIRD_PARTY_NOTICES.md", import.meta.url),
+  "utf8",
+);
 
 const production = process.argv[2] === "production";
 const context = await esbuild.context({
@@ -38,10 +48,21 @@ const context = await esbuild.context({
  *
  * Includes pdf-lib, Copyright (c) 2019 Andrew Dillon, used under the MIT
  * License. See THIRD_PARTY_NOTICES.md in the source repository.
+ * Includes @pdf-lib/fontkit, Copyright (c) 2014 Devon Govett, MIT License.
+ * Includes unmodified Liberation Mono 2.1.5 regular and bold fonts:
+${fontLicense
+  .split("\n")
+  .map((line) => ` * ${line}`)
+  .join("\n")}
+${thirdPartyNotices
+  .split("\n")
+  .map((line) => ` * ${line}`)
+  .join("\n")}
  */`,
   },
   entryPoints: ["src/main.ts"],
   bundle: true,
+  loader: { ".ttf": "dataurl" },
   external: [
     "obsidian",
     "electron",
