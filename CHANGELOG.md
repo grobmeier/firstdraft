@@ -5,6 +5,31 @@ All notable changes to First Draft are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-01
+
+### Added
+
+- Optional unnumbered title pages from Fountain title blocks or screenplay/project
+  Markdown properties, with body numbering starting at 1.
+- Dialogue pagination with `(MORE)` and repeated `(CONT'D)` speaker cues;
+  keep short speeches and parentheticals with their dialogue where possible.
+- Offline horizontal Chinese, Japanese and Korean PDFs with regional glyph
+  selection, measured wrapping and embedded Noto fonts.
+- Bundled Liberation Mono fonts for broader Latin, Greek and Cyrillic PDF text.
+
+### Fixed
+
+- Stop PDF export with explicit missing-glyph or oversized-metadata diagnostics
+  instead of silently substituting text or clipping indivisible blocks.
+- Include current editor title metadata in preview and export without modifying
+  screenplay source.
+- Improve screenplay activation controls and command-palette access.
+
+### Known limitations
+
+- The bundle is approximately 33 MB. Physical iPhone memory/performance testing
+  remains outstanding; CJK preview pagination is approximate.
+
 ## [0.11.0] - 2026-09-29
 
 ### Added

@@ -1,10 +1,10 @@
 # PDF preview and export compatibility
 
-First Draft 0.11 adds a local, read-only screenplay preview and
+First Draft adds a local, read-only screenplay preview and
 non-destructive PDF export for standalone screenplays and ordered multi-file
 projects.
 
-## Supported in 0.11
+## Supported in 0.12
 
 - Scene headings, action, character cues, character extensions,
   parentheticals, dialogue, and transitions.
@@ -25,13 +25,13 @@ The PDF is intended for comfortable reading and review. It is not locked
 production pagination and is not guaranteed to match Final Draft page for
 page.
 
-This release does not yet format Fountain title-page metadata, dual dialogue,
+This release does not yet format dual dialogue,
 lyrics, centred text, notes, sections, synopses, boneyards, revision colours,
 locked pages, or production tags.
 
-### Next-build text safety
+### Text safety
 
-The next build embeds unmodified Liberation Mono 2.1.5 regular and bold fonts
+The plugin embeds unmodified Liberation Mono 2.1.5 regular and bold fonts
 locally. It includes representative extended Latin (such as Polish and Czech),
 Greek and Cyrillic support, including tested combining accents. Font bytes are
 bundled with the plugin and PDFs embed only the glyphs they use; no downloads
@@ -43,10 +43,9 @@ code points; no PDF is saved and the source remains unchanged. Genuine `?`
 characters and supported accents still export normally. Preview remains
 available, and Fountain export preserves text for use in another application.
 This is not complete Unicode font support: emoji and unencoded characters remain unsupported,
-and right-to-left/complex-script layout is not guaranteed. Published 0.11.0 still substitutes
-unsupported characters with `?`; the safety check is not released yet.
+and right-to-left/complex-script layout is not guaranteed.
 
-### Development-build Chinese, Japanese and Korean PDFs
+### Chinese, Japanese and Korean PDFs
 
 - Horizontal output for representative Simplified/Traditional Chinese,
   Japanese kana/kanji and Korean Hangul. Mixed Latin text is supported.
@@ -77,5 +76,29 @@ unsupported characters with `?`; the safety check is not released yet.
 languages in Letter/A4) and timings in ignored `output/pdf/`. Render them with
 Poppler for visual review. Reproducible font source details and licence are in
 `assets/fonts/noto-cjk/README.md`.
+
+### Title pages and continued dialogue
+
+Explicit title metadata adds one unnumbered title page. Fountain supports a
+leading Title/Credit/Author/Source/Draft date/Contact block with indented
+multiline values. Markdown supports equivalent properties (`draft-date` for
+the date); use string values, quoting dates. A project's own note provides its
+metadata, and part title blocks never become body text or multiple cover pages.
+A filename alone does not generate a title page. No dates or personal details
+are inferred. Long fields wrap; metadata that cannot fit stops export rather
+than clipping. Missing glyphs in metadata also stop export before saving.
+
+Character cues, parentheticals and dialogue are paginated as a speech. Short
+speeches move intact when they fit a fresh page. A speech that must span pages
+ends its outgoing page with `(MORE)` and repeats its cue with `(CONT'D)` on the
+next page, preserving extensions such as `(V.O.)`. Parentheticals stay with
+their following dialogue. Oversized indivisible cues/parentheticals stop export.
+Generated markers never modify source or dialogue statistics. Preview uses
+the same layout rules, with approximate CJK metrics as described above.
+
+Automatic same-speaker continuation across action, scene CONTINUED markers,
+dual dialogue and production pagination remain outside this release.
+The PDF review script also generates four title/continuation samples in
+Letter/A4, with Latin and mixed CJK text.
 
 For interchange with Final Draft, see [FDX compatibility](FDX_COMPATIBILITY.md).

@@ -61,16 +61,43 @@ See [PDF compatibility](docs/PDF_COMPATIBILITY.md) and
 [FDX compatibility](docs/FDX_COMPATIBILITY.md) for the deliberately narrow
 format boundaries.
 
-The next development build embeds a local Courier-compatible PDF font with
+First Draft 0.12 embeds a local Courier-compatible PDF font with
 broader Latin, Greek and Cyrillic coverage. Missing characters stop export
-with a clear diagnostic rather than silently becoming `?`. This is not yet
-released or universal Unicode support; see the PDF compatibility guide.
+with a clear diagnostic rather than silently becoming `?`. This is not
+universal Unicode support; see the PDF compatibility guide.
 
-The development build also supports horizontal Chinese, Japanese and Korean
+The plugin also supports horizontal Chinese, Japanese and Korean
 PDFs with offline Noto fonts and measured wrapping. Select **PDF language** in
 First Draft settings for the regional character forms. Preview pagination is
 approximate; inspect the exported PDF. This increases the plugin bundle to
 approximately 33 MB, so physical-phone performance testing remains important.
+
+### PDF title pages and dialogue continuation
+
+Add an explicit `title` property to a screenplay or project note for an
+unnumbered title page. Optional properties are `credit`, `author`, `source`,
+`draft-date` (a quoted string), and `contact` (multiline text is supported).
+For projects, set these on the project note, not individual parts. Without an
+explicit title, PDF export keeps its existing body-only behaviour.
+
+Plain Fountain files can start with:
+
+```fountain
+Title: The Long Night
+Credit: Written by
+Author: Alex Example
+Draft date: 1 October 2026
+Contact:
+    Example office
+    Example City
+
+INT. OFFICE - NIGHT
+```
+
+The body starts at page 1. Speeches crossing page boundaries get `(MORE)`
+and a repeated speaker cue with `(CONT'D)`; short speeches stay together
+where possible. These markers appear in preview/PDF only, not in your source.
+Oversized title metadata or parentheticals stop export with a clear message.
 
 ### Create a screenplay project
 
