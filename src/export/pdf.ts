@@ -16,12 +16,19 @@
 
 import { PDFDocument, rgb } from "pdf-lib";
 import type { PageSize, ScreenplayDocument } from "../screenplay/model";
-import { layoutScreenplay } from "./screenplayLayout";
+import {
+  CJK_LINE_HEIGHT,
+  layoutScreenplay,
+  screenplayElementText,
+} from "./screenplayLayout";
 import { embedScreenplayFonts } from "./pdfFonts";
+import { hasCjkText, isPdfLanguage } from "./pdfLanguage";
+import type { PdfLanguage } from "./pdfLanguage";
 
 export interface PdfExportOptions {
   pageSize: PageSize;
   title: string;
+  language?: PdfLanguage;
 }
 
 export class UnsupportedPdfTextError extends Error {
@@ -54,10 +61,31 @@ export async function serializePdf(
   pdf.setTitle(options.title);
   pdf.setCreator("First Draft for Obsidian");
   pdf.setProducer("First Draft for Obsidian");
-  const { regular, bold } = await embedScreenplayFonts(pdf);
+  const cjk = document.elements.some((element) =>
+    hasCjkText(screenplayElementText(element)),
+  );
+  const { regular, bold } = cjk
+    ? await (
+        await import("./cjkFonts")
+      ).embedCjkFonts(
+        pdf,
+        isPdfLanguage(options.language) ? options.language : "zh-Hans",
+      )
+    : await embedScreenplayFonts(pdf);
   const regularCharacters = new Set(regular.getCharacterSet());
   const boldCharacters = new Set(bold.getCharacterSet());
-  const layout = layoutScreenplay(document, options.pageSize);
+  const layout = layoutScreenplay(
+    document,
+    options.pageSize,
+    cjk
+      ? (text, type) =>
+          (type === "scene-heading" || type === "character"
+            ? bold
+            : regular
+          ).widthOfTextAtSize(text, 12)
+      : undefined,
+    cjk ? CJK_LINE_HEIGHT : undefined,
+  );
 
   // Validate precisely the text and fonts used below, before drawing or saving.
   const unsupported = new Set<string>();

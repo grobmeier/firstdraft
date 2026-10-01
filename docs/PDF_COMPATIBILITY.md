@@ -42,8 +42,40 @@ the text. It reports up to eight distinct unsupported characters with Unicode
 code points; no PDF is saved and the source remains unchanged. Genuine `?`
 characters and supported accents still export normally. Preview remains
 available, and Fountain export preserves text for use in another application.
-This is not complete Unicode font support: CJK and emoji remain unsupported,
+This is not complete Unicode font support: emoji and unencoded characters remain unsupported,
 and right-to-left/complex-script layout is not guaranteed. Published 0.11.0 still substitutes
 unsupported characters with `?`; the safety check is not released yet.
+
+### Development-build Chinese, Japanese and Korean PDFs
+
+- Horizontal output for representative Simplified/Traditional Chinese,
+  Japanese kana/kanji and Korean Hangul. Mixed Latin text is supported.
+- Choose **Settings → First Draft → PDF language** to select regional Han
+  character forms. The default is Simplified Chinese; select Japanese for a
+  Japanese screenplay, Korean for Korean, or Traditional Chinese for Taiwan
+  forms. This does not translate text; Hong Kong-specific forms are not included
+  as a selectable mode. One PDF uses one selected language.
+- CJK-containing PDFs use local Noto Sans CJK 2.004 regular/bold; Latin-only
+  PDFs retain Liberation Mono. Noto is proportional for Latin letters. Both
+  fonts are bundled and glyph-subsetted into each PDF, with no network requests.
+- CJK wrapping uses measured font widths and Unicode line-break opportunities,
+  with 14.4-point line spacing for readable 12-point CJK text (Latin-only output
+  keeps its existing spacing),
+  with grapheme-safe emergency wrapping for oversized words. Canonically
+  equivalent decomposed Hangul is normalized only for drawing, never in source.
+- Preview line breaks/page counts are approximate; review the exported PDF.
+  Vertical typesetting, ruby, specialist typographic layout and universal Han
+  coverage are not promised. Newer/rare ideographs and emoji can still stop
+  export with the existing diagnostic. Forced character cues (`@美咲`) remain
+  useful for names without uppercase/lowercase forms.
+- The compressed Noto assets add approximately 23 MB before base64 bundling;
+  the plugin bundle is approximately 33 MB. Font decoding happens on CJK export,
+  not on a Latin-only export. PDF subsets are much smaller than these assets.
+  Physical iPhone/iPad memory and performance acceptance remains required.
+
+`npm run test:pdf-output` generates eight multi-page review PDFs (all four
+languages in Letter/A4) and timings in ignored `output/pdf/`. Render them with
+Poppler for visual review. Reproducible font source details and licence are in
+`assets/fonts/noto-cjk/README.md`.
 
 For interchange with Final Draft, see [FDX compatibility](FDX_COMPATIBILITY.md).

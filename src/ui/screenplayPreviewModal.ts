@@ -17,7 +17,12 @@
 import { Modal } from "obsidian";
 import type { App } from "obsidian";
 import type { PageSize, ScreenplayDocument } from "../screenplay/model";
-import { layoutScreenplay } from "../export/screenplayLayout";
+import {
+  CJK_LINE_HEIGHT,
+  layoutScreenplay,
+  screenplayElementText,
+} from "../export/screenplayLayout";
+import { hasCjkText } from "../export/pdfLanguage";
 
 export class ScreenplayPreviewModal extends Modal {
   constructor(
@@ -38,13 +43,29 @@ export class ScreenplayPreviewModal extends Modal {
     const toolbar = this.contentEl.createDiv({
       cls: "firstdraft-preview-toolbar",
     });
+    const cjk = this.screenplay.elements.some((element) =>
+      hasCjkText(screenplayElementText(element)),
+    );
     toolbar.createEl("p", {
-      text: "Read-only preview. Your Fountain source remains unchanged.",
+      text: cjk
+        ? "Read-only preview. CJK line breaks and page count are approximate; export PDF for the measured layout. Choose the PDF language in settings for regional character forms."
+        : "Read-only preview. Your Fountain source remains unchanged.",
     });
     const exportButton = toolbar.createEl("button", { text: "Export PDF" });
     exportButton.addEventListener("click", () => void this.exportPdf());
 
-    const layout = layoutScreenplay(this.screenplay, this.pageSize);
+    const layout = layoutScreenplay(
+      this.screenplay,
+      this.pageSize,
+      cjk
+        ? (text) =>
+            Array.from(text).reduce(
+              (width, character) => width + (hasCjkText(character) ? 12 : 7.2),
+              0,
+            )
+        : undefined,
+      cjk ? CJK_LINE_HEIGHT : undefined,
+    );
     const pages = this.contentEl.createDiv({
       cls: "firstdraft-preview-pages",
     });

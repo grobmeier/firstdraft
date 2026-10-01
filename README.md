@@ -66,6 +66,12 @@ broader Latin, Greek and Cyrillic coverage. Missing characters stop export
 with a clear diagnostic rather than silently becoming `?`. This is not yet
 released or universal Unicode support; see the PDF compatibility guide.
 
+The development build also supports horizontal Chinese, Japanese and Korean
+PDFs with offline Noto fonts and measured wrapping. Select **PDF language** in
+First Draft settings for the regional character forms. Preview pagination is
+approximate; inspect the exported PDF. This increases the plugin bundle to
+approximately 33 MB, so physical-phone performance testing remains important.
+
 ### Create a screenplay project
 
 Put a project note in the screenplay's folder and list its parts in reading

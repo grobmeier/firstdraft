@@ -24,33 +24,45 @@ import {
 } from "../export/pdf";
 import { loadScreenplayContext } from "../projects/vault";
 
+const activeExports = new WeakSet<FirstDraftPlugin>();
+
 export async function exportPdf(
   plugin: FirstDraftPlugin,
   view: MarkdownView,
 ): Promise<void> {
   const file = view.file;
   if (file === null) return;
+  if (activeExports.has(plugin)) {
+    new Notice("A PDF export is already in progress.");
+    return;
+  }
 
-  const context = await loadScreenplayContext(
-    plugin.app,
-    file,
-    plugin.settings.characterFolder,
-    plugin.isScreenplayFile(file) ? view.editor.getValue() : undefined,
-  );
-  const title = context.project?.project.title ?? context.owner.basename;
-  const path = pdfExportPath(
-    context.owner.path,
-    {
-      has: (candidate: string) =>
-        plugin.app.vault.getAbstractFileByPath(candidate) !== null,
-    },
-    title,
-  );
-
+  activeExports.add(plugin);
+  const progress = new Notice("Preparing screenplay PDF…", 0);
   try {
+    // Paint the progress notice before synchronous font decoding starts, using
+    // the editor's window so this also works in an Obsidian popout.
+    const ownerWindow = view.containerEl.ownerDocument.defaultView ?? window;
+    await new Promise<void>((resolve) => ownerWindow.setTimeout(resolve, 0));
+    const context = await loadScreenplayContext(
+      plugin.app,
+      file,
+      plugin.settings.characterFolder,
+      plugin.isScreenplayFile(file) ? view.editor.getValue() : undefined,
+    );
+    const title = context.project?.project.title ?? context.owner.basename;
+    const path = pdfExportPath(
+      context.owner.path,
+      {
+        has: (candidate: string) =>
+          plugin.app.vault.getAbstractFileByPath(candidate) !== null,
+      },
+      title,
+    );
     const content = await serializePdf(context.document, {
       pageSize: plugin.settings.pageSize,
       title,
+      language: plugin.settings.pdfLanguage,
     });
     const buffer = content.buffer.slice(
       content.byteOffset,
@@ -65,5 +77,8 @@ export async function exportPdf(
     }
     console.error("First Draft could not export PDF", error);
     new Notice("First Draft could not export the screenplay PDF.");
+  } finally {
+    progress.hide();
+    activeExports.delete(plugin);
   }
 }

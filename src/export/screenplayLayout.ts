@@ -20,6 +20,7 @@ import type {
   ScreenplayElement,
   ScreenplayElementType,
 } from "../screenplay/model";
+import { wrapMeasuredText } from "./measuredWrapping";
 
 export interface ScreenplayPageDimensions {
   width: number;
@@ -61,6 +62,7 @@ const PAGE_DIMENSIONS: Record<PageSize, ScreenplayPageDimensions> = {
 
 const FONT_SIZE = 12;
 const LINE_HEIGHT = 12;
+export const CJK_LINE_HEIGHT = 14.4;
 const TOP_MARGIN = 72;
 const BOTTOM_MARGIN = 60;
 
@@ -190,6 +192,8 @@ function minimumFollowingLines(
 export function layoutScreenplay(
   document: ScreenplayDocument,
   pageSize: PageSize,
+  measure?: (text: string, type: ScreenplayElementType) => number,
+  lineHeight = LINE_HEIGHT,
 ): ScreenplayLayout {
   const dimensions = PAGE_DIMENSIONS[pageSize];
   const pages: ScreenplayLayoutPage[] = [{ blocks: [] }];
@@ -206,14 +210,18 @@ export function layoutScreenplay(
     const element = document.elements[index];
     if (!element) continue;
     const style = styleFor(element.type, dimensions.width);
-    let lines = wrapScreenplayText(
-      screenplayElementText(element),
-      style.maximumCharacters,
-    );
+    const text = screenplayElementText(element);
+    let lines = measure
+      ? wrapMeasuredText(
+          text,
+          dimensions.width - style.left - style.right,
+          (line) => measure(line, element.type),
+        )
+      : wrapScreenplayText(text, style.maximumCharacters);
     let gap = page.blocks.length === 0 ? 0 : style.gapBefore;
     const minimumHeight =
       (lines.length + minimumFollowingLines(document.elements, index)) *
-      LINE_HEIGHT;
+      lineHeight;
 
     if (
       page.blocks.length > 0 &&
@@ -227,7 +235,7 @@ export function layoutScreenplay(
       const top = cursor + gap;
       const availableLines = Math.max(
         1,
-        Math.floor((dimensions.height - BOTTOM_MARGIN - top) / LINE_HEIGHT),
+        Math.floor((dimensions.height - BOTTOM_MARGIN - top) / lineHeight),
       );
       const pageLines = lines.slice(0, availableLines);
       page.blocks.push({
@@ -238,7 +246,7 @@ export function layoutScreenplay(
         width: dimensions.width - style.left - style.right,
         align: style.align,
       });
-      cursor = top + pageLines.length * LINE_HEIGHT;
+      cursor = top + pageLines.length * lineHeight;
       lines = lines.slice(availableLines);
       gap = 0;
       if (lines.length > 0) addPage();
@@ -248,7 +256,7 @@ export function layoutScreenplay(
   return {
     dimensions,
     fontSize: FONT_SIZE,
-    lineHeight: LINE_HEIGHT,
+    lineHeight,
     pages,
   };
 }

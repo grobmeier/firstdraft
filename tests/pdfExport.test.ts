@@ -102,7 +102,7 @@ describe("PDF export", () => {
   );
 
   it("rejects unsupported text with deduplicated Unicode diagnostics", async () => {
-    const source = "INT. ROOM - DAY\n\nJANE\n你好 🙂 你好 🙂";
+    const source = "INT. ROOM - DAY\n\nJANE\n🙂 🙂";
     const document = parseFountain(source);
     const original = JSON.stringify(document);
     let caught: unknown;
@@ -117,7 +117,7 @@ describe("PDF export", () => {
     expect(caught).toBeInstanceOf(UnsupportedPdfTextError);
     if (!(caught instanceof UnsupportedPdfTextError))
       throw new Error("Expected PDF text error");
-    expect(caught.characters).toEqual(["你", "好", "🙂"]);
+    expect(caught.characters).toEqual(["🙂"]);
     expect(caught.truncated).toBe(false);
     expect(caught.message).toContain("U+1F642");
     expect(caught.message).toContain("No PDF was saved");
@@ -127,13 +127,13 @@ describe("PDF export", () => {
 
   it("bounds diagnostics and validates bold headings as well as dialogue", async () => {
     await expect(
-      serializePdf(parseFountain("INT. 一二三四五六七八九十 - DAY"), {
+      serializePdf(parseFountain("INT. 😀😁😂😃😄😅😆😇😈😉 - DAY"), {
         pageSize: "a4",
         title: "Bounded",
       }),
     ).rejects.toMatchObject({
       name: "UnsupportedPdfTextError",
-      characters: ["一", "二", "三", "四", "五", "六", "七", "八"],
+      characters: ["😀", "😁", "😂", "😃", "😄", "😅", "😆", "😇"],
       truncated: true,
     });
   });

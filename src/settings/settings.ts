@@ -18,6 +18,8 @@ import { PluginSettingTab } from "obsidian";
 import type { App, SettingDefinitionItem } from "obsidian";
 import type FirstDraftPlugin from "../main";
 import type { PageSize } from "../screenplay/model";
+import { isPdfLanguage, PDF_LANGUAGES } from "../export/pdfLanguage";
+import type { PdfLanguage } from "../export/pdfLanguage";
 import {
   DEFAULT_SCENE_TYPES,
   DEFAULT_TIMES_OF_DAY,
@@ -37,6 +39,7 @@ export interface FirstDraftSettings {
   showWordCount: boolean;
   showSceneCount: boolean;
   pageSize: PageSize;
+  pdfLanguage: PdfLanguage;
   minutesPerPage: number;
   updateDelayMs: number;
   characterFolder: string;
@@ -56,6 +59,7 @@ export const DEFAULT_SETTINGS: FirstDraftSettings = {
   showWordCount: true,
   showSceneCount: true,
   pageSize: "us-letter",
+  pdfLanguage: "zh-Hans",
   minutesPerPage: 1,
   updateDelayMs: 300,
   characterFolder: "Characters",
@@ -153,6 +157,16 @@ export class FirstDraftSettingTab extends PluginSettingTab {
           key: "pageSize",
           options: { "us-letter": "US Letter", a4: "A4" },
           defaultValue: DEFAULT_SETTINGS.pageSize,
+        },
+      },
+      {
+        name: "PDF language",
+        desc: "Regional character forms for Chinese, Japanese and Korean PDFs. Horizontal layout only. Does not translate your text.",
+        control: {
+          type: "dropdown",
+          key: "pdfLanguage",
+          options: PDF_LANGUAGES,
+          defaultValue: DEFAULT_SETTINGS.pdfLanguage,
         },
       },
       {
@@ -268,6 +282,9 @@ export class FirstDraftSettingTab extends PluginSettingTab {
     } else if (key === "pageSize") {
       if (value !== "us-letter" && value !== "a4") return;
       this.plugin.settings.pageSize = value;
+    } else if (key === "pdfLanguage") {
+      if (!isPdfLanguage(value)) return;
+      this.plugin.settings.pdfLanguage = value;
     } else if (typeof DEFAULT_SETTINGS[key] === "boolean") {
       if (typeof value !== "boolean") return;
       this.setBooleanSetting(key, value);
