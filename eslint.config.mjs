@@ -25,6 +25,7 @@ export default tseslint.config(
       "node_modules",
       "First Draft Test Vault",
       "graphify-out",
+      "output",
     ],
   },
   ...obsidianmd.configs.recommended,

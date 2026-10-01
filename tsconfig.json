@@ -2,7 +2,7 @@
   "compilerOptions": {
     "inlineSourceMap": true,
     "inlineSources": true,
-    "lib": ["DOM", "ES2021"],
+    "lib": ["DOM", "ES2021", "ES2022.Intl", "ES2022.Object"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "noImplicitAny": true,

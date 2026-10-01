@@ -27,6 +27,10 @@ const thirdPartyNotices = readFileSync(
   new URL("./THIRD_PARTY_NOTICES.md", import.meta.url),
   "utf8",
 );
+const cjkLicense = readFileSync(
+  new URL("./assets/fonts/noto-cjk/LICENSE", import.meta.url),
+  "utf8",
+);
 
 const production = process.argv[2] === "production";
 const context = await esbuild.context({
@@ -58,11 +62,15 @@ ${thirdPartyNotices
   .split("\n")
   .map((line) => ` * ${line}`)
   .join("\n")}
+${cjkLicense
+  .split("\n")
+  .map((line) => ` * ${line}`)
+  .join("\n")}
  */`,
   },
   entryPoints: ["src/main.ts"],
   bundle: true,
-  loader: { ".ttf": "dataurl" },
+  loader: { ".ttf": "dataurl", ".woff": "dataurl" },
   external: [
     "obsidian",
     "electron",

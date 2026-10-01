@@ -1,5 +1,26 @@
 # Third-party notices
 
+## Noto Sans CJK 2.004
+
+Copyright 2014–2021 Adobe (http://www.adobe.com/), with Reserved Font Name
+'Source'. Licensed under SIL Open Font
+License 1.1. Source: https://github.com/notofonts/noto-cjk . Regular and bold
+pan-CJK fonts are static instances of the upstream variable TrueType font,
+packaged as WOFF with aligned glyph records, retaining glyphs and localized
+forms. Full terms are in `assets/fonts/noto-cjk/LICENSE` and the `main.js` banner.
+
+## Unicode line breaking
+
+The one-pass WOFF decoder uses `pako`, Copyright (C) 2014-2017 by Vitaly Puzrin
+and Andrei Tuputcyn, under the MIT permission/warranty terms reproduced below,
+as a fallback when native browser decompression is unavailable.
+
+First Draft includes `linebreak`, Copyright (c) 2014-present Devon Govett;
+`unicode-trie`, Copyright 2018; `tiny-inflate`, Copyright (c) 2015-present Devon
+Govett; and `base64-js`, Copyright (c) 2014. All use the MIT
+permission and warranty terms reproduced below. The distributed plugin banner
+reproduces these notices and terms.
+
 ## Liberation Mono 2.1.5
 
 First Draft bundles unmodified regular and bold fonts from

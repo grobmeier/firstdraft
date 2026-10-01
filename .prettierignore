@@ -2,3 +2,5 @@ main.js
 node_modules/
 First Draft Test Vault/
 package-lock.json
+output/
+.playwright-cli/

@@ -13,6 +13,7 @@
     "license:headers:check": "node scripts/add-license-headers.mjs --check",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:pdf-output": "node scripts/check-pdf-output.mjs",
     "test:watch": "vitest",
     "test-vault": "npm run build && node scripts/install-test-vault.mjs"
   },
@@ -46,6 +47,8 @@
   },
   "dependencies": {
     "@pdf-lib/fontkit": "1.1.1",
+    "linebreak": "1.1.0",
+    "pako": "1.0.11",
     "pdf-lib": "^1.17.1"
   }
 }

@@ -19,9 +19,15 @@ import type { PDFDocument } from "pdf-lib";
 import regularData from "../../assets/fonts/liberation-mono/LiberationMono-Regular.ttf?inline";
 import boldData from "../../assets/fonts/liberation-mono/LiberationMono-Bold.ttf?inline";
 
-function fontBytes(data: string): Uint8Array {
+export function fontBytes(data: string): Uint8Array {
   const base64 = data.slice(data.indexOf(",") + 1);
-  return Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  // A direct copy avoids the huge intermediate character array created by
+  // Uint8Array.from(string, mapper) for the bundled CJK fonts.
+  for (let index = 0; index < binary.length; index++)
+    bytes[index] = binary.charCodeAt(index);
+  return bytes;
 }
 
 export async function embedScreenplayFonts(pdf: PDFDocument) {

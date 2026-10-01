@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-declare module "*.ttf?inline" {
-  const data: string;
-  export default data;
+export const PDF_LANGUAGES = {
+  "zh-Hans": "Chinese (Simplified)",
+  "zh-Hant": "Chinese (Traditional)",
+  ja: "Japanese",
+  ko: "Korean",
+} as const;
+
+export type PdfLanguage = keyof typeof PDF_LANGUAGES;
+
+export function isPdfLanguage(value: unknown): value is PdfLanguage {
+  return typeof value === "string" && Object.hasOwn(PDF_LANGUAGES, value);
 }
 
-declare module "*.woff?inline" {
-  const data: string;
-  export default data;
-}
-
-declare module "linebreak" {
-  export default class LineBreaker {
-    constructor(text: string);
-    nextBreak(): { position: number; required: boolean } | null;
-  }
-}
-
-declare module "pako" {
-  export function inflate(data: Uint8Array): Uint8Array;
+export function hasCjkText(text: string): boolean {
+  return /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\u3000-\u303f\uff00-\uffef]/u.test(
+    text,
+  );
 }
