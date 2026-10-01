@@ -23,6 +23,7 @@ import {
   UnsupportedPdfTextError,
 } from "../export/pdf";
 import { loadScreenplayContext } from "../projects/vault";
+import { ScreenplayLayoutError } from "../export/screenplayLayout";
 
 const activeExports = new WeakSet<FirstDraftPlugin>();
 
@@ -48,7 +49,7 @@ export async function exportPdf(
       plugin.app,
       file,
       plugin.settings.characterFolder,
-      plugin.isScreenplayFile(file) ? view.editor.getValue() : undefined,
+      view.editor.getValue(),
     );
     const title = context.project?.project.title ?? context.owner.basename;
     const path = pdfExportPath(
@@ -71,7 +72,10 @@ export async function exportPdf(
     await plugin.app.vault.createBinary(path, buffer);
     new Notice(`Exported screenplay PDF to ${path}`);
   } catch (error) {
-    if (error instanceof UnsupportedPdfTextError) {
+    if (
+      error instanceof UnsupportedPdfTextError ||
+      error instanceof ScreenplayLayoutError
+    ) {
       new Notice(error.message, 15000);
       return;
     }

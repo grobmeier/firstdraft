@@ -33,11 +33,12 @@ export interface ScreenplayLayoutBlock {
   left: number;
   top: number;
   width: number;
-  align: "left" | "right";
+  align: "left" | "right" | "center";
 }
 
 export interface ScreenplayLayoutPage {
   blocks: ScreenplayLayoutBlock[];
+  titlePage?: boolean;
 }
 
 export interface ScreenplayLayout {
@@ -206,9 +207,200 @@ export function layoutScreenplay(
     cursor = TOP_MARGIN;
   };
 
+  const wrap = (text: string, type: ScreenplayElementType): string[] => {
+    const style = styleFor(type, dimensions.width);
+    return measure
+      ? wrapMeasuredText(
+          text,
+          dimensions.width - style.left - style.right,
+          (line) => measure(line, type),
+        )
+      : wrapScreenplayText(text, style.maximumCharacters);
+  };
+  const append = (
+    type: ScreenplayElementType,
+    lines: string[],
+    gap = 0,
+  ): void => {
+    const style = styleFor(type, dimensions.width);
+    page.blocks.push({
+      type,
+      lines,
+      left: style.left,
+      top: cursor + gap,
+      width: dimensions.width - style.left - style.right,
+      align: style.align,
+    });
+    cursor += gap + lines.length * lineHeight;
+  };
+
+  if (document.titlePage) {
+    const metadata = document.titlePage;
+    page.titlePage = true;
+    const titleLines = (value: string, type: ScreenplayElementType): string[] =>
+      value
+        .split("\n")
+        .flatMap((line) =>
+          measure
+            ? wrapMeasuredText(line, dimensions.width - 144, (text) =>
+                measure(text, type),
+              )
+            : wrapScreenplayText(
+                line,
+                Math.floor((dimensions.width - 144) / 7.2),
+              ),
+        );
+    const central = [metadata.title, metadata.credit, metadata.author].filter(
+      (value): value is string => Boolean(value),
+    );
+    cursor = dimensions.height * 0.32;
+    for (const [index, value] of central.entries()) {
+      const type = index === 0 ? "scene-heading" : "action";
+      const lines = titleLines(value, type);
+      page.blocks.push({
+        type,
+        lines,
+        left: 72,
+        top: cursor,
+        width: dimensions.width - 144,
+        align: "center",
+      });
+      cursor += lines.length * lineHeight + 24;
+    }
+    const lower = [
+      metadata.source,
+      metadata.draftDate,
+      metadata.contact,
+    ].filter((value): value is string => Boolean(value));
+    const lowerLines = lower.map((value) => titleLines(value, "action"));
+    const lowerHeight = lowerLines.reduce(
+      (sum, lines) => sum + lines.length * lineHeight + 12,
+      0,
+    );
+    const lowerTop = dimensions.height - 72 - lowerHeight;
+    if (cursor > lowerTop - 24)
+      throw new ScreenplayLayoutError(
+        "Title-page metadata is too long for one page. Shorten the title, credits or contact details.",
+      );
+    cursor = lowerTop;
+    for (const lines of lowerLines) {
+      page.blocks.push({
+        type: "action",
+        lines,
+        left: 72,
+        top: cursor,
+        width: dimensions.width - 144,
+        align: "left",
+      });
+      cursor += lines.length * lineHeight + 12;
+    }
+    addPage();
+  }
+
   for (let index = 0; index < document.elements.length; index += 1) {
     const element = document.elements[index];
     if (!element) continue;
+    if (
+      element.type === "character" &&
+      document.elements[index + 1]?.type &&
+      ["dialogue", "parenthetical"].includes(
+        document.elements[index + 1]?.type ?? "",
+      )
+    ) {
+      let end = index + 1;
+      while (
+        ["dialogue", "parenthetical"].includes(
+          document.elements[end]?.type ?? "",
+        )
+      )
+        end++;
+      const speech = document.elements.slice(index + 1, end);
+      if (speech.some((part) => part.type === "dialogue")) {
+        const cue = screenplayElementText(element);
+        const firstCue = wrap(cue, "character");
+        const continued = wrap(
+          /\(CONT['’]D\)/iu.test(cue) ? cue : `${cue} (CONT'D)`,
+          "character",
+        );
+        // Each parenthetical is atomic and tied to the first following dialogue line.
+        const units: { type: ScreenplayElementType; lines: string[] }[][] = [];
+        let pending: { type: ScreenplayElementType; lines: string[] }[] = [];
+        for (const part of speech) {
+          const lines = wrap(screenplayElementText(part), part.type);
+          if (part.type === "parenthetical")
+            pending.push({ type: part.type, lines });
+          else
+            for (const line of lines) {
+              units.push([...pending, { type: part.type, lines: [line] }]);
+              pending = [];
+            }
+        }
+        // A trailing parenthetical belongs to the final dialogue unit.
+        if (pending.length && units.length)
+          units[units.length - 1]?.push(...pending);
+        const size = (unit: typeof pending) =>
+          unit.reduce((sum, part) => sum + part.lines.length, 0);
+        const total =
+          firstCue.length + units.reduce((sum, unit) => sum + size(unit), 0);
+        const capacity = Math.floor(
+          (dimensions.height - BOTTOM_MARGIN - TOP_MARGIN) / lineHeight,
+        );
+        let gap = page.blocks.length ? 12 : 0;
+        if (
+          total <= capacity &&
+          cursor + gap + total * lineHeight > dimensions.height - BOTTOM_MARGIN
+        ) {
+          addPage();
+          gap = 0;
+        }
+        let offset = 0;
+        let cueLines = firstCue;
+        while (offset < units.length) {
+          const available = Math.floor(
+            (dimensions.height - BOTTOM_MARGIN - cursor - gap) / lineHeight,
+          );
+          let used = cueLines.length;
+          let stop = offset;
+          while (stop < units.length) {
+            const count = size(units[stop] ?? []);
+            const more = stop + 1 < units.length ? 1 : 0;
+            if (used + count + more > available) break;
+            used += count;
+            stop++;
+          }
+          if (stop === offset) {
+            if (!page.blocks.length)
+              throw new ScreenplayLayoutError(
+                "A character cue or parenthetical is too long to fit with dialogue on one page. Shorten it before exporting.",
+              );
+            addPage();
+            gap = 0;
+            continue;
+          }
+          append("character", cueLines, gap);
+          for (const unit of units.slice(offset, stop))
+            for (const part of unit) {
+              const last = page.blocks[page.blocks.length - 1];
+              if (
+                last?.type === part.type &&
+                last.top + last.lines.length * lineHeight === cursor
+              ) {
+                last.lines.push(...part.lines);
+                cursor += part.lines.length * lineHeight;
+              } else append(part.type, [...part.lines]);
+            }
+          offset = stop;
+          if (offset < units.length) {
+            append("parenthetical", ["(MORE)"]);
+            addPage();
+            gap = 0;
+            cueLines = continued;
+          }
+        }
+        index = end - 1;
+        continue;
+      }
+    }
     const style = styleFor(element.type, dimensions.width);
     const text = screenplayElementText(element);
     let lines = measure
@@ -259,4 +451,11 @@ export function layoutScreenplay(
     lineHeight,
     pages,
   };
+}
+
+export class ScreenplayLayoutError extends Error {
+  constructor(message: string) {
+    super(`PDF layout stopped: ${message} Your source is unchanged.`);
+    this.name = "ScreenplayLayoutError";
+  }
 }

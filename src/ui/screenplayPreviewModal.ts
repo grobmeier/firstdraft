@@ -21,6 +21,7 @@ import {
   CJK_LINE_HEIGHT,
   layoutScreenplay,
   screenplayElementText,
+  ScreenplayLayoutError,
 } from "../export/screenplayLayout";
 import { hasCjkText } from "../export/pdfLanguage";
 
@@ -43,9 +44,11 @@ export class ScreenplayPreviewModal extends Modal {
     const toolbar = this.contentEl.createDiv({
       cls: "firstdraft-preview-toolbar",
     });
-    const cjk = this.screenplay.elements.some((element) =>
-      hasCjkText(screenplayElementText(element)),
-    );
+    const cjk =
+      Object.values(this.screenplay.titlePage ?? {}).some(hasCjkText) ||
+      this.screenplay.elements.some((element) =>
+        hasCjkText(screenplayElementText(element)),
+      );
     toolbar.createEl("p", {
       text: cjk
         ? "Read-only preview. CJK line breaks and page count are approximate; export PDF for the measured layout. Choose the PDF language in settings for regional character forms."
@@ -54,18 +57,26 @@ export class ScreenplayPreviewModal extends Modal {
     const exportButton = toolbar.createEl("button", { text: "Export PDF" });
     exportButton.addEventListener("click", () => void this.exportPdf());
 
-    const layout = layoutScreenplay(
-      this.screenplay,
-      this.pageSize,
-      cjk
-        ? (text) =>
-            Array.from(text).reduce(
-              (width, character) => width + (hasCjkText(character) ? 12 : 7.2),
-              0,
-            )
-        : undefined,
-      cjk ? CJK_LINE_HEIGHT : undefined,
-    );
+    let layout;
+    try {
+      layout = layoutScreenplay(
+        this.screenplay,
+        this.pageSize,
+        cjk
+          ? (text) =>
+              Array.from(text).reduce(
+                (width, character) =>
+                  width + (hasCjkText(character) ? 12 : 7.2),
+                0,
+              )
+          : undefined,
+        cjk ? CJK_LINE_HEIGHT : undefined,
+      );
+    } catch (error) {
+      if (!(error instanceof ScreenplayLayoutError)) throw error;
+      this.contentEl.createEl("p", { text: error.message });
+      return;
+    }
     const pages = this.contentEl.createDiv({
       cls: "firstdraft-preview-pages",
     });
@@ -81,11 +92,13 @@ export class ScreenplayPreviewModal extends Modal {
         element.style.top = `${(block.top / layout.dimensions.height) * 100}%`;
         element.style.width = `${(block.width / layout.dimensions.width) * 100}%`;
         element.style.textAlign = block.align;
+        element.style.lineHeight = String(layout.lineHeight / layout.fontSize);
       }
-      page.createDiv({
-        cls: "firstdraft-preview-page-number",
-        text: String(pageIndex + 1),
-      });
+      if (!layoutPage.titlePage)
+        page.createDiv({
+          cls: "firstdraft-preview-page-number",
+          text: String(pageIndex + 1 - (this.screenplay.titlePage ? 1 : 0)),
+        });
     }
   }
 

@@ -61,9 +61,11 @@ export async function serializePdf(
   pdf.setTitle(options.title);
   pdf.setCreator("First Draft for Obsidian");
   pdf.setProducer("First Draft for Obsidian");
-  const cjk = document.elements.some((element) =>
-    hasCjkText(screenplayElementText(element)),
-  );
+  const cjk =
+    Object.values(document.titlePage ?? {}).some(hasCjkText) ||
+    document.elements.some((element) =>
+      hasCjkText(screenplayElementText(element)),
+    );
   const { regular, bold } = cjk
     ? await (
         await import("./cjkFonts")
@@ -125,9 +127,11 @@ export async function serializePdf(
         const text = rawLine;
         const textWidth = font.widthOfTextAtSize(text, layout.fontSize);
         const x =
-          block.align === "right"
-            ? block.left + Math.max(0, block.width - textWidth)
-            : block.left;
+          block.align === "center"
+            ? block.left + Math.max(0, (block.width - textWidth) / 2)
+            : block.align === "right"
+              ? block.left + Math.max(0, block.width - textWidth)
+              : block.left;
         const y =
           layout.dimensions.height -
           block.top -
@@ -143,7 +147,8 @@ export async function serializePdf(
       }
     }
 
-    const pageNumber = String(pageIndex + 1);
+    if (layoutPage.titlePage) continue;
+    const pageNumber = String(pageIndex + 1 - (document.titlePage ? 1 : 0));
     const numberWidth = regular.widthOfTextAtSize(pageNumber, 10);
     page.drawText(pageNumber, {
       x: layout.dimensions.width - 72 - numberWidth,

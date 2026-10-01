@@ -62,6 +62,20 @@ try {
       });
     }
   }
+  for (const pageSize of ["us-letter", "a4"]) {
+    for (const cjk of [false, true]) {
+      const source = `Title: ${cjk ? "東京の夜 / 서울 / 北京" : "The Long Night"}\nCredit: Written by\nAuthor: Alex Example\nSource: An original screenplay\nDraft date: 1 October 2026\nContact:\n    Example office\n    Example City\n\nINT. OFFICE - NIGHT\n\nALEX (V.O.)\n(quietly)\n${Array.from({ length: 150 }, (_, index) => (cjk ? `${index + 1}. 雨が静かに降る。窗外下着雨。오늘은 비가 옵니다.` : `${index + 1}. We should leave before anyone notices.`)).join("\n")}\n\n!Rain falls outside.`;
+      const bytes = await serializePdf(parseFountain(source), {
+        pageSize,
+        title: "Title and continuation review",
+        language: "ja",
+      });
+      await writeFile(
+        join(output, `fidelity-${cjk ? "cjk" : "latin"}-${pageSize}.pdf`),
+        bytes,
+      );
+    }
+  }
   await writeFile(
     join(output, "timings.json"),
     JSON.stringify(results, null, 2),

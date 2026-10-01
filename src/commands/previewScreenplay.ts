@@ -30,7 +30,7 @@ export async function previewScreenplay(
     plugin.app,
     file,
     plugin.settings.characterFolder,
-    plugin.isScreenplayFile(file) ? view.editor.getValue() : undefined,
+    view.editor.getValue(),
   );
   const title = context.project?.project.title ?? context.owner.basename;
   new ScreenplayPreviewModal(
