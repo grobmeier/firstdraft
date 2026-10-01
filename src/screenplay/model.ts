@@ -32,6 +32,16 @@ export interface ScreenplayElement {
 export interface ScreenplayDocument {
   elements: ScreenplayElement[];
   blankLines: number;
+  titlePage?: ScreenplayTitlePage;
+}
+
+export interface ScreenplayTitlePage {
+  title: string;
+  credit?: string;
+  author?: string;
+  source?: string;
+  draftDate?: string;
+  contact?: string;
 }
 
 export type PageSize = "us-letter" | "a4";

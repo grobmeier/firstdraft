@@ -19,6 +19,7 @@ import type {
   ScreenplayElement,
   ScreenplayElementType,
 } from "./model";
+import { extractFountainTitlePage } from "./titlePage";
 
 const SCENE_HEADING = /^(?:INT|EXT|EST|INT\.\/EXT|INT\/EXT|I\/E)(?:\.|\s)/iu;
 const HAS_LETTER = /\p{L}/u;
@@ -26,7 +27,10 @@ const UPPERCASE_LETTER = /\p{Lu}/u;
 const LOWERCASE_LETTER = /\p{Ll}/u;
 
 function withoutFrontmatter(source: string): string {
-  const lines = source.replaceAll("\r\n", "\n").split("\n");
+  const lines = source
+    .replace(/^\uFEFF/u, "")
+    .replaceAll("\r\n", "\n")
+    .split("\n");
   if (lines[0]?.trim() !== "---") return lines.join("\n");
 
   const closingIndex = lines.findIndex(
@@ -94,7 +98,9 @@ function pushElement(
 }
 
 export function parseFountain(source: string): ScreenplayDocument {
-  const lines = withoutFrontmatter(source).split("\n");
+  const { lines, titlePage } = extractFountainTitlePage(
+    withoutFrontmatter(source).split("\n"),
+  );
   const elements: ScreenplayElement[] = [];
   let blankLines = 0;
   let inDialogue = false;
@@ -149,5 +155,5 @@ export function parseFountain(source: string): ScreenplayDocument {
     pushElement(elements, "action", raw, index + 1);
   }
 
-  return { elements, blankLines };
+  return { elements, blankLines, ...(titlePage ? { titlePage } : {}) };
 }

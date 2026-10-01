@@ -14,11 +14,29 @@
  * limitations under the License.
  */
 
-import { TFile } from "obsidian";
+import { TFile, getFrontMatterInfo, parseYaml } from "obsidian";
 import type { App, TFolder } from "obsidian";
 import { stripObsidianFrontmatter } from "../export/fountain";
 import { parseFountain } from "../screenplay/parser";
 import type { ScreenplayDocument } from "../screenplay/model";
+import { titlePageFromFrontmatter } from "../screenplay/titlePage";
+
+function documentWithProperties(source: string): ScreenplayDocument {
+  const document = parseFountain(source);
+  const info = getFrontMatterInfo(source);
+  if (!info.exists) return document;
+  const properties: unknown = parseYaml(info.frontmatter);
+  if (
+    typeof properties !== "object" ||
+    properties === null ||
+    Array.isArray(properties)
+  )
+    return document;
+  const titlePage = titlePageFromFrontmatter(
+    properties as Record<string, unknown>,
+  );
+  return titlePage ? { ...document, titlePage } : document;
+}
 import {
   combineScreenplayDocuments,
   resolveCharacterFolder,
@@ -143,7 +161,7 @@ export async function loadScreenplayContext(
       owner: file,
       project: null,
       parts: [file],
-      document: parseFountain(source),
+      document: documentWithProperties(source),
       source: stripObsidianFrontmatter(source),
       characterFolder: resolveCharacterFolder(
         file.path,
@@ -161,11 +179,17 @@ export async function loadScreenplayContext(
         : app.vault.cachedRead(part),
     ),
   );
+  const document = combineScreenplayDocuments(sources.map(parseFountain));
+  const ownerSource =
+    project.file.path === file.path && currentSource !== undefined
+      ? currentSource
+      : await app.vault.cachedRead(project.file);
+  const titlePage = documentWithProperties(ownerSource).titlePage;
   return {
     owner: project.file,
     project,
     parts,
-    document: combineScreenplayDocuments(sources.map(parseFountain)),
+    document: { ...document, ...(titlePage ? { titlePage } : {}) },
     source: sources.map(stripObsidianFrontmatter).join("\n\n"),
     characterFolder: resolveCharacterFolder(
       project.file.path,
