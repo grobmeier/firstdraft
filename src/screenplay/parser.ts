@@ -118,6 +118,11 @@ export function parseFountain(source: string): ScreenplayDocument {
       continue;
     }
 
+    if (/^=(?!=)/u.test(text)) {
+      inDialogue = false;
+      continue;
+    }
+
     if (isSceneHeading(text)) {
       pushElement(elements, "scene-heading", text, index + 1);
       inDialogue = false;
