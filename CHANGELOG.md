@@ -5,6 +5,30 @@ All notable changes to First Draft are documented here. This project follows
 
 ## [Unreleased]
 
+### Added
+
+- Scene workspace in the palette and command palette for standalone scripts and
+  explicitly ordered projects: click-to-jump, active-scene highlighting, search,
+  part/character/location/time filters and approximate page positions.
+- Scene creation, portable `= Synopsis` editing, same-file Up/Down and explicit
+  destination moves, with normal editor undo for single-file changes.
+- Confirmed cross-part moves with a local pre-move recovery copy, destination-first
+  writes, stale-source checks, rollback and conflict-aware restore.
+
+### Fixed
+
+- Exclude Fountain synopsis lines from screenplay statistics, preview and PDF
+  output while preserving them in source and Fountain export.
+
+### Known limitations
+
+- Scripts with sections, dual dialogue, boneyards, multiline notes or fenced code
+  remain navigable, but scene mutations are disabled to protect boundaries.
+- Cross-part moves require saved notes and ordinary non-hidden note paths.
+- Initial desktop user acceptance passed. Focused undo/conflict interaction
+  checks and physical mobile acceptance remain outstanding; automated tests
+  do not establish device compatibility.
+
 ## [0.12.0] - 2026-10-01
 
 ### Added
@@ -95,7 +119,8 @@ All notable changes to First Draft are documented here. This project follows
 - FDX export intentionally supports the six core screenplay element types; see
   `docs/FDX_COMPATIBILITY.md`.
 
-[Unreleased]: https://github.com/grobmeier/firstdraft/compare/0.11.0...HEAD
+[Unreleased]: https://github.com/grobmeier/firstdraft/compare/0.12.0...HEAD
+[0.12.0]: https://github.com/grobmeier/firstdraft/releases/tag/0.12.0
 [0.11.0]: https://github.com/grobmeier/firstdraft/releases/tag/0.11.0
 [0.10.2]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.2
 [0.10.1]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.1

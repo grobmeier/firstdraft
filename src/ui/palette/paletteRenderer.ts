@@ -60,6 +60,13 @@ function renderGlobalActions(
   const actions = container.createDiv({
     cls: "firstdraft-palette-global-actions",
   });
+  const scenes = actions.createEl("button", {
+    cls: "firstdraft-palette-action",
+    text: "Scenes",
+  });
+  scenes.addEventListener("click", () => {
+    void plugin.openSceneWorkspace();
+  });
   const cheatSheet = actions.createEl("button", {
     cls: "firstdraft-palette-action",
     text: "Cheat sheet",

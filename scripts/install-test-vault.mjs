@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -49,6 +49,73 @@ await mkdir(pluginRoot, { recursive: true });
 await mkdir(characterRoot, { recursive: true });
 await mkdir(projectPartsFolder, { recursive: true });
 await mkdir(projectElsewhereFolder, { recursive: true });
+const sceneDemoFolder = path.join(vaultRoot, "Scene Workspace Demo");
+await mkdir(path.join(sceneDemoFolder, "Elsewhere"), { recursive: true });
+const sceneDemoFiles = {
+  "Project.md": `---
+firstdraft: screenplay-project
+title: The Last Train
+parts:
+  - "[[01 - Arrival]]"
+  - "[[Elsewhere/02 - Departure]]"
+character-folder: Characters
+---
+
+# The Last Train
+
+An isolated scene workspace demo. Start with the Scene workspace test plan.
+`,
+  "01 - Arrival.md": `---
+screenplay: true
+screenplay-project: "[[Scene Workspace Demo/Project]]"
+---
+
+Title: The Last Train
+Author: Example Writer
+
+FADE IN:
+
+INT. STATION - DAY
+= Alex arrives before the last train.
+
+ALEX
+Is this the right platform?
+
+EXT. PLATFORM - NIGHT
+= Sam waits beneath the clock.
+
+SAM
+We have one minute.
+`,
+  "Elsewhere/02 - Departure.md": `---
+screenplay: true
+screenplay-project: "[[Scene Workspace Demo/Project]]"
+---
+
+INT. STATION - DAY
+= Alex returns to collect a forgotten ticket.
+
+ALEX
+I left something behind.
+
+.INT. 駅 - NIGHT
+= The last train leaves.
+
+@サム
+出発しましょう。
+`,
+  "Scene workspace test plan.md": await readFile(
+    path.join(projectRoot, "docs", "SCENE_WORKSPACE.md"),
+    "utf8",
+  ),
+};
+for (const [name, contents] of Object.entries(sceneDemoFiles)) {
+  await writeFile(path.join(sceneDemoFolder, name), contents, {
+    flag: "wx",
+  }).catch((error) => {
+    if (error?.code !== "EEXIST") throw error;
+  });
+}
 await copyFile(
   path.join(projectRoot, "main.js"),
   path.join(pluginRoot, "main.js"),

@@ -18,12 +18,15 @@ import { ItemView } from "obsidian";
 import type { IconName, WorkspaceLeaf } from "obsidian";
 import type FirstDraftPlugin from "../main";
 import { renderFirstDraftPalette } from "./palette/paletteRenderer";
+import { renderSceneWorkspace } from "./sceneWorkspace";
+import { EMPTY_SCENE_FILTERS } from "../scenes/model";
 
 export const FIRST_DRAFT_PALETTE_VIEW_TYPE = "firstdraft-palette";
 
 export class FirstDraftPaletteView extends ItemView {
   private query = "";
   private renderGeneration = 0;
+  private sceneFilters = { ...EMPTY_SCENE_FILTERS };
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -55,6 +58,16 @@ export class FirstDraftPaletteView extends ItemView {
 
   refresh(): void {
     const generation = ++this.renderGeneration;
+    if (this.plugin.sceneWorkspaceMode) {
+      void renderSceneWorkspace(
+        this.plugin,
+        this.contentEl,
+        this.sceneFilters,
+        () => generation === this.renderGeneration,
+        () => this.refresh(),
+      );
+      return;
+    }
     renderFirstDraftPalette(this.plugin, this.contentEl, {
       getQuery: () => this.query,
       setQuery: (query) => {

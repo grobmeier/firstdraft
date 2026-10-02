@@ -35,6 +35,8 @@ The current build provides:
   Courier typography, page breaks, and page numbers;
 - a dockable First Draft Palette with contextual actions and recent screenplay
   elements;
+- a scene workspace with project-wide navigation, filters, portable synopses,
+  scene creation and conflict-checked rearranging, including cross-part recovery;
 - portable Markdown character dossiers with aliases, screenplay links, and
   relationship links;
 - derived per-character scene, cue, and dialogue usage without generated data
@@ -60,6 +62,10 @@ The current build provides:
 See [PDF compatibility](docs/PDF_COMPATIBILITY.md) and
 [FDX compatibility](docs/FDX_COMPATIBILITY.md) for the deliberately narrow
 format boundaries.
+
+Open a screenplay or project, then choose **Scenes** in the palette or run
+**Open scene workspace** with Cmd/Ctrl+P. See the
+[scene workspace guide and test checklist](docs/SCENE_WORKSPACE.md).
 
 First Draft 0.12 embeds a local Courier-compatible PDF font with
 broader Latin, Greek and Cyrillic coverage. Missing characters stop export

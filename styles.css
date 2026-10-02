@@ -258,6 +258,56 @@
   line-height: 1;
 }
 
+.firstdraft-scene-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-block: 8px;
+}
+.firstdraft-scene-actions button {
+  height: auto;
+  min-height: 28px;
+  white-space: normal;
+}
+.firstdraft-scene-filters {
+  display: grid;
+  gap: 8px;
+  margin-block: 12px;
+}
+.firstdraft-scene-filters input,
+.firstdraft-scene-filters select {
+  width: 100%;
+  min-width: 0;
+}
+.firstdraft-scene-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-block: 10px;
+  overflow-wrap: anywhere;
+}
+.firstdraft-scene-card.is-active {
+  border-color: var(--interactive-accent);
+}
+.firstdraft-scene-heading {
+  display: block;
+  width: 100%;
+  text-align: left;
+  white-space: normal;
+  height: auto;
+  min-height: 32px;
+}
+.firstdraft-scene-card p {
+  margin-block: 6px;
+}
+.firstdraft-scene-synopsis,
+.firstdraft-scene-warning {
+  white-space: pre-wrap;
+}
+.firstdraft-scene-warning {
+  color: var(--text-warning);
+}
+
 .firstdraft-preview-scene-heading,
 .firstdraft-preview-character {
   font-weight: 700;

@@ -14,6 +14,13 @@ First Draft processes screenplay text locally inside Obsidian.
   ordered project parts.
 - It does not read or write the system clipboard. Cheat-sheet examples are
   selectable text that users can copy with their normal system shortcut.
+- A confirmed cross-file scene move stores both files' complete before/after
+  text in `scene-recovery.json` inside this plugin's vault configuration folder
+  (normally `.obsidian/plugins/firstdraft`). The next confirmed cross-file move
+  replaces this single recovery copy; restoring does not delete it. It is plain
+  text, not encrypted, and may be included in vault backups or configuration
+  sync. After recovery is no longer needed, users can remove that file manually.
+  Single-file scene edits do not create a recovery copy.
 
 Obsidian, installed third-party plugins, sync providers, and the operating
 system are outside First Draft's control and have their own privacy behaviour.

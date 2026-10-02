@@ -58,6 +58,7 @@ import { CheatSheetModal } from "./ui/cheatSheetModal";
 import { StatisticsModal } from "./ui/statisticsModal";
 
 export default class FirstDraftPlugin extends Plugin {
+  sceneWorkspaceMode = false;
   settings: FirstDraftSettings = { ...DEFAULT_SETTINGS };
   private statusBarItem: HTMLElement | null = null;
   private refreshTimer: number | null = null;
@@ -82,6 +83,11 @@ export default class FirstDraftPlugin extends Plugin {
       id: "open-first-draft-palette",
       name: "Open palette",
       callback: () => void this.openPalette(),
+    });
+    this.addCommand({
+      id: "open-scene-workspace",
+      name: "Open scene workspace",
+      callback: () => void this.openSceneWorkspace(),
     });
 
     this.addCommand({
@@ -320,9 +326,17 @@ export default class FirstDraftPlugin extends Plugin {
     );
     this.registerEvent(
       this.app.metadataCache.on("changed", (file) => {
-        if (file === this.activeFile()) this.scheduleRefresh();
+        if (this.sceneWorkspaceMode || file === this.activeFile())
+          this.scheduleRefresh();
       }),
     );
+    const refreshScenes = () => {
+      if (this.sceneWorkspaceMode) this.scheduleRefresh();
+    };
+    this.registerEvent(this.app.vault.on("modify", refreshScenes));
+    this.registerEvent(this.app.vault.on("rename", refreshScenes));
+    this.registerEvent(this.app.vault.on("delete", refreshScenes));
+    this.registerEvent(this.app.vault.on("create", refreshScenes));
     this.registerDomEvent(document, "selectionchange", () => {
       const activeElement = document.activeElement;
       if (
@@ -464,6 +478,12 @@ export default class FirstDraftPlugin extends Plugin {
       active: true,
     });
     await this.app.workspace.revealLeaf(leaf);
+  }
+
+  async openSceneWorkspace(): Promise<void> {
+    this.sceneWorkspaceMode = true;
+    await this.openPalette();
+    this.refreshPalettes();
   }
 
   activeMarkdownView(): MarkdownView | null {
