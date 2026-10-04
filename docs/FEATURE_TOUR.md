@@ -4,9 +4,9 @@ First Draft keeps Fountain or Markdown as the source of truth and adds a
 screenplay-aware workspace around it. Everything shown below runs locally in
 Obsidian.
 
-The screenshots and short video show the published **0.12.0** workflow. The scene
-workspace and continuity inspector below are on `main`, ready for the next release;
-they are not in 0.12.0. Their dedicated screenshots are still to be captured.
+The scene workspace and continuity inspector screenshots show **0.13.0**.
+The other screenshots and short video show the continuing writing and export
+workflow introduced in earlier releases. All captures use an isolated demo vault.
 
 ## Write with the quick-access palette
 
@@ -38,6 +38,8 @@ Choose **Scenes** in the palette or run **Open scene workspace** with Cmd/Ctrl+P
 Scene cards show headings, source parts, characters, portable `= Synopsis` notes
 and approximate page positions. Search or filter by part, character, location or
 time; click a heading to return to the original text.
+
+![Scene workspace with source part and portable synopsis](images/scene-workspace.png)
 
 Create scenes, edit synopses and rearrange complete scene blocks. Cross-part moves
 require confirmation and saved, unchanged notes; **Restore last move** retains a
@@ -76,6 +78,8 @@ It combines character identity, alias, relationship and spelling checks with
 advice about optional dossiers, empty scenes and missing time-of-day labels.
 Evidence opens the original cue, heading or character page; changed sources
 require **Refresh** before navigation.
+
+![Read-only continuity inspector with original-source links](images/continuity-inspector.png)
 
 Only the current screenplay/project parts and configured character folder are
 checked. **Checks incomplete** explicitly discloses unsupported or unresolved

@@ -15,9 +15,8 @@ Search for **First Draft**, install it, and enable it. See the
 
 ## Features
 
-The latest published release is **0.12.0**. The scene workspace and continuity
-inspector described below are on `main` for the next release; installing 0.12.0
-does not include them yet.
+**0.13.0** adds the scene workspace and read-only continuity inspector described
+below. See the [release notes](docs/releases/0.13.0.md) for validation boundaries.
 
 The current build provides:
 
