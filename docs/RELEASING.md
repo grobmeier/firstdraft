@@ -10,8 +10,13 @@ in `manifest.json`.
 2. Add the version and minimum Obsidian version to `versions.json`.
 3. Add user-facing notes at `docs/releases/<version>.md` and update
    `CHANGELOG.md`.
-4. Complete the desktop test-vault checklist in `README.md`.
-5. Complete and record the physical-device checklist in `MOBILE_TESTING.md`.
+4. Complete the desktop test-vault checklist in `README.md` and the relevant
+   feature guides. For the next release, finish [scene workspace](SCENE_WORKSPACE.md)
+   Undo, narrow-sidebar, cross-part restore/conflict and stale-dialog checks, and
+   repeat the [inspector](CONTINUITY_INSPECTOR.md) smoke test on the final build.
+5. Complete and record the physical-device checklist in `MOBILE_TESTING.md` when
+   a device is available. If deferred, disclose unverified mobile layout/performance
+   in release notes; do not describe desktop tests as physical-mobile acceptance.
 6. Confirm `main` is clean, reviewed, and pushed.
 7. Run the same local quality gate as CI:
 
@@ -25,14 +30,20 @@ in `manifest.json`.
    npm run build
    ```
 
+8. Confirm README, feature tour, compatibility/privacy guides and screenshots
+   distinguish the published version from unreleased features. Capture scene and
+   inspector screenshots; the existing video only covers preview/PDF export.
+9. Confirm the complete audit is clean and [Dependabot alert 1](https://github.com/grobmeier/firstdraft/security/dependabot/1)
+   is closed after pushing the Moment fix. See [dependency security](DEPENDENCY_SECURITY.md).
+
 ## Publish
 
 Create and push an annotated tag whose name exactly matches the manifest
 version:
 
 ```bash
-git tag -a 0.11.0 -m "First Draft 0.11.0"
-git push origin 0.11.0
+git tag -a <version> -m "First Draft <version>"
+git push origin <version>
 ```
 
 The Release workflow verifies that the tag is on `main`, repeats the complete

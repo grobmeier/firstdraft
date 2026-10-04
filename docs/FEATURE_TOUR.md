@@ -4,6 +4,10 @@ First Draft keeps Fountain or Markdown as the source of truth and adds a
 screenplay-aware workspace around it. Everything shown below runs locally in
 Obsidian.
 
+The screenshots and short video show the published **0.12.0** workflow. The scene
+workspace and continuity inspector below are on `main`, ready for the next release;
+they are not in 0.12.0. Their dedicated screenshots are still to be captured.
+
 ## Write with the quick-access palette
 
 The dockable First Draft palette keeps context-sensitive writing commands,
@@ -28,6 +32,19 @@ Project statistics, checks, recent items, preview, and Fountain, FDX, and PDF
 exports operate on the combined screenplay. Previous/next actions move between
 parts without the command palette.
 
+## Plan and navigate scenes
+
+Choose **Scenes** in the palette or run **Open scene workspace** with Cmd/Ctrl+P.
+Scene cards show headings, source parts, characters, portable `= Synopsis` notes
+and approximate page positions. Search or filter by part, character, location or
+time; click a heading to return to the original text.
+
+Create scenes, edit synopses and rearrange complete scene blocks. Cross-part moves
+require confirmation and saved, unchanged notes; **Restore last move** retains a
+local recovery copy and refuses to overwrite later writing. Unsupported syntax
+disables editing with an explanation. See the [scene workspace guide](SCENE_WORKSPACE.md)
+for safety boundaries and the remaining desktop acceptance checks.
+
 ## Preview and export a readable PDF
 
 Preview renders the active screenplay or whole project as paper-like pages.
@@ -51,6 +68,20 @@ screenplay and offers the normal Obsidian Local Graph for relationships.
 Deterministic checks report missing pages, duplicate identities, ambiguous
 aliases, broken relationships, unused pages, and likely spelling variants.
 They do not generate or rewrite story material.
+
+## Review source-linked continuity signals
+
+Run **Inspect continuity** from Cmd/Ctrl+P, the palette or the scene workspace.
+It combines character identity, alias, relationship and spelling checks with
+advice about optional dossiers, empty scenes and missing time-of-day labels.
+Evidence opens the original cue, heading or character page; changed sources
+require **Refresh** before navigation.
+
+Only the current screenplay/project parts and configured character folder are
+checked. **Checks incomplete** explicitly discloses unsupported or unresolved
+scope. This is not an assessment of story logic, chronology, props or inferred
+character presence, and it never rewrites your text. See the
+[continuity inspector guide](CONTINUITY_INSPECTOR.md).
 
 ## Keep the terminology close
 

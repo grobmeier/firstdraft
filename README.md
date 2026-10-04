@@ -13,7 +13,11 @@ Install First Draft from **Settings → Community plugins → Browse** in Obsidi
 Search for **First Draft**, install it, and enable it. See the
 [visual feature tour](docs/FEATURE_TOUR.md) for the complete workflow.
 
-## Version 0.11
+## Features
+
+The latest published release is **0.12.0**. The scene workspace and continuity
+inspector described below are on `main` for the next release; installing 0.12.0
+does not include them yet.
 
 The current build provides:
 
@@ -44,6 +48,8 @@ The current build provides:
 - deterministic character checks for missing pages, duplicate identities,
   ambiguous aliases, broken relationships, unused pages, and likely spelling
   variants;
+- a read-only continuity inspector with original-source evidence, explicit
+  incomplete-scope reporting and advisory empty-scene/missing-time checks;
 - native Obsidian Local Graph access for character relationships;
 - ordered multi-file screenplay projects whose parts can live in different
   vault folders;
@@ -66,6 +72,10 @@ format boundaries.
 Open a screenplay or project, then choose **Scenes** in the palette or run
 **Open scene workspace** with Cmd/Ctrl+P. See the
 [scene workspace guide and test checklist](docs/SCENE_WORKSPACE.md).
+
+**Inspect continuity** provides read-only, source-linked character checks and
+scene advice. See the [inspector guide](docs/CONTINUITY_INSPECTOR.md) for its
+deliberately limited scope.
 
 First Draft 0.12 embeds a local Courier-compatible PDF font with
 broader Latin, Greek and Cyrillic coverage. Missing characters stop export
@@ -166,7 +176,8 @@ access the system clipboard.
 
 ## Development
 
-Requirements: Node.js 22 and npm. If you use nvm, run `nvm use` in the
+Requirements: Node.js 22.12+ within the 22 series, or Node.js 24+, and npm.
+If you use nvm, run `nvm use` in the
 repository before installing dependencies.
 
 ```bash

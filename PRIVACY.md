@@ -11,7 +11,12 @@ First Draft processes screenplay text locally inside Obsidian.
   to the active note's explicit project link and its ancestor folders; character
   discovery is limited to the configured project-local character folder.
 - It reads note contents only for the current screenplay and its explicitly
-  ordered project parts.
+  ordered project parts, the project note and character pages selected from the
+  configured character folder. The inspector reads these pages to capture
+  source snapshots and reject stale navigation.
+- Continuity findings stay in memory, are regenerated on Refresh and are not
+  written into notes or a diagnostic database. There is no remote analysis or
+  automatic correction of screenplay or character text.
 - It does not read or write the system clipboard. Cheat-sheet examples are
   selectable text that users can copy with their normal system shortcut.
 - A confirmed cross-file scene move stores both files' complete before/after

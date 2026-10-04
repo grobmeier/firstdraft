@@ -1,7 +1,9 @@
 # Mobile testing
 
 First Draft uses browser-compatible Obsidian APIs and declares mobile support,
-but a physical-device check is still required before the first public release.
+but physical-device acceptance remains outstanding. Record it before claiming
+verified mobile support; if a release proceeds without a device, disclose the
+untested layout/performance in its release notes.
 Use a dedicated test vault containing no private screenplay material.
 
 ## Recommended: install the release candidate with BRAT
@@ -43,6 +45,10 @@ BRAT release-candidate path is the practical option there.
 - Create and open a character dossier.
 - Open a multi-part screenplay project and navigate between parts.
 - View project statistics and character checks.
+- In a build containing the scene workspace, check narrow cards, filters, scene
+  editing and cross-part move/restore on disposable notes.
+- In a build containing the continuity inspector, check scrolling/wrapped
+  evidence, source navigation, Refresh and stale-report warnings.
 - Preview a standalone screenplay and a multi-part project in both portrait
   and landscape orientation without horizontal page clipping.
 - Export Fountain, FDX, and PDF files without changing the source document;

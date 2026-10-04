@@ -7,6 +7,9 @@ All notable changes to First Draft are documented here. This project follows
 
 ### Added
 
+- Read-only continuity inspector with source-linked character identity/link checks,
+  optional dossier and empty-scene/missing-time advice, stale-evidence guards and
+  explicit incomplete-scope reporting.
 - Scene workspace in the palette and command palette for standalone scripts and
   explicitly ordered projects: click-to-jump, active-scene highlighting, search,
   part/character/location/time filters and approximate page positions.
@@ -16,6 +19,10 @@ All notable changes to First Draft are documented here. This project follows
   writes, stale-source checks, rollback and conflict-aware restore.
 
 ### Fixed
+
+- Override the vulnerable development-only Moment dependency with patched 2.31.0.
+- Same-file scene transactions leave unchanged frontmatter and surrounding text
+  outside the replacement range.
 
 - Exclude Fountain synopsis lines from screenplay statistics, preview and PDF
   output while preserving them in source and Fountain export.
