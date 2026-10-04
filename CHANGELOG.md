@@ -5,6 +5,8 @@ All notable changes to First Draft are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-10-04
+
 ### Added
 
 - Read-only continuity inspector with source-linked character identity/link checks,
@@ -32,9 +34,10 @@ All notable changes to First Draft are documented here. This project follows
 - Scripts with sections, dual dialogue, boneyards, multiline notes or fenced code
   remain navigable, but scene mutations are disabled to protect boundaries.
 - Cross-part moves require saved notes and ordinary non-hidden note paths.
-- Initial desktop user acceptance passed. Focused undo/conflict interaction
-  checks and physical mobile acceptance remain outstanding; automated tests
-  do not establish device compatibility.
+- Desktop native menu Undo, cross-part move/restore, later-edit conflicts and
+  stale-dialog rejection passed in the isolated test vault. Narrow-sidebar and
+  physical mobile acceptance remain outstanding; automated tests do not establish
+  device compatibility.
 
 ## [0.12.0] - 2026-10-01
 
