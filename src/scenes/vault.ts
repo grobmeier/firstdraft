@@ -246,15 +246,36 @@ export async function applySceneChanges(
             throw new Error(
               "An open editor changed before the scene transaction.",
             );
-          view.editor.transaction({
-            changes: [
-              {
-                from: { line: 0, ch: 0 },
-                to: view.editor.offsetToPos(change.before.length),
-                text: change.after,
-              },
-            ],
-          });
+          // Leave unchanged properties and text outside the move untouched.
+          let start = 0;
+          while (
+            start < change.before.length &&
+            start < change.after.length &&
+            change.before[start] === change.after[start]
+          )
+            start++;
+          let endBefore = change.before.length;
+          let endAfter = change.after.length;
+          while (
+            endBefore > start &&
+            endAfter > start &&
+            change.before[endBefore - 1] === change.after[endAfter - 1]
+          ) {
+            endBefore--;
+            endAfter--;
+          }
+          view.editor.transaction(
+            {
+              changes: [
+                {
+                  from: view.editor.offsetToPos(start),
+                  to: view.editor.offsetToPos(endBefore),
+                  text: change.after.slice(start, endAfter),
+                },
+              ],
+            },
+            "input",
+          );
         }
       } else
         throw new Error(

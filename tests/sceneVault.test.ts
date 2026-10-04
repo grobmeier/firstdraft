@@ -34,10 +34,17 @@ vi.mock("../src/projects/vault", () => ({
   loadScreenplayContext: async (app: { testParts: unknown[] }) => ({
     parts: app.testParts,
     project: { issues: context.issues },
+    characterFolder: "Characters",
+    scopeFiles: app.testParts,
+    owner: app.testParts[0],
   }),
   projectMembershipIssue: () =>
     context.ambiguous ? "Ambiguous project" : null,
 }));
+vi.mock("../src/characters/vault", () => ({
+  verifiableCharacterPages: () => [],
+}));
+import { loadInspector, openInspectorEvidence } from "../src/continuity/vault";
 import { TFile, MarkdownView, type WorkspaceLeaf } from "obsidian";
 import {
   loadSceneWorkspace,
@@ -62,6 +69,7 @@ function fixture() {
   ]);
   const configuration = new Map<string, string>();
   const undo: string[] = [];
+  const changeStarts: number[] = [];
   const selections: unknown[] = [];
   const views = new Map<string, MarkdownView>();
   let active: MarkdownView;
@@ -76,9 +84,23 @@ function fixture() {
           getValue: () => buffer,
           getCursor: () => ({ line: 4, ch: 0 }),
           offsetToPos: (offset: number) => ({ line: 0, ch: offset }),
-          transaction: ({ changes }: { changes: { text: string }[] }) => {
+          transaction: ({
+            changes,
+          }: {
+            changes: {
+              from: { ch: number };
+              to: { ch: number };
+              text: string;
+            }[];
+          }) => {
             undo.push(buffer);
-            buffer = changes[0]?.text ?? buffer;
+            const change = changes[0];
+            if (change) changeStarts.push(change.from.ch);
+            if (change)
+              buffer =
+                buffer.slice(0, change.from.ch) +
+                change.text +
+                buffer.slice(change.to.ch);
             sources.set(file.path, buffer);
           },
           setSelection: (...args: unknown[]) => selections.push(args),
@@ -147,6 +169,7 @@ function fixture() {
     configuration,
     views,
     undo,
+    changeStarts,
     selections,
     open,
   };
@@ -156,6 +179,44 @@ beforeEach(() => {
   context.ambiguous = false;
 });
 describe("Obsidian scene safety integration", () => {
+  it("loads a read-only project inspector and navigates to exact cue evidence", async () => {
+    const f = fixture();
+    const before = new Map(f.sources);
+    const snapshot = await loadInspector(f.plugin);
+    expect(snapshot.report.files.map((file) => file.path)).toEqual([
+      "One.md",
+      "Two.md",
+    ]);
+    const evidence = {
+      path: f.one.path,
+      source: f.sources.get(f.one.path) ?? "",
+      line: 4,
+      text: "INT. ROOM - DAY",
+    };
+    await openInspectorEvidence(f.plugin, evidence, snapshot.guards);
+    expect(f.selections[0]).toEqual([
+      { line: 4, ch: 0 },
+      { line: 4, ch: 15 },
+    ]);
+    expect(f.sources).toEqual(before);
+    expect(f.undo).toEqual([]);
+    expect(f.configuration.size).toBe(0);
+  });
+  it("rejects stale inspector evidence when another part changes", async () => {
+    const f = fixture();
+    const snapshot = await loadInspector(f.plugin);
+    const evidence = {
+      path: f.one.path,
+      source: f.sources.get(f.one.path) ?? "",
+      line: 4,
+      text: "INT. ROOM - DAY",
+    };
+    f.sources.set(f.two.path, "Later edit");
+    await expect(
+      openInspectorEvidence(f.plugin, evidence, snapshot.guards),
+    ).rejects.toThrow("report is stale");
+    expect(f.selections).toEqual([]);
+  });
   it("reads only the explicitly resolved parts and preserves project order", async () => {
     const f = fixture();
     const workspace = await loadSceneWorkspace(f.plugin);
@@ -173,6 +234,9 @@ describe("Obsidian scene safety integration", () => {
     ]);
     expect(f.undo).toEqual([file.source]);
     expect(f.sources.get(f.one.path)).toContain("INT. STUDIO - DAY");
+    expect(f.changeStarts[0]).toBeGreaterThanOrEqual(
+      file.source.indexOf("INT."),
+    );
   });
   it("opens an unopened part for a same-file editor transaction", async () => {
     const f = fixture();
@@ -265,5 +329,75 @@ describe("Obsidian scene safety integration", () => {
     );
     await expect(readSceneRecovery(f.plugin)).rejects.toThrow("invalid");
     expect(f.undo).toEqual([]);
+  });
+  it("preserves unreadable recovery JSON without touching screenplay files", async () => {
+    const f = fixture();
+    const before = new Map(f.sources);
+    const path = ".obsidian/plugins/firstdraft/scene-recovery.json";
+    f.configuration.set(path, "{broken");
+    await expect(readSceneRecovery(f.plugin)).rejects.toThrow(
+      "could not be read",
+    );
+    expect(f.sources).toEqual(before);
+    expect(f.configuration.get(path)).toBe("{broken");
+  });
+  it("rejects a move planned from an unsaved buffer before saving recovery", async () => {
+    const f = fixture();
+    const before = new Map(f.sources);
+    const view = f.open(f.one);
+    (view.editor as unknown as { testSet: (text: string) => void }).testSet(
+      (f.sources.get(f.one.path) ?? "") + "\nUnsaved action.",
+    );
+    const workspace = await loadSceneWorkspace(f.plugin);
+    const one = workspace.files[0];
+    const two = workspace.files[1];
+    const scene = one?.scenes[0];
+    if (!one || !two || !scene) throw new Error("Fixture missing scene");
+    await expect(
+      applySceneChanges(f.plugin, moveScene(one, scene, two, null)),
+    ).rejects.toThrow("Save the affected notes");
+    expect(f.sources).toEqual(before);
+    expect(f.configuration.size).toBe(0);
+  });
+  it("retains later saved writing and the recovery copy when restore conflicts", async () => {
+    const f = fixture();
+    const one = sceneFile(f.one.path, f.sources.get(f.one.path) ?? "");
+    const two = sceneFile(f.two.path, f.sources.get(f.two.path) ?? "");
+    const scene = one.scenes[0];
+    if (!scene) throw new Error("Fixture missing scene");
+    await applySceneChanges(f.plugin, moveScene(one, scene, two, null));
+    const record = await readSceneRecovery(f.plugin);
+    if (!record) throw new Error("Fixture missing recovery");
+    f.sources.set(
+      f.two.path,
+      (f.sources.get(f.two.path) ?? "") + "\nLater writing.",
+    );
+    const before = new Map(f.sources);
+    const recoveryBefore = new Map(f.configuration);
+    await expect(restoreLastSceneMove(f.plugin, record)).rejects.toThrow(
+      "Automatic restore stopped",
+    );
+    expect(f.sources).toEqual(before);
+    expect(f.configuration).toEqual(recoveryBefore);
+  });
+  it("rejects a restore dialog whose recovery copy has been replaced", async () => {
+    const f = fixture();
+    const one = sceneFile(f.one.path, f.sources.get(f.one.path) ?? "");
+    const two = sceneFile(f.two.path, f.sources.get(f.two.path) ?? "");
+    const scene = one.scenes[0];
+    if (!scene) throw new Error("Fixture missing scene");
+    await applySceneChanges(f.plugin, moveScene(one, scene, two, null));
+    const record = await readSceneRecovery(f.plugin);
+    if (!record) throw new Error("Fixture missing recovery");
+    const newer = { ...record, createdAt: "2026-10-02T12:00:00.000Z" };
+    f.configuration.set(
+      ".obsidian/plugins/firstdraft/scene-recovery.json",
+      JSON.stringify(newer),
+    );
+    const before = new Map(f.sources);
+    await expect(restoreLastSceneMove(f.plugin, record)).rejects.toThrow(
+      "newer recovery",
+    );
+    expect(f.sources).toEqual(before);
   });
 });

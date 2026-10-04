@@ -308,6 +308,17 @@
   color: var(--text-warning);
 }
 
+.firstdraft-inspector-evidence {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 32px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+  margin-block: 6px;
+}
+
 .firstdraft-preview-scene-heading,
 .firstdraft-preview-character {
   font-weight: 700;

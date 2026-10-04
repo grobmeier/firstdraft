@@ -67,6 +67,11 @@ function renderGlobalActions(
   scenes.addEventListener("click", () => {
     void plugin.openSceneWorkspace();
   });
+  const inspect = actions.createEl("button", {
+    cls: "firstdraft-palette-action",
+    text: "Inspect continuity",
+  });
+  inspect.addEventListener("click", () => plugin.openContinuityInspector());
   const cheatSheet = actions.createEl("button", {
     cls: "firstdraft-palette-action",
     text: "Cheat sheet",

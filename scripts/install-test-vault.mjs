@@ -116,6 +116,81 @@ for (const [name, contents] of Object.entries(sceneDemoFiles)) {
     if (error?.code !== "EEXIST") throw error;
   });
 }
+const inspectorRoot = path.join(vaultRoot, "Continuity Inspector Demo");
+await mkdir(path.join(inspectorRoot, "Characters"), { recursive: true });
+const inspectorFiles = {
+  "Project.md": `---
+firstdraft: screenplay-project
+title: Inspector demo
+parts:
+  - "[[Opening]]"
+  - "[[Departure]]"
+character-folder: Characters
+---
+
+An isolated, neutral continuity demo.
+`,
+  "Opening.md": `---
+screenplay: true
+screenplay-project: "[[Continuity Inspector Demo/Project]]"
+---
+
+Title: Inspector Demo
+Author: Example Writer
+
+INT. STATION
+= Intentional outline placeholder.
+
+INT. STATION - DAY
+
+@ÉLISE (V.O.)
+The platform is quiet.
+
+MILER
+I have the tickets.
+`,
+  "Departure.md": `---
+screenplay: true
+screenplay-project: "[[Continuity Inspector Demo/Project]]"
+---
+
+.INT. 駅 - NIGHT
+
+@サム
+出発しましょう。
+`,
+  "Characters/Elise.md": `---
+firstdraft: character
+character: ELISE
+aliases:
+  - ÉLISE
+screenplays:
+  - "[[Continuity Inspector Demo/Project]]"
+---
+
+# Elise
+`,
+  "Characters/Miller.md": `---
+firstdraft: character
+character: MILLER
+screenplays:
+  - "[[Continuity Inspector Demo/Project]]"
+---
+
+# Miller
+`,
+  "Inspector test plan.md": await readFile(
+    path.join(projectRoot, "docs", "CONTINUITY_INSPECTOR.md"),
+    "utf8",
+  ),
+};
+for (const [name, contents] of Object.entries(inspectorFiles)) {
+  await writeFile(path.join(inspectorRoot, name), contents, {
+    flag: "wx",
+  }).catch((error) => {
+    if (error?.code !== "EEXIST") throw error;
+  });
+}
 await copyFile(
   path.join(projectRoot, "main.js"),
   path.join(pluginRoot, "main.js"),

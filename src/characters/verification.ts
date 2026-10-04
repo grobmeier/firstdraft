@@ -38,6 +38,7 @@ export interface CharacterIssue {
     | "unused-page";
   message: string;
   path?: string;
+  characterNames?: string[];
 }
 
 function comparable(value: string): string {
@@ -99,6 +100,7 @@ export function verifyCharacterPages(
           ? `${name} is the canonical cue on ${owners.length} character pages.`
           : `${name} resolves to more than one character page.`,
       path: owners[0]?.path,
+      characterNames: [name],
     });
   }
 
@@ -112,6 +114,7 @@ export function verifyCharacterPages(
       severity: "warning",
       code: "missing-page",
       message: `${cue} has no character page.`,
+      characterNames: [cue],
     });
     const possible = pages.find((page) => likelyVariant(cue, page));
     if (possible) {
@@ -120,6 +123,7 @@ export function verifyCharacterPages(
         code: "possible-variant",
         message: `${cue} may be a spelling variant of ${possible.character}.`,
         path: possible.path,
+        characterNames: [cue],
       });
     }
   }
@@ -134,6 +138,7 @@ export function verifyCharacterPages(
         code: "unused-page",
         message: `${page.character} links to this screenplay but is not used in it.`,
         path: page.path,
+        characterNames: [page.character, ...page.aliases],
       });
     }
     for (const related of page.unresolvedRelated) {
@@ -142,6 +147,7 @@ export function verifyCharacterPages(
         code: "unresolved-relationship",
         message: `${page.character} links to missing relationship target ${related}.`,
         path: page.path,
+        characterNames: [page.character, ...page.aliases],
       });
     }
   }

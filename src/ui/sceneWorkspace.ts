@@ -82,6 +82,7 @@ export async function renderSceneWorkspace(
     refresh();
   });
   action(bar, "Refresh", refresh);
+  action(bar, "Inspect continuity", () => plugin.openContinuityInspector());
   try {
     const workspace = await loadSceneWorkspace(plugin);
     if (!isCurrent()) return;

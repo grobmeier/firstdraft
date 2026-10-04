@@ -56,6 +56,7 @@ import {
 } from "./ui/firstDraftPaletteView";
 import { CheatSheetModal } from "./ui/cheatSheetModal";
 import { StatisticsModal } from "./ui/statisticsModal";
+import { ContinuityInspectorModal } from "./ui/continuityInspectorModal";
 
 export default class FirstDraftPlugin extends Plugin {
   sceneWorkspaceMode = false;
@@ -88,6 +89,11 @@ export default class FirstDraftPlugin extends Plugin {
       id: "open-scene-workspace",
       name: "Open scene workspace",
       callback: () => void this.openSceneWorkspace(),
+    });
+    this.addCommand({
+      id: "inspect-continuity",
+      name: "Inspect continuity",
+      callback: () => this.openContinuityInspector(),
     });
 
     this.addCommand({
@@ -484,6 +490,10 @@ export default class FirstDraftPlugin extends Plugin {
     this.sceneWorkspaceMode = true;
     await this.openPalette();
     this.refreshPalettes();
+  }
+
+  openContinuityInspector(): void {
+    new ContinuityInspectorModal(this).open();
   }
 
   activeMarkdownView(): MarkdownView | null {
