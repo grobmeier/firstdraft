@@ -13,7 +13,9 @@ is public and has a GitHub release.
 
 1. Install the **BRAT** community plugin in the mobile test vault.
 2. In BRAT, choose **Add Beta plugin**.
-3. Enter `grobmeier/firstdraft` and select the current release.
+3. Enter `grobmeier/firstdraft` and select the intended test release. For the
+   activated-note palette fix, select `0.13.1-beta.1` explicitly; the stable
+   `0.13.0` release does not include it.
 4. Enable **First Draft** under **Settings → Community plugins**.
 5. Open the project fixture and complete the checklist below.
 
@@ -38,6 +40,34 @@ Direct installation on iOS/iPadOS is constrained by app file access, so the
 BRAT release-candidate path is the practical option there.
 
 ## Mobile acceptance checklist
+
+### Activated-note palette regression
+
+For the palette-context fix, repeat these checks on the iPad in a disposable
+vault. The public 0.13.0 release does not contain this fix; use the matching test
+build, then restart Obsidian or disable/re-enable First Draft.
+
+1. Open an existing Markdown screenplay with boolean `screenplay: true`.
+2. Open the First Draft Palette, focus its controls, close/reopen the sidebar
+   repeatedly, and switch between editing and reading views. Writing controls
+   should remain available without asking you to activate the note again.
+3. Create a project, open its parts, and return to the original screenplay.
+   Each view should show the corresponding controls, not those of the previous
+   note. While properties load, a waiting message is preferable to activation.
+4. Switch to an ordinary note, an empty tab, a project, and a character page.
+   Only the ordinary Markdown note should offer screenplay activation; no action
+   should edit a screenplay left open in another tab by mistake.
+5. In an editable disposable note, change `screenplay: true` to `false`, then
+   back to `true`, and remove the property. Controls should reflect the current
+   properties. A malformed or incomplete YAML block should show waiting feedback
+   rather than an activation button.
+6. Restart Obsidian, lock/resume the device, and repeat steps 1–3.
+
+Record any failure together with the note type, reading/editing mode and whether
+the sidebar was focused. Automated context and rendering tests are not physical
+iPad acceptance.
+
+### General acceptance
 
 - Open a `.fountain` file and a Markdown note with `screenplay: true`.
 - Confirm autocomplete works with the on-screen keyboard.

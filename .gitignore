@@ -7,4 +7,5 @@ graphify-out/
 .DS_Store
 output/pdf/
 output/playwright/
+output/test-builds/
 .playwright-cli/

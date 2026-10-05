@@ -5,6 +5,21 @@ All notable changes to First Draft are documented here. This project follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Keep the active Markdown note context when the First Draft palette takes focus;
+  reject stale editors during note navigation.
+- Recognise current screenplay properties while metadata catches up, and show
+  waiting feedback instead of activation for unknown or malformed properties.
+- Refresh the palette after activation and report an already-active note.
+
+### Testing
+
+- Added 24 regression checks for note context, property loading, palette rendering
+  and activation feedback. Physical iPad acceptance remains outstanding.
+- Beta releases use separate tags and attested assets without replacing the
+  stable GitHub release.
+
 ## [0.13.0] - 2026-10-04
 
 ### Added
