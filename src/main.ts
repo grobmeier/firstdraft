@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MarkdownView, Plugin } from "obsidian";
+import { MarkdownView, Plugin, getFrontMatterInfo, parseYaml } from "obsidian";
 import type { TFile } from "obsidian";
 import { openCharacterPicker } from "./commands/character";
 import { exportFdx } from "./commands/exportFdx";
@@ -57,12 +57,15 @@ import {
 import { CheatSheetModal } from "./ui/cheatSheetModal";
 import { StatisticsModal } from "./ui/statisticsModal";
 import { ContinuityInspectorModal } from "./ui/continuityInspectorModal";
+import { NoteContext, resolveNoteProperties } from "./ui/noteContext";
+import type { NoteProperties } from "./ui/noteContext";
 
 export default class FirstDraftPlugin extends Plugin {
   sceneWorkspaceMode = false;
   settings: FirstDraftSettings = { ...DEFAULT_SETTINGS };
   private statusBarItem: HTMLElement | null = null;
   private refreshTimer: number | null = null;
+  private readonly noteContext = new NoteContext<TFile, MarkdownView>();
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -319,10 +322,17 @@ export default class FirstDraftPlugin extends Plugin {
     });
 
     this.registerEvent(
-      this.app.workspace.on("active-leaf-change", () => this.scheduleRefresh()),
+      this.app.workspace.on("active-leaf-change", () => {
+        this.activeMarkdownView();
+        this.scheduleRefresh();
+      }),
     );
     this.registerEvent(
-      this.app.workspace.on("file-open", () => this.scheduleRefresh()),
+      this.app.workspace.on("file-open", (file) => {
+        this.noteContext.opened(file);
+        this.activeMarkdownView();
+        this.scheduleRefresh();
+      }),
     );
     this.registerEvent(
       this.app.workspace.on("layout-change", () => this.scheduleRefresh()),
@@ -372,22 +382,60 @@ export default class FirstDraftPlugin extends Plugin {
   }
 
   isScreenplayFile(file: TFile | null): boolean {
-    const frontmatter = file
-      ? this.app.metadataCache.getFileCache(file)?.frontmatter
-      : undefined;
-    return isScreenplayMode(file, frontmatter, this.settings);
+    const properties = this.notePropertiesForFile(file);
+    return isScreenplayMode(
+      file,
+      properties.state === "ready" ? properties.frontmatter : undefined,
+      this.settings,
+    );
+  }
+
+  notePropertiesForFile(file: TFile | null): NoteProperties {
+    if (file === null) return { state: "loading" };
+    const cache = this.app.metadataCache.getFileCache(file);
+    const view = this.activeMarkdownView();
+    const editorSource = view?.file === file ? view.editor.getValue() : null;
+    // Reading views can have an empty editor; do not mistake that for removed properties.
+    const source =
+      editorSource === "" && (view?.getMode() !== "source" || cache == null)
+        ? null
+        : editorSource;
+    return resolveNoteProperties(
+      source,
+      cache != null,
+      cache?.frontmatter,
+      (text) => {
+        const info = getFrontMatterInfo(text);
+        if (!info.exists) {
+          if (/^\uFEFF?---(?:\r?\n|$)/u.test(text))
+            throw new Error("Properties are still loading or incomplete.");
+          return undefined;
+        }
+        const properties: unknown = parseYaml(info.frontmatter);
+        if (properties === null || properties === undefined) return undefined;
+        if (typeof properties !== "object" || Array.isArray(properties))
+          throw new Error("Properties must be a mapping.");
+        return properties as Record<string, unknown>;
+      },
+    );
   }
 
   isCharacterFile(file: TFile | null): boolean {
     if (file === null || file.extension !== "md") return false;
-    const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
-    return isCharacterFrontmatter(frontmatter);
+    const properties = this.notePropertiesForFile(file);
+    return (
+      properties.state === "ready" &&
+      isCharacterFrontmatter(properties.frontmatter)
+    );
   }
 
   isProjectFile(file: TFile | null): boolean {
     if (file === null || file.extension !== "md") return false;
-    const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
-    return isScreenplayProjectFrontmatter(frontmatter);
+    const properties = this.notePropertiesForFile(file);
+    return (
+      properties.state === "ready" &&
+      isScreenplayProjectFrontmatter(properties.frontmatter)
+    );
   }
 
   refreshStatus(): void {
@@ -469,6 +517,7 @@ export default class FirstDraftPlugin extends Plugin {
   }
 
   async openPalette(): Promise<void> {
+    this.activeMarkdownView();
     const existing = this.app.workspace.getLeavesOfType(
       FIRST_DRAFT_PALETTE_VIEW_TYPE,
     )[0];
@@ -498,22 +547,22 @@ export default class FirstDraftPlugin extends Plugin {
 
   activeMarkdownView(): MarkdownView | null {
     const direct = this.app.workspace.getActiveViewOfType(MarkdownView);
-    if (direct !== null) return direct;
-
-    const activeFile = this.activeFile();
-    if (activeFile === null) return null;
-
-    for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
-      if (leaf.view instanceof MarkdownView && leaf.view.file === activeFile) {
-        return leaf.view;
-      }
-    }
-
-    return null;
+    const views = this.app.workspace
+      .getLeavesOfType("markdown")
+      .map((leaf) => leaf.view)
+      .filter((view): view is MarkdownView => view instanceof MarkdownView);
+    return this.noteContext.resolve(
+      direct,
+      this.app.workspace.getActiveFile(),
+      views,
+      this.app.workspace.getActiveViewOfType(FirstDraftPaletteView) !== null,
+    );
   }
 
   private activeFile(): TFile | null {
-    return this.app.workspace.getActiveFile();
+    return (
+      this.activeMarkdownView()?.file ?? this.app.workspace.getActiveFile()
+    );
   }
 
   private refreshPalettes(): void {

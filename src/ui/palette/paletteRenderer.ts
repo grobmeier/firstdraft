@@ -33,6 +33,17 @@ export function renderFirstDraftPalette(
   renderGlobalActions(plugin, container);
 
   const view = plugin.activeMarkdownView();
+  if (
+    view?.file &&
+    !plugin.isScreenplayFile(view.file) &&
+    plugin.notePropertiesForFile(view.file).state === "loading"
+  ) {
+    container.createEl("p", {
+      cls: "firstdraft-palette-empty",
+      text: "Waiting for this note’s properties. If this persists, reopen the note and check its property block.",
+    });
+    return;
+  }
   if (view?.file && plugin.isCharacterFile(view.file)) {
     renderCharacterPalette(plugin, container, view.file, state.isCurrent);
     return;

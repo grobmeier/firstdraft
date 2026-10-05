@@ -32,7 +32,9 @@ export function renderCharacterPalette(
   file: TFile,
   isCurrent: () => boolean,
 ): void {
-  const frontmatter = plugin.app.metadataCache.getFileCache(file)?.frontmatter;
+  const properties = plugin.notePropertiesForFile(file);
+  const frontmatter =
+    properties.state === "ready" ? properties.frontmatter : undefined;
   const page = characterPageFromFrontmatter(file.path, frontmatter);
   if (page === null) return;
 

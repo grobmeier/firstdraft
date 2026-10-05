@@ -37,6 +37,10 @@ export async function activateScreenplayNote(
     );
     if (result === "activated") {
       new Notice(`Screenplay mode enabled for ${file.basename}.`);
+      plugin.refreshStatus();
+    } else if (result === "already-active") {
+      new Notice(`Screenplay mode is already enabled for ${file.basename}.`);
+      plugin.refreshStatus();
     } else if (result === "disabled") {
       new Notice(
         'In First Draft settings, enable "use screenplay frontmatter" first.',
