@@ -17,9 +17,7 @@
 import fontkit from "@pdf-lib/fontkit";
 import type { Font } from "@pdf-lib/fontkit";
 import type { PDFDocument } from "pdf-lib";
-import regularData from "../../assets/fonts/noto-cjk/NotoSansCJK-Regular.woff?inline";
-import boldData from "../../assets/fonts/noto-cjk/NotoSansCJK-Bold.woff?inline";
-import { fontBytes } from "./pdfFonts";
+import type { CjkFontBytes } from "./cjkFontPack";
 import type { PdfLanguage } from "./pdfLanguage";
 import { decodeWoff } from "./woff";
 
@@ -41,17 +39,18 @@ export function localizeFont(font: Font, language: PdfLanguage): Font {
   return font;
 }
 
-export async function embedCjkFonts(pdf: PDFDocument, language: PdfLanguage) {
+export async function embedCjkFonts(
+  pdf: PDFDocument,
+  language: PdfLanguage,
+  fonts: CjkFontBytes,
+) {
   pdf.registerFontkit({
     create: (bytes) => localizeFont(fontkit.create(bytes), language),
   });
-  const regular = await pdf.embedFont(
-    await decodeWoff(fontBytes(regularData)),
-    {
-      subset: true,
-    },
-  );
-  const bold = await pdf.embedFont(await decodeWoff(fontBytes(boldData)), {
+  const regular = await pdf.embedFont(await decodeWoff(fonts.regular), {
+    subset: true,
+  });
+  const bold = await pdf.embedFont(await decodeWoff(fonts.bold), {
     subset: true,
   });
   return { regular, bold };

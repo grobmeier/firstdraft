@@ -161,7 +161,7 @@ export class FirstDraftSettingTab extends PluginSettingTab {
       },
       {
         name: "PDF language",
-        desc: "Regional character forms for Chinese, Japanese and Korean PDFs. Horizontal layout only. Does not translate your text.",
+        desc: 'Regional character forms for Chinese, Japanese and Korean PDFs. First run "Install offline CJK PDF fonts" on this device. Horizontal layout only; does not translate text.',
         control: {
           type: "dropdown",
           key: "pdfLanguage",
