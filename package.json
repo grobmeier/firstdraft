@@ -1,6 +1,6 @@
 {
   "name": "firstdraft",
-  "version": "0.13.1-beta.2",
+  "version": "0.13.1-beta.3",
   "description": "Screenplay-aware writing assistance for Obsidian, with portable Fountain source.",
   "type": "module",
   "main": "main.js",
