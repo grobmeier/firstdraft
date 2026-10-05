@@ -29,10 +29,9 @@ jobs:
             echo "Release tag must be a numeric version, optionally followed by -beta.N, without a v prefix."
             exit 1
           fi
-          export MANIFEST_VERSION="${BASH_REMATCH[1]}"
-          test "$(node -p "require('./manifest.json').version")" = "$MANIFEST_VERSION"
-          test "$(node -p "require('./package.json').version")" = "$MANIFEST_VERSION"
-          node -e 'const versions = require("./versions.json"); const manifest = require("./manifest.json"); if (versions[process.env.MANIFEST_VERSION] !== manifest.minAppVersion) process.exit(1)'
+          test "$(node -p "require('./manifest.json').version")" = "$VERSION"
+          test "$(node -p "require('./package.json').version")" = "$VERSION"
+          node -e 'const versions = require("./versions.json"); const manifest = require("./manifest.json"); if (versions[process.env.VERSION] !== manifest.minAppVersion) process.exit(1)'
           git fetch origin main
           if [[ "$VERSION" == *-beta.* ]]; then
             # Beta metadata may live on a branch descended from main so that
@@ -61,14 +60,16 @@ jobs:
           VERSION: ${{ github.ref_name }}
         run: |
           release_flags=()
+          release_title="First Draft $VERSION"
           if [[ "$VERSION" == *-beta.* ]]; then
             release_flags+=(--prerelease --latest=false)
+            release_title="$VERSION"
           fi
           gh release create "$VERSION" \
             main.js \
             manifest.json \
             styles.css \
-            --title "First Draft $VERSION" \
+            --title "$release_title" \
             --notes-file "docs/releases/$VERSION.md" \
             --verify-tag \
             "${release_flags[@]}"
