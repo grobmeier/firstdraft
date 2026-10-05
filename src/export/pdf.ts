@@ -24,11 +24,14 @@ import {
 import { embedScreenplayFonts } from "./pdfFonts";
 import { hasCjkText, isPdfLanguage } from "./pdfLanguage";
 import type { PdfLanguage } from "./pdfLanguage";
+import { CjkFontPackError } from "./cjkFontPack";
+import type { CjkFontBytes } from "./cjkFontPack";
 
 export interface PdfExportOptions {
   pageSize: PageSize;
   title: string;
   language?: PdfLanguage;
+  loadCjkFonts?: () => Promise<CjkFontBytes>;
 }
 
 export class UnsupportedPdfTextError extends Error {
@@ -66,12 +69,14 @@ export async function serializePdf(
     document.elements.some((element) =>
       hasCjkText(screenplayElementText(element)),
     );
+  if (cjk && !options.loadCjkFonts) throw new CjkFontPackError();
   const { regular, bold } = cjk
     ? await (
         await import("./cjkFonts")
       ).embedCjkFonts(
         pdf,
         isPdfLanguage(options.language) ? options.language : "zh-Hans",
+        await options.loadCjkFonts!(),
       )
     : await embedScreenplayFonts(pdf);
   const regularCharacters = new Set(regular.getCharacterSet());

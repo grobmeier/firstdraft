@@ -46,7 +46,9 @@ To reproduce:
 | Regular bundled WOFF | `d61013536b8fe91d998513b0eaf752fa42d3a17ec189b06989344c050f37be21` |
 | Bold bundled WOFF    | `43c0db530c9d2af4e1a294939e45beb58da7bb6d9197b8e6743660ef35708367` |
 
-The two assets total 23,365,148 bytes. They are included in `main.js`, not fetched
-at runtime. Character coverage is finite: emoji and newer/rare ideographs may
+The two assets total 23,365,148 bytes. They are distributed as an optional offline
+font pack, not included in `main.js` or fetched by the plugin. The user selects
+both files; hashes are checked before storing six sub-5-MB chunks in the plugin
+directory. See `docs/CJK_FONT_PACK.md`. Character coverage is finite: emoji and newer/rare ideographs may
 still be rejected. Full Chinese/Japanese typography, vertical layout and ruby
 annotations are not claimed.

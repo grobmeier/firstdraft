@@ -25,6 +25,7 @@ import {
 } from "../src/export/screenplayLayout";
 import { serializePdf, UnsupportedPdfTextError } from "../src/export/pdf";
 import type { PageSize } from "../src/screenplay/model";
+import { testCjkFonts } from "./fixtures/cjkFonts";
 
 describe("PDF title pages", () => {
   it("handles BOM/CRLF title blocks and does not recognise inherited field names", () => {
@@ -116,6 +117,7 @@ describe("PDF title pages", () => {
           pageSize: "a4",
           title: "Night",
           language: "ja",
+          loadCjkFonts: testCjkFonts,
         })
       ).length,
     ).toBeGreaterThan(1000);

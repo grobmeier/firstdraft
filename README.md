@@ -82,10 +82,12 @@ with a clear diagnostic rather than silently becoming `?`. This is not
 universal Unicode support; see the PDF compatibility guide.
 
 The plugin also supports horizontal Chinese, Japanese and Korean
-PDFs with offline Noto fonts and measured wrapping. Select **PDF language** in
-First Draft settings for the regional character forms. Preview pagination is
-approximate; inspect the exported PDF. This increases the plugin bundle to
-approximately 33 MB, so physical-phone performance testing remains important.
+PDFs with an [optional offline Noto font pack](docs/CJK_FONT_PACK.md) and measured
+wrapping. Run **Install offline CJK PDF fonts** once on each device that needs
+CJK PDFs. Select **PDF language** in First Draft settings for regional character
+forms. The core bundle is approximately 2.35 MB and its build enforces a 5 MB
+release-asset limit. Preview pagination is approximate; inspect the exported
+PDF. Physical-phone font installation and export testing remain important.
 
 ### PDF title pages and dialogue continuation
 

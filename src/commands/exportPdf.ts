@@ -24,6 +24,7 @@ import {
 } from "../export/pdf";
 import { loadScreenplayContext } from "../projects/vault";
 import { ScreenplayLayoutError } from "../export/screenplayLayout";
+import { CjkFontPackError, loadCjkFontPack } from "../export/cjkFontPack";
 
 const activeExports = new WeakSet<FirstDraftPlugin>();
 
@@ -64,6 +65,8 @@ export async function exportPdf(
       pageSize: plugin.settings.pageSize,
       title,
       language: plugin.settings.pdfLanguage,
+      loadCjkFonts: () =>
+        loadCjkFontPack(plugin.app.vault.adapter, plugin.manifest.dir ?? ""),
     });
     const buffer = content.buffer.slice(
       content.byteOffset,
@@ -74,7 +77,8 @@ export async function exportPdf(
   } catch (error) {
     if (
       error instanceof UnsupportedPdfTextError ||
-      error instanceof ScreenplayLayoutError
+      error instanceof ScreenplayLayoutError ||
+      error instanceof CjkFontPackError
     ) {
       new Notice(error.message, 15000);
       return;

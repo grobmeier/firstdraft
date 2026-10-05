@@ -8,4 +8,5 @@ graphify-out/
 output/pdf/
 output/playwright/
 output/test-builds/
+output/font-pack/
 .playwright-cli/

@@ -31,6 +31,7 @@ import { parseFountain } from "../src/screenplay/parser";
 import { layoutScreenplay } from "../src/export/screenplayLayout";
 import { wrapMeasuredText } from "../src/export/measuredWrapping";
 import { decodeWoff } from "../src/export/woff";
+import { testCjkFonts } from "./fixtures/cjkFonts";
 
 describe("CJK PDF export", () => {
   it("decodes the same font with native compression and the older-browser fallback", async () => {
@@ -74,6 +75,7 @@ describe("CJK PDF export", () => {
         const bytes = await serializePdf(doc, {
           pageSize,
           title: "CJK",
+          loadCjkFonts: testCjkFonts,
           language,
         });
         const pdf = await PDFDocument.load(bytes);
@@ -133,6 +135,7 @@ describe("CJK PDF export", () => {
     const { regular, bold } = await embedCjkFonts(
       await PDFDocument.create(),
       "ko",
+      await testCjkFonts(),
     );
     const doc = parseFountain(
       "INT. 서울 - DAY\n\n@민수\n" + "안녕하세요. Hello, 世界。 ".repeat(40),
@@ -166,6 +169,7 @@ describe("CJK PDF export", () => {
       serializePdf(parseFountain("INT. 室内 - DAY\n\n@小李\n你好 🙂 𱍐"), {
         pageSize: "a4",
         title: "Missing",
+        loadCjkFonts: testCjkFonts,
       }),
     ).rejects.toMatchObject({
       name: "UnsupportedPdfTextError",

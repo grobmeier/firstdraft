@@ -65,8 +65,15 @@ export default tseslint.config(
       "obsidianmd/ui/sentence-case": [
         "warn",
         {
-          brands: ["First Draft", "Final Draft", "Fountain"],
-          acronyms: ["FDX", "PDF"],
+          brands: [
+            "First Draft",
+            "Final Draft",
+            "Fountain",
+            "Chinese",
+            "Japanese",
+            "Korean",
+          ],
+          acronyms: ["FDX", "PDF", "CJK", "WOFF", "MB"],
         },
       ],
     },

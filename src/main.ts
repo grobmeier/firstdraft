@@ -59,6 +59,7 @@ import { StatisticsModal } from "./ui/statisticsModal";
 import { ContinuityInspectorModal } from "./ui/continuityInspectorModal";
 import { NoteContext, resolveNoteProperties } from "./ui/noteContext";
 import type { NoteProperties } from "./ui/noteContext";
+import { CjkFontPackModal } from "./ui/cjkFontPackModal";
 
 export default class FirstDraftPlugin extends Plugin {
   sceneWorkspaceMode = false;
@@ -87,6 +88,11 @@ export default class FirstDraftPlugin extends Plugin {
       id: "open-first-draft-palette",
       name: "Open palette",
       callback: () => void this.openPalette(),
+    });
+    this.addCommand({
+      id: "install-offline-cjk-pdf-fonts",
+      name: "Install offline CJK PDF fonts",
+      callback: () => new CjkFontPackModal(this).open(),
     });
     this.addCommand({
       id: "open-scene-workspace",

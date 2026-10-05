@@ -14,7 +14,7 @@ is public and has a GitHub release.
 1. Install the **BRAT** community plugin in the mobile test vault.
 2. In BRAT, choose **Add Beta plugin**.
 3. Enter `grobmeier/firstdraft` and select the intended test release. For the
-   activated-note palette fix, select `0.13.1-beta.2` explicitly; the stable
+   activated-note palette and bundle-size fixes, select `0.13.1-beta.3` explicitly; the stable
    `0.13.0` release does not include it.
 4. Enable **First Draft** under **Settings → Community plugins**.
 5. Open the project fixture and complete the checklist below.
@@ -83,6 +83,13 @@ iPad acceptance.
   and landscape orientation without horizontal page clipping.
 - Export Fountain, FDX, and PDF files without changing the source document;
   open the PDF and confirm its pages are readable.
+- Confirm Latin PDFs work without the optional font pack. A CJK PDF should offer
+  clear installation instructions without saving a partial PDF. Run **Install
+  offline CJK PDF fonts**, select both official files from the device file picker,
+  then verify Japanese, Chinese and Korean PDF output and regional forms. See
+  [font-pack instructions](CJK_FONT_PACK.md). Verify cancelled selection, retry
+  after interrupted installation and reinstall on each device; do not assume
+  auxiliary font chunks are transferred by Obsidian Sync.
 - Change First Draft settings, restart Obsidian, and confirm they persist.
 - Lock and resume the device, then confirm the active screenplay still works.
 

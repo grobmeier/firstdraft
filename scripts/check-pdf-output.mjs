@@ -15,7 +15,7 @@
  */
 
 import { build } from "esbuild";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -38,6 +38,10 @@ try {
   });
   // eslint-disable-next-line no-unsanitized/method -- Fixed filename built by esbuild in our own newly created temporary directory.
   const { serializePdf, parseFountain } = await import(pathToFileURL(engine));
+  const loadCjkFonts = async () => ({
+    regular: await readFile("assets/fonts/noto-cjk/NotoSansCJK-Regular.woff"),
+    bold: await readFile("assets/fonts/noto-cjk/NotoSansCJK-Bold.woff"),
+  });
   await mkdir(output, { recursive: true });
   const source =
     "INT. 東京 / 北京 / 서울 - DAY\n\n@美咲\nこんにちは。「今日は雨です。」 English dialogue.\n\n@小李\n你好，世界！窗外下着雨。\n\n@小林\n繁體中文：窗外下著雨。\n\n@민수\n안녕하세요. 오늘은 비가 옵니다. 한글.\n\n!" +
@@ -51,6 +55,7 @@ try {
         language,
         pageSize,
         title: "CJK review",
+        loadCjkFonts,
       });
       const path = join(output, `cjk-${language}-${pageSize}.pdf`);
       await writeFile(path, bytes);
@@ -69,6 +74,7 @@ try {
         pageSize,
         title: "Title and continuation review",
         language: "ja",
+        loadCjkFonts,
       });
       await writeFile(
         join(output, `fidelity-${cjk ? "cjk" : "latin"}-${pageSize}.pdf`),

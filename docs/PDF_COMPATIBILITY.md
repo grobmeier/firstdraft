@@ -56,7 +56,10 @@ and right-to-left/complex-script layout is not guaranteed.
   as a selectable mode. One PDF uses one selected language.
 - CJK-containing PDFs use local Noto Sans CJK 2.004 regular/bold; Latin-only
   PDFs retain Liberation Mono. Noto is proportional for Latin letters. Both
-  fonts are bundled and glyph-subsetted into each PDF, with no network requests.
+  fonts are glyph-subsetted into each PDF, with no network requests. Install the
+  [optional offline CJK font pack](CJK_FONT_PACK.md) once on each device using
+  **Install offline CJK PDF fonts**. Latin fonts remain built into the plugin.
+  Missing/incomplete/corrupt CJK packs stop export without saving a partial PDF.
 - CJK wrapping uses measured font widths and Unicode line-break opportunities,
   with 14.4-point line spacing for readable 12-point CJK text (Latin-only output
   keeps its existing spacing),
@@ -67,8 +70,10 @@ and right-to-left/complex-script layout is not guaranteed.
   coverage are not promised. Newer/rare ideographs and emoji can still stop
   export with the existing diagnostic. Forced character cues (`@美咲`) remain
   useful for names without uppercase/lowercase forms.
-- The compressed Noto assets add approximately 23 MB before base64 bundling;
-  the plugin bundle is approximately 33 MB. Font decoding happens on CJK export,
+- The optional Noto assets total approximately 23.4 MB and are stored in six
+  verified chunks no larger than 4 MB; the core bundle is approximately 2.35 MB.
+  Standard release assets have an enforced 5 MB limit. Install auxiliary fonts
+  separately per device rather than relying on plugin-file sync. Font decoding happens on CJK export,
   not on a Latin-only export. PDF subsets are much smaller than these assets.
   Physical iPhone/iPad memory and performance acceptance remains required.
 
