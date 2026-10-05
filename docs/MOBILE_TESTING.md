@@ -14,7 +14,7 @@ is public and has a GitHub release.
 1. Install the **BRAT** community plugin in the mobile test vault.
 2. In BRAT, choose **Add Beta plugin**.
 3. Enter `grobmeier/firstdraft` and select the intended test release. For the
-   activated-note palette fix, select `0.13.1-beta.1` explicitly; the stable
+   activated-note palette fix, select `0.13.1-beta.2` explicitly; the stable
    `0.13.0` release does not include it.
 4. Enable **First Draft** under **Settings → Community plugins**.
 5. Open the project fixture and complete the checklist below.
