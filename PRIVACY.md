@@ -5,6 +5,12 @@ First Draft processes screenplay text locally inside Obsidian.
 - It does not include telemetry or analytics.
 - It does not send screenplay text or usage data over the network.
 - It does not require an account or cloud service.
+- Optional CJK PDF font installation reads only the two files explicitly selected
+  in the device file picker. Their official hashes are verified before storage
+  in the plugin configuration directory as six chunks of at most 4 MB. PDF
+  export reads only those known paths and verifies their hashes again. Fonts
+  are never automatically downloaded; the user may obtain the official files
+  separately through their browser. Auxiliary plugin-file sync is not assumed.
 - It reconstructs screenplay statistics from the current document rather than
   maintaining an external character database.
 - It does not enumerate every file in the vault. Project discovery is limited

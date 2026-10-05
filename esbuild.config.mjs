@@ -70,7 +70,7 @@ ${cjkLicense
   },
   entryPoints: ["src/main.ts"],
   bundle: true,
-  loader: { ".ttf": "dataurl", ".woff": "dataurl" },
+  loader: { ".ttf": "dataurl" },
   external: [
     "obsidian",
     "electron",

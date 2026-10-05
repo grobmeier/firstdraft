@@ -7,16 +7,27 @@ All notable changes to First Draft are documented here. This project follows
 
 ### Fixed
 
+- Reduce the core bundle from approximately 33.5 MB to 2.35 MB by moving CJK PDF
+  fonts into an optional, hash-verified offline pack. All standard assets must
+  now stay below 5 MB; production builds enforce the limit.
+
 - Keep the active Markdown note context when the First Draft palette takes focus;
   reject stale editors during note navigation.
 - Recognise current screenplay properties while metadata catches up, and show
   waiting feedback instead of activation for unknown or malformed properties.
 - Refresh the palette after activation and report an already-active note.
 
+### Added
+
+- Install offline CJK PDF fonts command with a device file picker, verified
+  regular/bold files and sub-5-MB local storage chunks. Missing or invalid packs
+  stop export with actionable feedback; Latin PDFs need no additional install.
+
 ### Testing
 
-- Added 24 regression checks for note context, property loading, palette rendering
-  and activation feedback. Physical iPad acceptance remains outstanding.
+- Added 46 regression checks for note context, property loading, palette rendering,
+  activation feedback, font-pack integrity/installation and release-asset size.
+  Physical iPad acceptance remains outstanding.
 - Beta releases use separate tags and attested assets without replacing the
   stable GitHub release.
 
