@@ -33,19 +33,19 @@
   "devDependencies": {
     "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/state": "^6.7.6",
-    "@codemirror/view": "^6.43.13",
-    "@types/node": "^26.6.2",
+    "@codemirror/view": "^6.43.14",
+    "@types/node": "^26.6.5",
     "@xmldom/xmldom": "^0.9.12",
     "esbuild": "0.28.2",
-    "eslint": "^10.11.0",
+    "eslint": "^10.13.0",
     "eslint-plugin-obsidianmd": "^0.4.2",
-    "globals": "^17.6.0",
+    "globals": "^17.13.0",
     "obsidian": "latest",
-    "prettier": "^3.9.9",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.1",
-    "vite": "8.3.1",
-    "vitest": "5.0.2"
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.71.2",
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
   },
   "overrides": {
     "moment": "2.31.0"
