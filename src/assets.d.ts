@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-declare module "*.ttf?inline" {
-  const data: string;
-  export default data;
-}
-
-declare module "*.woff?inline" {
-  const data: string;
+declare module "*.ttf?bytes" {
+  const data: Uint8Array;
   export default data;
 }
 

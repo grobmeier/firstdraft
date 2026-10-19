@@ -44,7 +44,12 @@ const CODE_EXTENSIONS = new Set([
   ".mts",
   ".ts",
 ]);
-const ROOT_FILES = ["esbuild.config.mjs", "eslint.config.mjs", "styles.css"];
+const ROOT_FILES = [
+  "esbuild.config.mjs",
+  "eslint.config.mjs",
+  "vite.config.mjs",
+  "styles.css",
+];
 const SOURCE_DIRECTORIES = ["scripts", "src", "tests"];
 const checkOnly = process.argv.includes("--check");
 

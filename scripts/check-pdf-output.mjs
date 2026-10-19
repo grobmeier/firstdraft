@@ -19,6 +19,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { fontBytesEsbuildPlugin } from "./font-bytes.mjs";
 
 const temporary = await mkdtemp(join(tmpdir(), "firstdraft-pdf-"));
 const output = resolve("output/pdf");
@@ -33,7 +34,7 @@ try {
     bundle: true,
     platform: "browser",
     format: "esm",
-    loader: { ".ttf": "dataurl", ".woff": "dataurl" },
+    plugins: [fontBytesEsbuildPlugin()],
     outfile: engine,
   });
   // eslint-disable-next-line no-unsanitized/method -- Fixed filename built by esbuild in our own newly created temporary directory.

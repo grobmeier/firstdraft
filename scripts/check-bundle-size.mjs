@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 
 export const MAX_RELEASE_ASSET_BYTES = 5_000_000;
 export function assertReleaseAssetSize(name, size) {
@@ -24,10 +24,18 @@ export function assertReleaseAssetSize(name, size) {
     );
 }
 
+export function assertNoNativeBase64Calls(source) {
+  if (/\b(?:atob|btoa)\s*\(/.test(source))
+    throw new Error(
+      "The release bundle must not call atob() or btoa(). Embed font bytes at build time instead.",
+    );
+}
+
 if (
   process.argv[1] &&
   import.meta.url === new URL(process.argv[1], "file:").href
 ) {
+  assertNoNativeBase64Calls(await readFile("main.js", "utf8"));
   for (const name of ["main.js", "manifest.json", "styles.css"]) {
     const { size } = await stat(name);
     assertReleaseAssetSize(name, size);

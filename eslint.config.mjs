@@ -34,9 +34,7 @@ export default tseslint.config(
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
       parserOptions: {
-        projectService: {
-          allowDefaultProject: ["*.config.mjs", "scripts/*.mjs"],
-        },
+        projectService: true,
       },
     },
   },

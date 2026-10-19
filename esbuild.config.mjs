@@ -18,6 +18,7 @@ import esbuild from "esbuild";
 import process from "node:process";
 import { builtinModules } from "node:module";
 import { readFileSync } from "node:fs";
+import { fontBytesEsbuildPlugin } from "./scripts/font-bytes.mjs";
 
 const fontLicense = readFileSync(
   new URL("./assets/fonts/liberation-mono/LICENSE", import.meta.url),
@@ -70,7 +71,7 @@ ${cjkLicense
   },
   entryPoints: ["src/main.ts"],
   bundle: true,
-  loader: { ".ttf": "dataurl" },
+  plugins: [fontBytesEsbuildPlugin()],
   external: [
     "obsidian",
     "electron",

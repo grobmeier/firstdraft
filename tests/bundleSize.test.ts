@@ -18,6 +18,35 @@ import { execFileSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 
 describe("release asset size guard", () => {
+  it.each(["atob('font')", "window.btoa('font')"])(
+    "rejects native runtime base64: %s",
+    (source) => {
+      expect(() =>
+        execFileSync(
+          process.execPath,
+          [
+            "--input-type=module",
+            "-e",
+            `import { assertNoNativeBase64Calls } from './scripts/check-bundle-size.mjs'; assertNoNativeBase64Calls(${JSON.stringify(source)});`,
+          ],
+          { stdio: "pipe" },
+        ),
+      ).toThrow();
+    },
+  );
+  it("accepts literal byte arrays without runtime base64", () => {
+    expect(() =>
+      execFileSync(
+        process.execPath,
+        [
+          "--input-type=module",
+          "-e",
+          "import { assertNoNativeBase64Calls } from './scripts/check-bundle-size.mjs'; assertNoNativeBase64Calls('new Uint8Array([0,1,255])');",
+        ],
+        { stdio: "pipe" },
+      ),
+    ).not.toThrow();
+  });
   it.each([0, 2_400_000, 4_999_999])("accepts %i bytes", (size) => {
     expect(() =>
       execFileSync(

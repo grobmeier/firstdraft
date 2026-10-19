@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "inlineSourceMap": true,
     "inlineSources": true,
     "lib": ["DOM", "ES2021", "ES2022.Intl", "ES2022.Object"],
@@ -12,5 +13,5 @@
     "target": "ES2021",
     "types": ["node", "vitest/globals"]
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", "scripts/*.mjs", "*.config.mjs"]
 }
