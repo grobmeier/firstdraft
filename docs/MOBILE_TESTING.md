@@ -6,7 +6,14 @@ verified mobile support; if a release proceeds without a device, disclose the
 untested layout/performance in its release notes.
 Use a dedicated test vault containing no private screenplay material.
 
-## Recommended: install the release candidate with BRAT
+## Install stable 0.13.1
+
+Use **Settings → Community plugins → Check for updates** to install 0.13.1,
+then restart Obsidian. It contains the palette-context and bundle-size fixes.
+If you pinned beta 3 in BRAT, use BRAT to select `0.13.1` explicitly before
+removing its beta tracking; do not rely on Obsidian's prerelease comparison.
+
+## Alternative: select an exact release with BRAT
 
 This path works on both Android and iOS/iPadOS once the First Draft repository
 is public and has a GitHub release.
@@ -14,8 +21,8 @@ is public and has a GitHub release.
 1. Install the **BRAT** community plugin in the mobile test vault.
 2. In BRAT, choose **Add Beta plugin**.
 3. Enter `grobmeier/firstdraft` and select the intended test release. For the
-   activated-note palette and bundle-size fixes, select `0.13.1-beta.3` explicitly; the stable
-   `0.13.0` release does not include it.
+   activated-note palette and bundle-size fixes, select `0.13.1` explicitly;
+   the old stable `0.13.0` release does not include them.
 4. Enable **First Draft** under **Settings → Community plugins**.
 5. Open the project fixture and complete the checklist below.
 

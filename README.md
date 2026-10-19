@@ -15,8 +15,12 @@ Search for **First Draft**, install it, and enable it. See the
 
 ## Features
 
-**0.13.0** adds the scene workspace and read-only continuity inspector described
-below. See the [release notes](docs/releases/0.13.0.md) for validation boundaries.
+**0.13.1** fixes the oversized plugin bundle and activated-note palette context,
+and removes native base64 decoding for bundled PDF fonts. CJK PDF export now
+uses a separately installed offline font pack. See the
+[release notes](docs/releases/0.13.1.md) for upgrade instructions and validation
+boundaries. The scene workspace and continuity inspector introduced in 0.13.0
+remain available.
 
 The current build provides:
 
@@ -85,7 +89,7 @@ The plugin also supports horizontal Chinese, Japanese and Korean
 PDFs with an [optional offline Noto font pack](docs/CJK_FONT_PACK.md) and measured
 wrapping. Run **Install offline CJK PDF fonts** once on each device that needs
 CJK PDFs. Select **PDF language** in First Draft settings for regional character
-forms. The core bundle is approximately 2.35 MB and its build enforces a 5 MB
+forms. The core bundle is approximately 3.34 MB and its build enforces a 5 MB
 release-asset limit. Preview pagination is approximate; inspect the exported
 PDF. Physical-phone font installation and export testing remain important.
 

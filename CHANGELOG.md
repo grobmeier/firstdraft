@@ -5,9 +5,11 @@ All notable changes to First Draft are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-10-19
+
 ### Fixed
 
-- Reduce the core bundle from approximately 33.5 MB to 2.35 MB by moving CJK PDF
+- Reduce the core bundle from approximately 33.5 MB to 3.34 MB by moving CJK PDF
   fonts into an optional, hash-verified offline pack. All standard assets must
   now stay below 5 MB; production builds enforce the limit.
 
@@ -16,6 +18,10 @@ All notable changes to First Draft are documented here. This project follows
 - Recognise current screenplay properties while metadata catches up, and show
   waiting feedback instead of activation for unknown or malformed properties.
 - Refresh the palette after activation and report an already-active note.
+- Embed bundled Latin PDF fonts as literal byte arrays, removing native
+  `atob()`/`btoa()` calls. Production builds reject these calls. Upstream PDF
+  libraries retain legitimate data-encoding utilities; see the scanner notes.
+- Update the development-only `source-map-js` dependency to patched 1.2.2.
 
 ### Added
 
@@ -25,8 +31,9 @@ All notable changes to First Draft are documented here. This project follows
 
 ### Testing
 
-- Added 46 regression checks for note context, property loading, palette rendering,
-  activation feedback, font-pack integrity/installation and release-asset size.
+- All 246 tests pass, including 52 checks added since 0.13.0 for note context,
+  property loading, palette rendering, activation feedback, font-pack integrity,
+  exact bundled font bytes, native base64 calls and release-asset size.
   Physical iPad acceptance remains outstanding.
 - Beta releases use separate tags and attested assets without replacing the
   stable GitHub release.
@@ -155,7 +162,9 @@ All notable changes to First Draft are documented here. This project follows
 - FDX export intentionally supports the six core screenplay element types; see
   `docs/FDX_COMPATIBILITY.md`.
 
-[Unreleased]: https://github.com/grobmeier/firstdraft/compare/0.12.0...HEAD
+[Unreleased]: https://github.com/grobmeier/firstdraft/compare/0.13.1...HEAD
+[0.13.1]: https://github.com/grobmeier/firstdraft/releases/tag/0.13.1
+[0.13.0]: https://github.com/grobmeier/firstdraft/releases/tag/0.13.0
 [0.12.0]: https://github.com/grobmeier/firstdraft/releases/tag/0.12.0
 [0.11.0]: https://github.com/grobmeier/firstdraft/releases/tag/0.11.0
 [0.10.2]: https://github.com/grobmeier/firstdraft/releases/tag/0.10.2
